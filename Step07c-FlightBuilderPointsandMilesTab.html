@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trip Studio   Flight Builder Points and Miles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deep: #0D0B0F; --bg-card: #16121A; --bg-card2: #1C1722;
+      --accent-gold: #C9A96E; --accent-gold2: #E8C98A;
+      --accent-rose: #D4848A; --accent-blush: #F2C4C4;
+      --accent-sage: #8DAF9B; --accent-lavender: #B8A9C9;
+      --text-primary: #F5EFE6; --text-muted: #9A8F8A; --text-label: #C9A96E;
+      --border: rgba(201,169,110,0.18); --border-subtle: rgba(255,255,255,0.06);
+      --sidebar-w: 248px;
+    }
+    html, body { height: 100%; background: var(--bg-deep); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 99px; }
+    .layout { display: flex; height: 100vh; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: linear-gradient(180deg, #110E15 0%, #0D0B0F 100%); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: relative; z-index: 10; flex-shrink: 0; }
+    .sidebar::before { content: ''; position: absolute; top: 0; right: 0; width: 1px; height: 100%; background: linear-gradient(180deg, transparent, var(--accent-gold), transparent); opacity: 0.3; }
+    .sidebar-brand { padding: 28px 24px 20px; border-bottom: 1px solid var(--border-subtle); }
+    .brand-logo { display: flex; align-items: center; gap: 10px; }
+    .brand-icon { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+    .brand-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .brand-sub { font-size: 10px; font-weight: 500; color: var(--text-label); letter-spacing: 0.14em; text-transform: uppercase; }
+    .sidebar-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
+    .nav-section-label { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); padding: 0 12px; margin: 20px 0 8px; }
+    .nav-section-label:first-child { margin-top: 0; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; color: var(--text-muted); font-size: 13.5px; text-decoration: none; position: relative; margin-bottom: 2px; }
+    .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+    .nav-item.active { background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(212,132,138,0.08)); color: var(--accent-gold2); font-weight: 500; border: 1px solid rgba(201,169,110,0.2); }
+    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 60%; background: linear-gradient(180deg, var(--accent-gold), var(--accent-rose)); border-radius: 0 3px 3px 0; }
+    .nav-badge { margin-left: auto; background: var(--accent-rose); color: white; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+    .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--border-subtle); }
+    .user-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gold), var(--accent-rose)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; font-family: 'Playfair Display', serif; border: 2px solid rgba(201,169,110,0.3); letter-spacing: 0.02em; }
+    .user-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .user-role { font-size: 11px; color: var(--text-label); }
+
+    /* MAIN */
+    .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; background: rgba(13,11,15,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 5; }
+    .page-breadcrumb { font-size: 12px; color: var(--text-muted); }
+    .page-breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .page-breadcrumb a:hover { color: var(--accent-gold); }
+    .page-breadcrumb span { color: var(--accent-gold); }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .topbar-search { position: relative; }
+    .topbar-search input { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 8px 14px 8px 36px; font-size: 12.5px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; outline: none; width: 220px; transition: border-color 0.2s ease; }
+    .topbar-search input:focus { border-color: var(--accent-gold); }
+    .topbar-search input::placeholder { color: var(--text-muted); }
+    .topbar-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--text-muted); pointer-events: none; }
+    .topbar-notif { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; position: relative; }
+    .notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: var(--accent-rose); border-radius: 50%; border: 1.5px solid var(--bg-deep); }
+
+    /* WORKFLOW PROGRESS BAR */
+    .workflow-bar {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 16px 32px;
+    }
+    .workflow-steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      max-width: 900px;
+    }
+    .workflow-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      position: relative;
+    }
+    .workflow-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 32px;
+      right: -10px;
+      top: 15px;
+      height: 2px;
+      background: var(--border-subtle);
+      z-index: 0;
+    }
+    .workflow-step.done:not(:last-child)::after { background: var(--accent-gold); opacity: 0.5; }
+    .workflow-step.active:not(:last-child)::after { background: var(--border-subtle); }
+    .step-circle {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+      transition: all 0.3s ease;
+    }
+    .step-circle.done { background: linear-gradient(135deg, var(--accent-gold), #B8905A); color: #0D0B0F; }
+    .step-circle.active { background: linear-gradient(135deg, var(--accent-rose), #C06870); color: white; box-shadow: 0 0 0 4px rgba(212,132,138,0.2); }
+    .step-circle.pending { background: var(--bg-card2); border: 2px solid var(--border-subtle); color: var(--text-muted); }
+    .step-label { font-size: 11px; font-weight: 500; white-space: nowrap; }
+    .step-label.done { color: var(--accent-gold); }
+    .step-label.active { color: var(--text-primary); }
+    .step-label.pending { color: var(--text-muted); }
+
+    /* CONTENT */
+    .content { padding: 32px; flex: 1; }
+
+    /* UPLOAD STEP */
+    .upload-step { display: none; }
+    .upload-step.visible { display: block; }
+
+    .step-header { margin-bottom: 28px; }
+    .step-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-label); margin-bottom: 8px; }
+    .step-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; max-width: 560px; }
+
+    .upload-zone {
+      border: 2px dashed rgba(201,169,110,0.3);
+      border-radius: 18px;
+      padding: 48px 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      background: rgba(201,169,110,0.03);
+      max-width: 600px;
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--accent-gold);
+      background: rgba(201,169,110,0.07);
+    }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-icon { font-size: 44px; margin-bottom: 14px; }
+    .upload-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+    .upload-sub { font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
+    .upload-types { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .upload-type-pill { font-size: 11px; font-weight: 600; padding: 5px 14px; border-radius: 99px; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.25); color: var(--accent-gold); }
+
+    /* UPLOADED STATE */
+    .uploaded-file {
+      display: none;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      background: rgba(141,175,155,0.08);
+      border: 1px solid rgba(141,175,155,0.25);
+      border-radius: 14px;
+      max-width: 600px;
+      margin-top: 14px;
+    }
+    .uploaded-file.visible { display: flex; }
+    .uploaded-icon { font-size: 28px; }
+    .uploaded-name { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+    .uploaded-size { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .uploaded-status { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--accent-sage); font-weight: 600; }
+
+    /* PROCESSING STATE */
+    .processing-card {
+      display: none;
+      max-width: 600px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      margin-top: 20px;
+    }
+    .processing-card.visible { display: block; }
+    .processing-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .processing-spinner { width: 36px; height: 36px; border: 3px solid rgba(201,169,110,0.2); border-top-color: var(--accent-gold); border-radius: 50%; animation: spin 1s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .processing-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .processing-sub { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+    .processing-items { display: flex; flex-direction: column; gap: 8px; }
+    .processing-item { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--text-muted); }
+    .processing-item.done { color: var(--accent-sage); }
+    .processing-item.active { color: var(--text-primary); }
+    .p-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .p-dot.done { background: var(--accent-sage); }
+    .p-dot.active { background: var(--accent-gold); animation: pulse 1s infinite; }
+    .p-dot.pending { background: var(--border-subtle); }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* STEP ACTIONS */
+    .step-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+      max-width: 600px;
+    }
+    .btn-primary { padding: 13px 28px; background: linear-gradient(135deg, var(--accent-gold), #B8905A); border-radius: 10px; font-size: 13px; font-weight: 600; color: #0D0B0F; cursor: pointer; transition: all 0.2s ease; border: none; }
+    .btn-primary:hover { box-shadow: 0 6px 20px rgba(201,169,110,0.35); transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-ghost { padding: 13px 24px; background: transparent; border: 1px solid var(--border-subtle); border-radius: 10px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; }
+    .btn-ghost:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+    /* PROFILE STEP */
+    .profile-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+
+    /* HERO IMAGE BUILDER */
+    .hero-builder {
+      border-radius: 18px;
+      overflow: hidden;
+      position: relative;
+      height: 240px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 20px;
+    }
+    .hero-img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-overlay-dark { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(13,11,15,0.85) 100%); }
+    .hero-actions-bar {
+      position: absolute;
+      top: 14px; right: 14px;
+      display: flex; gap: 8px;
+    }
+    .hero-action-btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+    }
+    .hero-btn-regen { background: rgba(201,169,110,0.85); color: #0D0B0F; }
+    .hero-btn-regen:hover { background: var(--accent-gold); }
+    .hero-btn-upload { background: rgba(13,11,15,0.7); color: var(--text-primary); border: 1px solid rgba(255,255,255,0.15); }
+    .hero-btn-upload:hover { border-color: var(--accent-gold); }
+    .hero-btn-url { background: rgba(13,11,15,0.7); color: var(--text-primary); border: 1px solid rgba(255,255,255,0.15); }
+    .hero-btn-url:hover { border-color: var(--accent-gold); }
+    .hero-dest-label { position: absolute; bottom: 16px; left: 20px; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--text-primary); text-shadow: 0 2px 12px rgba(0,0,0,0.6); }
+    .hero-ai-badge { position: absolute; bottom: 16px; right: 16px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 99px; background: rgba(201,169,110,0.2); border: 1px solid rgba(201,169,110,0.35); color: var(--accent-gold); backdrop-filter: blur(8px); }
+
+    /* URL INPUT (hidden by default) */
+    .url-input-row { display: none; gap: 10px; margin-top: 10px; }
+    .url-input-row.visible { display: flex; }
+    .url-input { flex: 1; background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s ease; }
+    .url-input:focus { border-color: var(--accent-gold); }
+    .url-input::placeholder { color: var(--text-muted); }
+    .url-apply-btn { padding: 10px 18px; background: linear-gradient(135deg, var(--accent-gold), #B8905A); border-radius: 10px; font-size: 12px; font-weight: 600; color: #0D0B0F; cursor: pointer; white-space: nowrap; }
+
+    /* PROFILE SECTIONS */
+    .profile-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin-bottom: 16px; overflow: hidden; }
+    .profile-section-header { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .profile-section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+    .profile-section-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-gold); }
+    .profile-section-edit { font-size: 11px; color: var(--text-label); cursor: pointer; transition: color 0.2s ease; }
+    .profile-section-edit:hover { color: var(--accent-gold2); }
+    .profile-section-body { padding: 16px 18px; }
+
+    /* FORM FIELDS */
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .field-full { grid-column: 1 / -1; }
+    .field-group { display: flex; flex-direction: column; gap: 5px; }
+    .field-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .field-input {
+      background: var(--bg-card2);
+      border: 1px solid var(--border-subtle);
+      border-radius: 9px;
+      padding: 10px 13px;
+      font-size: 13px;
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s ease;
+      width: 100%;
+    }
+    .field-input:focus { border-color: var(--accent-gold); }
+    .field-input::placeholder { color: var(--text-muted); }
+    .field-textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+    .field-select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239A8F8A' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+    .field-input option { background: var(--bg-card2); }
+
+    /* DESTINATION TAGS */
+    .dest-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+    .dest-tag { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(201,169,110,0.12); border: 1px solid rgba(201,169,110,0.25); border-radius: 99px; font-size: 12px; font-weight: 500; color: var(--accent-gold); }
+    .dest-tag-remove { cursor: pointer; font-size: 11px; color: var(--text-muted); transition: color 0.2s ease; }
+    .dest-tag-remove:hover { color: var(--accent-rose); }
+    .dest-add-row { display: flex; gap: 8px; }
+    .dest-add-input { flex: 1; }
+    .dest-add-btn { padding: 10px 16px; background: rgba(201,169,110,0.15); border: 1px solid rgba(201,169,110,0.25); border-radius: 9px; font-size: 12px; font-weight: 600; color: var(--accent-gold); cursor: pointer; white-space: nowrap; transition: all 0.2s ease; }
+    .dest-add-btn:hover { background: rgba(201,169,110,0.25); }
+
+    /* TRIP STAGE TRACKER */
+    .stage-tracker { display: flex; flex-direction: column; gap: 6px; }
+    .stage-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; font-size: 12.5px; }
+    .stage-item.done { background: rgba(141,175,155,0.08); color: var(--accent-sage); }
+    .stage-item.active { background: rgba(201,169,110,0.1); color: var(--accent-gold); border: 1px solid rgba(201,169,110,0.2); }
+    .stage-item.pending { color: var(--text-muted); }
+    .stage-icon { font-size: 14px; flex-shrink: 0; }
+
+    /* SECTION SELECTOR POPUP */
+    .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+    .popup-overlay.open { opacity: 1; pointer-events: all; }
+    .popup { background: var(--bg-card); border: 1px solid var(--border); border-radius: 22px; padding: 32px; max-width: 520px; width: 90%; transform: scale(0.95); transition: transform 0.25s ease; }
+    .popup-overlay.open .popup { transform: scale(1); }
+    .popup-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+    .popup-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+    .section-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .section-option { padding: 18px; background: var(--bg-card2); border: 2px solid var(--border-subtle); border-radius: 14px; cursor: pointer; transition: all 0.2s ease; text-align: center; }
+    .section-option:hover { border-color: var(--accent-gold); background: rgba(201,169,110,0.06); }
+    .section-option.selected { border-color: var(--accent-gold); background: rgba(201,169,110,0.1); }
+    .section-option-icon { font-size: 28px; margin-bottom: 8px; }
+    .section-option-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+    .section-option-desc { font-size: 11px; color: var(--text-muted); }
+    .popup-actions { display: flex; gap: 10px; }
+
+    /* FLIGHT BUILDER */
+    .flight-type-tabs { display: flex; background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 4px; gap: 4px; margin-bottom: 20px; max-width: 360px; }
+    .flight-tab { flex: 1; padding: 9px 16px; border-radius: 7px; font-size: 12.5px; font-weight: 500; text-align: center; cursor: pointer; transition: all 0.2s ease; color: var(--text-muted); }
+    .flight-tab.active { background: linear-gradient(135deg, rgba(201,169,110,0.2), rgba(212,132,138,0.1)); color: var(--accent-gold2); border: 1px solid rgba(201,169,110,0.2); }
+
+    .flight-section { display: none; }
+    .flight-section.visible { display: block; }
+
+    .points-bank-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+    .bank-card { padding: 12px 8px; background: var(--bg-card2); border: 2px solid var(--border-subtle); border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+    .bank-card:hover { border-color: var(--accent-gold); }
+    .bank-card.selected { border-color: var(--accent-gold); background: rgba(201,169,110,0.1); }
+    .bank-card-icon { font-size: 22px; margin-bottom: 6px; }
+    .bank-card-name { font-size: 10px; font-weight: 600; color: var(--text-muted); }
+    .bank-card.selected .bank-card-name { color: var(--accent-gold); }
+
+    .generated-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 12px; border-radius: 99px; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.2); color: var(--accent-gold); margin-bottom: 14px; }
+
+    .flight-save-row { display: flex; align-items: center; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-subtle); }
+    .add-another-link { font-size: 12.5px; color: var(--text-label); cursor: pointer; transition: color 0.2s ease; }
+    .add-another-link:hover { color: var(--accent-gold2); }
+
+    /* FLIGHT COUNTER */
+    .flight-counter { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+    .flight-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-subtle); }
+    .flight-dot.filled { background: var(--accent-gold); }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+    <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <div class="brand-icon"><img src="assets/globe-mascot.png" alt="" style="width:36px;height:36px;border-radius:10px;object-fit:contain;" /></div>
+        <div class="brand-name">
+          <div class="brand-title">Trip Studio</div>
+          <div class="brand-sub">BY MAME DEE</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">MAIN</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Client Trips
+      </a>
+      <a href="#" class="nav-item  active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Trip
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Vault
+      </a>
+      <div class="nav-section-label">SETTINGS</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item" style="color:var(--text-muted);font-size:12.5px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Exit to WordPress
+      </a>
+      <div class="user-card" style="margin-top:8px;">
+        <img src="assets/agent-dee.png" alt="Agent Dee" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,169,110,0.3);" />
+        <div>
+          <div class="user-name">Agent Dee</div>
+          <div class="user-role" style="color:var(--accent-gold);">AI Assistant</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="page-breadcrumb">
+        <a href="client-trips.html">Client Trips</a> &nbsp;/&nbsp; <span>New Client</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <span class="topbar-search-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          <input type="text" placeholder="Search trips, clients, destinations..." />
+        </div>
+        <div class="topbar-notif"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="notif-dot"></span></div>
+        <span style="font-size:13px;color:var(--text-primary);font-weight:500;">Good morning, <span style="color:var(--accent-gold);font-family:'Playfair Display',serif;font-style:italic;">Deja</span></span>
+      </div>
+    </div>
+
+    <!-- WORKFLOW PROGRESS BAR -->
+    <div class="workflow-bar">
+      <div class="workflow-steps">
+        <div class="workflow-step done" id="wStep1">
+          <div class="step-circle done"></div>
+          <span class="step-label done">Questionnaire</span>
+        </div>
+        <div class="workflow-step active" id="wStep2">
+          <div class="step-circle active">2</div>
+          <span class="step-label active">Consultation</span>
+        </div>
+        <div class="workflow-step pending" id="wStep3">
+          <div class="step-circle pending">3</div>
+          <span class="step-label pending">Client Profile</span>
+        </div>
+        <div class="workflow-step pending" id="wStep4">
+          <div class="step-circle pending">4</div>
+          <span class="step-label pending">Trip Sections</span>
+        </div>
+        <div class="workflow-step pending" id="wStep5">
+          <div class="step-circle pending">5</div>
+          <span class="step-label pending">Flights</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT AREA -->
+    <div class="content">
+
+      <!-- ═══ STEP 1: QUESTIONNAIRE UPLOAD ═══════════════ -->
+      <div class="upload-step" id="step1">
+        <div class="step-header">
+          <div class="step-eyebrow">Step 1 of 5</div>
+          <h1 class="step-title">Upload Client Questionnaire</h1>
+          <p class="step-desc">Upload the completed questionnaire as a PDF or TXT file, or paste the exported text. Dee will extract all the key details automatically.</p>
+        </div>
+
+        <div class="upload-zone" id="uploadZone1" onclick="simulateUpload(1)">
+          <input type="file" accept=".pdf,.txt" />
+          <div class="upload-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+          <div class="upload-title">Drop your questionnaire here</div>
+          <div class="upload-sub">Drag and drop, or click to browse.<br/>Supports PDF and TXT files from your questionnaire form.</div>
+          <div class="upload-types">
+            <span class="upload-type-pill">PDF</span>
+            <span class="upload-type-pill">TXT</span>
+          </div>
+        </div>
+
+        <div class="uploaded-file" id="uploaded1">
+          <span class="uploaded-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+          <div>
+            <div class="uploaded-name">Sarah_Michael_Questionnaire.pdf</div>
+            <div class="uploaded-size">142 KB · Uploaded just now</div>
+          </div>
+          <div class="uploaded-status">Uploaded</div>
+        </div>
+
+        <div class="processing-card" id="processing1">
+          <div class="processing-header">
+            <div class="processing-spinner"></div>
+            <div>
+              <div class="processing-title">Dee is reading the questionnaire...</div>
+              <div class="processing-sub">Extracting traveler info, destinations, and preferences</div>
+            </div>
+          </div>
+          <div class="processing-items">
+            <div class="processing-item done"><div class="p-dot done"></div>Traveler name, email, and phone extracted</div>
+            <div class="processing-item done"><div class="p-dot done"></div>Travel dates and destinations identified</div>
+            <div class="processing-item active"><div class="p-dot active"></div>Extracting budget, group size, and preferences...</div>
+            <div class="processing-item pending"><div class="p-dot pending"></div>Dietary needs and special requests</div>
+            <div class="processing-item pending"><div class="p-dot pending"></div>Building client profile</div>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn-primary" id="nextBtn1" onclick="goToStep(2)" disabled>Continue to Consultation</button>
+          <button class="btn-ghost" onclick="window.location='client-trips.html'">Cancel</button>
+        </div>
+      </div>
+
+      <!-- ═══ STEP 2: CONSULTATION UPLOAD ═══════════════ -->
+      <div class="upload-step" id="step2">
+        <div class="step-header">
+          <div class="step-eyebrow">Step 2 of 5</div>
+          <h1 class="step-title">Upload Consultation Notes</h1>
+          <p class="step-desc">Upload the written transcript or your filled-out consultation form. Dee will combine this with the questionnaire to complete the client profile.</p>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-bottom:20px;">
+          <div style="flex:1;padding:14px 18px;background:rgba(141,175,155,0.08);border:1px solid rgba(141,175,155,0.25);border-radius:12px;display:flex;align-items:center;gap:12px;">
+            <span style="font-size:20px;"></span>
+            <div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--accent-sage);">Questionnaire processed</div>
+              <div style="font-size:11px;color:var(--text-muted);">Sarah_Michael_Questionnaire.pdf · 22 fields extracted</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="upload-zone" id="uploadZone2" onclick="simulateUpload(2)">
+          <input type="file" accept=".pdf,.txt,.docx" />
+          <div class="upload-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <div class="upload-title">Drop your consultation notes here</div>
+          <div class="upload-sub">Upload a written transcript, your filled-out consultation form,<br/>or paste notes as a TXT file.</div>
+          <div class="upload-types">
+            <span class="upload-type-pill">PDF</span>
+            <span class="upload-type-pill">TXT</span>
+            <span class="upload-type-pill">DOCX</span>
+          </div>
+        </div>
+
+        <div class="uploaded-file" id="uploaded2">
+          <span class="uploaded-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+          <div>
+            <div class="uploaded-name">Sarah_Michael_Consultation.pdf</div>
+            <div class="uploaded-size">89 KB · Uploaded just now</div>
+          </div>
+          <div class="uploaded-status">Uploaded</div>
+        </div>
+
+        <div class="processing-card" id="processing2">
+          <div class="processing-header">
+            <div class="processing-spinner"></div>
+            <div>
+              <div class="processing-title">Dee is combining both documents...</div>
+              <div class="processing-sub">Building the complete client profile from questionnaire + consultation</div>
+            </div>
+          </div>
+          <div class="processing-items">
+            <div class="processing-item done"><div class="p-dot done"></div>Lodging preferences extracted</div>
+            <div class="processing-item done"><div class="p-dot done"></div>Dietary restrictions and allergies noted</div>
+            <div class="processing-item active"><div class="p-dot active"></div>Generating hero image for Lisbon, Portugal...</div>
+            <div class="processing-item pending"><div class="p-dot pending"></div>Finalizing client profile</div>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn-primary" id="nextBtn2" onclick="goToStep(3)" disabled>Build Client Profile</button>
+          <button class="btn-ghost" onclick="goToStep(1)">← Back</button>
+        </div>
+      </div>
+
+      <!-- ═══ STEP 3: CLIENT PROFILE ═══════════════════ -->
+      <div class="upload-step" id="step3">
+        <div class="step-header">
+          <div class="step-eyebrow">Step 3 of 5</div>
+          <h1 class="step-title">Client Profile</h1>
+          <p class="step-desc">Dee has auto-populated everything from the questionnaire and consultation. Review, edit any field, then save and continue.</p>
+        </div>
+
+        <div class="profile-grid">
+          <div>
+
+            <!-- HERO IMAGE -->
+            <div class="hero-builder">
+              <img class="hero-img" src="assets/lisbon.jpg" alt="Lisbon hero" id="heroImg" />
+              <div class="hero-overlay-dark"></div>
+              <div class="hero-actions-bar">
+                <div class="hero-action-btn hero-btn-regen" onclick="regenHero()">Regenerate</div>
+                <div class="hero-action-btn hero-btn-upload" onclick="document.getElementById('heroUpload').click()">Upload Image</div>
+                <div class="hero-action-btn hero-btn-url" onclick="toggleUrlInput()">Paste URL</div>
+              </div>
+              <input type="file" id="heroUpload" accept="image/*" style="display:none;" onchange="previewHero(this)" />
+              <div class="hero-dest-label">Lisbon, Portugal</div>
+              <div class="hero-ai-badge">AI Generated</div>
+            </div>
+
+            <div class="url-input-row" id="urlInputRow">
+              <input class="url-input" type="url" placeholder="Paste image URL here (e.g. https://unsplash.com/...)" id="heroUrlInput" />
+              <div class="url-apply-btn" onclick="applyUrl()">Apply</div>
+            </div>
+
+            <!-- CONTACT INFO -->
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <div class="profile-section-title"><div class="profile-section-dot"></div>Contact Information</div>
+                <span class="profile-section-edit">Edit</span>
+              </div>
+              <div class="profile-section-body">
+                <div class="field-grid">
+                  <div class="field-group">
+                    <label class="field-label">Full Name</label>
+                    <input class="field-input" type="text" value="Sarah & Michael Thompson" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Email</label>
+                    <input class="field-input" type="email" value="sarah.thompson@email.com" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Phone</label>
+                    <input class="field-input" type="tel" value="(555) 847-2910" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Special Occasion</label>
+                    <input class="field-input" type="text" value="5th Wedding Anniversary" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TRIP DETAILS -->
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <div class="profile-section-title"><div class="profile-section-dot" style="background:var(--accent-rose)"></div>Trip Details</div>
+                <span class="profile-section-edit">Edit</span>
+              </div>
+              <div class="profile-section-body">
+
+                <div style="margin-bottom:14px;">
+                  <div class="field-label" style="margin-bottom:8px;">Destinations</div>
+                  <div class="dest-tags" id="destTags">
+                    <div class="dest-tag">Lisbon, Portugal <span class="dest-tag-remove" onclick="removeTag(this)"></span></div>
+                    <div class="dest-tag">Sintra, Portugal <span class="dest-tag-remove" onclick="removeTag(this)"></span></div>
+                  </div>
+                  <div class="dest-add-row">
+                    <input class="field-input dest-add-input" type="text" placeholder="Add city or country..." id="destInput" />
+                    <div class="dest-add-btn" onclick="addDestination()">+ Add</div>
+                  </div>
+                </div>
+
+                <div class="field-grid">
+                  <div class="field-group">
+                    <label class="field-label">Departure Date</label>
+                    <input class="field-input" type="date" value="2026-10-05" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Return Date</label>
+                    <input class="field-input" type="date" value="2026-10-14" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Number of Adults</label>
+                    <input class="field-input" type="number" value="2" min="1" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Children (ages)</label>
+                    <input class="field-input" type="text" value="None" placeholder="e.g. 2 children: ages 5 and 8" />
+                  </div>
+                </div>
+
+                <div class="field-grid" style="margin-top:12px;">
+                  <div class="field-group">
+                    <label class="field-label">Total Budget</label>
+                    <input class="field-input" type="text" value="$8,000 – $12,000" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Budget Flexibility</label>
+                    <select class="field-input field-select">
+                      <option>Flexible</option>
+                      <option>Strict</option>
+                      <option>Very Flexible</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PREFERENCES -->
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <div class="profile-section-title"><div class="profile-section-dot" style="background:var(--accent-sage)"></div>Preferences &amp; Interests</div>
+                <span class="profile-section-edit">Edit</span>
+              </div>
+              <div class="profile-section-body">
+                <div class="field-grid">
+                  <div class="field-group">
+                    <label class="field-label">Travel Style</label>
+                    <select class="field-input field-select">
+                      <option selected>Romantic / Luxury</option>
+                      <option>Adventure</option>
+                      <option>Cultural</option>
+                      <option>Relaxed</option>
+                      <option>Budget</option>
+                    </select>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Pace</label>
+                    <select class="field-input field-select">
+                      <option>Relaxed</option>
+                      <option selected>Moderate</option>
+                      <option>Packed</option>
+                    </select>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Accommodation Type</label>
+                    <select class="field-input field-select">
+                      <option selected>Luxury Hotel</option>
+                      <option>Boutique Hotel</option>
+                      <option>Mid-tier Hotel</option>
+                      <option>Airbnb</option>
+                      <option>Hostel</option>
+                    </select>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Cabin Class Preference</label>
+                    <select class="field-input field-select">
+                      <option>Economy</option>
+                      <option selected>Premium Economy</option>
+                      <option>Business</option>
+                      <option>First Class</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field-group" style="margin-top:12px;">
+                  <label class="field-label">Interests &amp; Activities</label>
+                  <input class="field-input" type="text" value="Fine dining, wine tasting, historical sites, romantic walks, day trips" />
+                </div>
+              </div>
+            </div>
+
+            <!-- DIETARY / ALLERGIES -->
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <div class="profile-section-title"><div class="profile-section-dot" style="background:var(--accent-rose)"></div>Dietary Needs &amp; Allergies</div>
+                <span class="profile-section-edit">Edit</span>
+              </div>
+              <div class="profile-section-body">
+                <div class="field-grid">
+                  <div class="field-group">
+                    <label class="field-label">Dietary Restrictions</label>
+                    <input class="field-input" type="text" value="None" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Allergies</label>
+                    <input class="field-input" type="text" value="Michael: shellfish allergy" />
+                  </div>
+                </div>
+                <div class="field-group" style="margin-top:12px;">
+                  <label class="field-label">Food Preferences</label>
+                  <input class="field-input" type="text" value="Loves local cuisine, prefers candlelit restaurants, no fast food" />
+                </div>
+              </div>
+            </div>
+
+            <!-- SPECIAL REQUESTS -->
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <div class="profile-section-title"><div class="profile-section-dot" style="background:var(--accent-lavender)"></div>Special Requests &amp; Notes</div>
+                <span class="profile-section-edit">Edit</span>
+              </div>
+              <div class="profile-section-body">
+                <textarea class="field-input field-textarea">Celebrating 5th anniversary   prioritize romantic atmosphere. Michael has shellfish allergy, flag for all restaurant bookings. They want a mix of relaxation and exploration. Interested in a Fado dinner experience. Would love a day trip to Sintra.</textarea>
+              </div>
+            </div>
+
+            <!-- TRAVEL REQUIREMENTS -->
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <div class="profile-section-title">
+                  <div class="profile-section-dot" style="background:var(--accent-rose)"></div>
+                  Travel Requirements
+                </div>
+                <span class="profile-section-edit">Regenerate</span>
+              </div>
+              <div class="profile-section-body">
+            
+                <!-- CITIZENSHIP SELECTOR -->
+                <div style="margin-bottom:16px;">
+                  <label class="field-label" style="display:block;margin-bottom:8px;">Client Citizenship</label>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;" id="citizenshipBtns">
+                    <div class="citizenship-btn active" onclick="selectCitizenship(this,'US')">American</div>
+                    <div class="citizenship-btn" onclick="selectCitizenship(this,'UK')">British (UK)</div>
+                    <div class="citizenship-btn" onclick="selectCitizenship(this,'EU')">European Union</div>
+                    <div class="citizenship-btn" onclick="selectCitizenship(this,'CA')">Canadian</div>
+                    <div class="citizenship-btn" onclick="selectCitizenship(this,'AU')">Australian</div>
+                    <div class="citizenship-btn" onclick="selectCitizenship(this,'OTHER')">Other</div>
+                  </div>
+                </div>
+            
+                <!-- AI BADGE -->
+                <div style="display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:4px 12px;border-radius:99px;background:rgba(201,169,110,0.1);border:1px solid rgba(201,169,110,0.2);color:var(--accent-gold);margin-bottom:14px;">
+                  Auto-populated for US citizens traveling to Portugal
+                </div>
+            
+                <!-- REQUIREMENTS GRID -->
+                <div style="display:flex;flex-direction:column;gap:8px;" id="requirementsGrid">
+            
+                  <div class="req-item req-ok">
+                    <div class="req-status-dot req-dot-ok"></div>
+                    <div class="req-info">
+                      <div class="req-name">Passport</div>
+                      <div class="req-detail">Valid US passport required. Must be valid for at least 3 months beyond your stay.</div>
+                    </div>
+                    <div class="req-badge req-badge-ok">Required</div>
+                  </div>
+            
+                  <div class="req-item req-ok">
+                    <div class="req-status-dot req-dot-ok"></div>
+                    <div class="req-info">
+                      <div class="req-name">Visa</div>
+                      <div class="req-detail">No visa required for US citizens. Portugal is part of the Schengen Area. Stays up to 90 days are visa-free.</div>
+                    </div>
+                    <div class="req-badge req-badge-ok">Visa-Free</div>
+                  </div>
+            
+                  <div class="req-item req-warning">
+                    <div class="req-status-dot req-dot-warning"></div>
+                    <div class="req-info">
+                      <div class="req-name">ETIAS (Coming 2025)</div>
+                      <div class="req-detail">The EU ETIAS travel authorization will be required for US citizens entering the Schengen Area. Cost: 7 EUR. Valid 3 years.</div>
+                    </div>
+                    <div class="req-badge req-badge-warning">Check Status</div>
+                  </div>
+            
+                  <div class="req-item req-ok">
+                    <div class="req-status-dot req-dot-ok"></div>
+                    <div class="req-info">
+                      <div class="req-name">Vaccinations</div>
+                      <div class="req-detail">No vaccinations required for Portugal. Routine vaccines (COVID-19, flu) recommended.</div>
+                    </div>
+                    <div class="req-badge req-badge-ok">None Required</div>
+                  </div>
+            
+                </div>
+              </div>
+            </div>
+            
+            <!-- FYI SECTION -->
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <div class="profile-section-title">
+                  <div class="profile-section-dot" style="background:var(--accent-lavender)"></div>
+                  FYI &amp; Entry Notes
+                </div>
+                <span class="profile-section-edit">Regenerate</span>
+              </div>
+              <div class="profile-section-body">
+            
+                <div style="display:flex;flex-direction:column;gap:10px;">
+            
+                  <!-- ENTRY FORMS -->
+                  <div style="padding:13px 15px;background:rgba(184,169,201,0.07);border:1px solid rgba(184,169,201,0.2);border-radius:11px;">
+                    <div style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-lavender);margin-bottom:6px;">Entry Forms &amp; Smart Pages</div>
+                    <div style="font-size:12.5px;color:var(--text-muted);line-height:1.7;">No mandatory entry forms required for Portugal as of 2026. However, the EU ETIAS pre-travel authorization is expected to launch and will need to be completed online before departure.</div>
+                  </div>
+            
+                  <!-- CUSTOMS & RESTRICTIONS -->
+                  <div style="padding:13px 15px;background:rgba(212,132,138,0.07);border:1px solid rgba(212,132,138,0.2);border-radius:11px;">
+                    <div style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-rose);margin-bottom:6px;">Restricted &amp; Illegal Items</div>
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                      <div style="font-size:12.5px;color:var(--text-muted);">Cannabis is decriminalized for personal use but not legal to purchase or carry in quantity.</div>
+                      <div style="font-size:12.5px;color:var(--text-muted);">Certain prescription medications require a doctor's letter. Codeine-based products are restricted.</div>
+                      <div style="font-size:12.5px;color:var(--text-muted);">Cash over 10,000 EUR must be declared at customs.</div>
+                    </div>
+                  </div>
+            
+                  <!-- MEDICATION NOTES -->
+                  <div style="padding:13px 15px;background:rgba(201,169,110,0.07);border:1px solid rgba(201,169,110,0.18);border-radius:11px;">
+                    <div style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-gold);margin-bottom:6px;">Medication &amp; Health Notes</div>
+                    <div style="font-size:12.5px;color:var(--text-muted);line-height:1.7;">Carry a doctor's prescription for any controlled medications. European pharmacies are well-stocked. Emergency number in Portugal: 112.</div>
+                  </div>
+            
+                  <!-- CURRENCY & TIPPING -->
+                  <div style="padding:13px 15px;background:rgba(141,175,155,0.07);border:1px solid rgba(141,175,155,0.2);border-radius:11px;">
+                    <div style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-sage);margin-bottom:6px;">Currency &amp; Practical Info</div>
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                      <div style="display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:var(--text-muted);">Currency</span><span style="color:var(--text-primary);font-weight:500;">Euro (EUR)</span></div>
+                      <div style="display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:var(--text-muted);">Tipping</span><span style="color:var(--text-primary);font-weight:500;">Not mandatory, 5-10% appreciated</span></div>
+                      <div style="display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:var(--text-muted);">Plug Type</span><span style="color:var(--text-primary);font-weight:500;">Type F (EU) · Adapter needed</span></div>
+                      <div style="display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:var(--text-muted);">Emergency</span><span style="color:var(--text-primary);font-weight:500;">112</span></div>
+                    </div>
+                  </div>
+            
+                </div>
+              </div>
+            </div>
+            
+            <!-- AFFILIATE & REFERRAL LINKS -->
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <div class="profile-section-title">
+                  <div class="profile-section-dot" style="background:var(--accent-gold)"></div>
+                  Affiliate &amp; Referral Links
+                </div>
+                <span class="profile-section-edit">Manage Links</span>
+              </div>
+              <div class="profile-section-body">
+            
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Select the affiliate programs to include in this client's trip. Your referral link will be auto-generated and attached to the preview page.</div>
+            
+                <div style="display:flex;flex-direction:column;gap:8px;" id="affiliateList">
+            
+                  <div class="affiliate-item selected" onclick="toggleAffiliate(this)">
+                    <div class="affiliate-check">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="affiliate-info">
+                      <div class="affiliate-name">Rakuten</div>
+                      <div class="affiliate-sub">Cashback on hotel and flight bookings</div>
+                    </div>
+                    <div class="affiliate-link">rakuten.com/r/mamedee</div>
+                  </div>
+            
+                  <div class="affiliate-item selected" onclick="toggleAffiliate(this)">
+                    <div class="affiliate-check">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="affiliate-info">
+                      <div class="affiliate-name">Rove</div>
+                      <div class="affiliate-sub">Travel rewards and hotel booking</div>
+                    </div>
+                    <div class="affiliate-link">rove.travel/ref/mamedee</div>
+                  </div>
+            
+                  <div class="affiliate-item" onclick="toggleAffiliate(this)">
+                    <div class="affiliate-check" style="background:var(--bg-card2);border-color:var(--border-subtle);">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="affiliate-info">
+                      <div class="affiliate-name" style="color:var(--text-muted);">Chase Travel Portal</div>
+                      <div class="affiliate-sub">Book with Chase Ultimate Rewards points</div>
+                    </div>
+                    <div class="affiliate-link" style="color:var(--text-muted);">chase.com/travel/ref/mamedee</div>
+                  </div>
+            
+                  <div class="affiliate-item" onclick="toggleAffiliate(this)">
+                    <div class="affiliate-check" style="background:var(--bg-card2);border-color:var(--border-subtle);">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="affiliate-info">
+                      <div class="affiliate-name" style="color:var(--text-muted);">Booking.com Affiliate</div>
+                      <div class="affiliate-sub">Hotel and accommodation bookings</div>
+                    </div>
+                    <div class="affiliate-link" style="color:var(--text-muted);">booking.com/affiliate/mamedee</div>
+                  </div>
+            
+                </div>
+            
+                <div style="margin-top:12px;display:flex;align-items:center;gap:10px;padding:11px 14px;border:1.5px dashed rgba(201,169,110,0.2);border-radius:10px;cursor:pointer;color:var(--text-muted);font-size:13px;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-gold)';this.style.color='var(--accent-gold)'" onmouseout="this.style.borderColor='rgba(201,169,110,0.2)';this.style.color='var(--text-muted)'">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Add another affiliate program
+                </div>
+            
+              </div>
+            </div>
+            
+            <!-- STYLES FOR THESE SECTIONS -->
+            <style>
+              .citizenship-btn {
+                padding: 8px 16px;
+                border-radius: 99px;
+                font-size: 12px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                border: 1px solid var(--border-subtle);
+                color: var(--text-muted);
+                background: var(--bg-card2);
+              }
+              .citizenship-btn:hover { border-color: var(--accent-gold); color: var(--text-primary); }
+              .citizenship-btn.active { border-color: var(--accent-gold); color: var(--accent-gold); background: rgba(201,169,110,0.1); }
+            
+              .req-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 12px 14px;
+                border-radius: 10px;
+                border: 1px solid var(--border-subtle);
+                background: var(--bg-card2);
+              }
+              .req-status-dot {
+                width: 8px; height: 8px;
+                border-radius: 50%;
+                flex-shrink: 0;
+                margin-top: 4px;
+              }
+              .req-dot-ok { background: var(--accent-sage); }
+              .req-dot-warning { background: var(--accent-gold); }
+              .req-dot-alert { background: var(--accent-rose); }
+              .req-info { flex: 1; }
+              .req-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+              .req-detail { font-size: 11.5px; color: var(--text-muted); line-height: 1.55; }
+              .req-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
+              .req-badge-ok { background: rgba(141,175,155,0.15); color: var(--accent-sage); }
+              .req-badge-warning { background: rgba(201,169,110,0.15); color: var(--accent-gold); }
+              .req-badge-alert { background: rgba(212,132,138,0.15); color: var(--accent-rose); }
+            
+              .affiliate-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 14px;
+                border-radius: 10px;
+                border: 1px solid rgba(201,169,110,0.2);
+                background: rgba(201,169,110,0.06);
+                cursor: pointer;
+                transition: all 0.2s ease;
+              }
+              .affiliate-item:not(.selected) { border-color: var(--border-subtle); background: var(--bg-card2); }
+              .affiliate-item:hover { border-color: var(--accent-gold); }
+              .affiliate-check {
+                width: 20px; height: 20px;
+                border-radius: 6px;
+                background: rgba(201,169,110,0.2);
+                border: 1px solid rgba(201,169,110,0.4);
+                display: flex; align-items: center; justify-content: center;
+                flex-shrink: 0;
+                color: var(--accent-gold);
+              }
+              .affiliate-info { flex: 1; }
+              .affiliate-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+              .affiliate-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+              .affiliate-link { font-size: 11px; color: var(--text-label); font-family: 'DM Sans', monospace; }
+            </style>
+            
+            <script>
+              function selectCitizenship(el, code) {
+                document.querySelectorAll('.citizenship-btn').forEach(b => b.classList.remove('active'));
+                el.classList.add('active');
+                // In real implementation, this would trigger AI to re-populate requirements
+              }
+            
+              function toggleAffiliate(el) {
+                el.classList.toggle('selected');
+                const check = el.querySelector('.affiliate-check');
+                const name = el.querySelector('.affiliate-name');
+                const link = el.querySelector('.affiliate-link');
+                if (el.classList.contains('selected')) {
+                  check.style.background = 'rgba(201,169,110,0.2)';
+                  check.style.borderColor = 'rgba(201,169,110,0.4)';
+                  check.style.color = 'var(--accent-gold)';
+                  if (name) name.style.color = '';
+                  if (link) link.style.color = '';
+                } else {
+                  check.style.background = 'var(--bg-card2)';
+                  check.style.borderColor = 'var(--border-subtle)';
+                  check.style.color = 'var(--text-muted)';
+                  if (name) name.style.color = 'var(--text-muted)';
+                  if (link) link.style.color = 'var(--text-muted)';
+                }
+              }
+            </script>
+            
+
+          </div>
+
+          <!-- RIGHT SIDEBAR -->
+          <div>
+
+            <!-- TRIP STAGE -->
+            <div class="profile-section" style="margin-bottom:16px;">
+              <div class="profile-section-header">
+                <div class="profile-section-title"><div class="profile-section-dot" style="background:var(--accent-sage)"></div>Trip Stage</div>
+              </div>
+              <div class="profile-section-body">
+                <div class="stage-tracker">
+                  <div class="stage-item done"><span class="stage-icon"><span style="color:var(--accent-sage);font-size:12px;font-weight:600;">Done</span>Questionnaire Received</div>
+                  <div class="stage-item done"><span class="stage-icon"><span style="color:var(--accent-sage);font-size:12px;font-weight:600;">Done</span>Consultation Completed</div>
+                  <div class="stage-item active"><span class="stage-icon"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent-gold);display:inline-block;"></span>Profile Being Built</div>
+                  <div class="stage-item pending"><span class="stage-icon"><span style="width:8px;height:8px;border-radius:50%;background:var(--border-subtle);display:inline-block;"></span>Trip Building</div>
+                  <div class="stage-item pending"><span class="stage-icon"><span style="width:8px;height:8px;border-radius:50%;background:var(--border-subtle);display:inline-block;"></span>Preview Sent</div>
+                  <div class="stage-item pending"><span class="stage-icon"><span style="width:8px;height:8px;border-radius:50%;background:var(--border-subtle);display:inline-block;"></span>Client Approved</div>
+                  <div class="stage-item pending"><span class="stage-icon"><span style="width:8px;height:8px;border-radius:50%;background:var(--border-subtle);display:inline-block;"></span>Payment Received</div>
+                  <div class="stage-item pending"><span class="stage-icon"><span style="width:8px;height:8px;border-radius:50%;background:var(--border-subtle);display:inline-block;"></span>Booked &amp; Confirmed</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- DEE'S NOTES -->
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <div class="profile-section-title"><div class="profile-section-dot" style="background:var(--accent-gold)"></div>Dee's Smart Notes</div>
+              </div>
+              <div class="profile-section-body" style="display:flex;flex-direction:column;gap:10px;">
+                <div style="padding:12px;background:rgba(212,132,138,0.08);border:1px solid rgba(212,132,138,0.2);border-radius:10px;">
+                  <div style="font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-rose);margin-bottom:5px;">Allergy Alert</div>
+                  <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">Michael has a shellfish allergy. Flag this for every restaurant and accommodation booking.</div>
+                </div>
+                <div style="padding:12px;background:rgba(201,169,110,0.08);border:1px solid rgba(201,169,110,0.2);border-radius:10px;">
+                  <div style="font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-gold);margin-bottom:5px;">Occasion Tip</div>
+                  <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">5th anniversary trip. Consider recommending a surprise element like a room upgrade or private dinner.</div>
+                </div>
+                <div style="padding:12px;background:rgba(141,175,155,0.08);border:1px solid rgba(141,175,155,0.2);border-radius:10px;">
+                  <div style="font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-sage);margin-bottom:5px;">Budget Note</div>
+                  <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">Budget is flexible. They are open to luxury upgrades if the value is clear.</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn-primary" onclick="saveAndContinue()">Save &amp; Continue</button>
+          <button class="btn-ghost" onclick="goToStep(2)">← Back</button>
+        </div>
+      </div>
+
+      <!-- ═══ STEP 4: FLIGHT BUILDER ════════════════════ -->
+      <div class="upload-step" id="step4">
+        <div class="step-header">
+          <div class="step-eyebrow">Step 5 of 5</div>
+          <h1 class="step-title">Flight Details</h1>
+          <p class="step-desc">Upload a screenshot, PDF, or paste a URL for the flight. Dee will extract all the details automatically.</p>
+        </div>
+
+        <!-- FLIGHT TYPE TABS -->
+        <div class="flight-type-tabs">
+          <div class="flight-tab active" id="cashTab" onclick="switchFlightTab('cash')">Cash</div>
+          <div class="flight-tab" id="pointsTab" onclick="switchFlightTab('points')">Points &amp; Miles</div>
+        </div>
+
+        <!-- UPLOAD SOURCE ROW -->
+        <div style="display:flex;gap:10px;margin-bottom:20px;max-width:700px;">
+          <div style="flex:1;padding:12px 16px;background:var(--bg-card);border:2px dashed rgba(201,169,110,0.25);border-radius:12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.borderColor='rgba(201,169,110,0.25)'">
+            <span style="font-size:20px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+            <div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--text-primary);">Upload PDF or Screenshot</div>
+              <div style="font-size:11px;color:var(--text-muted);">Flight confirmation, booking page, or screenshot</div>
+            </div>
+          </div>
+          <div style="flex:1;padding:12px 16px;background:var(--bg-card);border:2px dashed rgba(201,169,110,0.25);border-radius:12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.borderColor='rgba(201,169,110,0.25)'">
+            <span style="font-size:20px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span>
+            <div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--text-primary);">Paste Flight URL</div>
+              <div style="font-size:11px;color:var(--text-muted);">Google Flights, airline site, or booking link</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="generated-badge">Auto-extracted from uploaded confirmation</div>
+
+        <!-- CASH FLIGHT SECTION -->
+        <div class="flight-section visible" id="cashSection">
+          <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:16px;padding:20px;max-width:700px;">
+            <div class="field-grid-3">
+              <div class="field-group">
+                <label class="field-label">Airline</label>
+                <input class="field-input" type="text" value="TAP Air Portugal" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Flight Number</label>
+                <input class="field-input" type="text" value="TP 201" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Cabin Class</label>
+                <select class="field-input field-select">
+                  <option>Economy</option>
+                  <option selected>Premium Economy</option>
+                  <option>Business</option>
+                  <option>First Class</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Departure City</label>
+                <input class="field-input" type="text" value="New York (JFK)" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Arrival City</label>
+                <input class="field-input" type="text" value="Lisbon (LIS)" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Trip Type</label>
+                <select class="field-input field-select">
+                  <option>One Way</option>
+                  <option selected>Round Trip</option>
+                  <option>Multi-City</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Departure Date &amp; Time</label>
+                <input class="field-input" type="text" value="Oct 5, 2026 · 7:45 PM" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Arrival Date &amp; Time</label>
+                <input class="field-input" type="text" value="Oct 6, 2026 · 9:20 AM" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Duration</label>
+                <input class="field-input" type="text" value="7h 35m" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Stops</label>
+                <select class="field-input field-select">
+                  <option selected>Nonstop</option>
+                  <option>1 Stop</option>
+                  <option>2 Stops</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Total Cost (USD)</label>
+                <input class="field-input" type="text" value="$1,840" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Per Person</label>
+                <input class="field-input" type="text" value="$920 / person" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- POINTS & MILES SECTION -->
+        <div class="flight-section" id="pointsSection">
+          <div style="max-width:700px;">
+
+            <!-- BANK SELECTOR -->
+            <div style="margin-bottom:18px;">
+              <div class="field-label" style="margin-bottom:12px;">Select Card Bank</div>
+              <div class="points-bank-grid">
+                <div class="bank-card" onclick="selectBank(this,'Chase')">
+                  <div class="bank-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+                  <div class="bank-card-name">Chase</div>
+                </div>
+                <div class="bank-card selected" onclick="selectBank(this,'Amex')">
+                  <div class="bank-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+                  <div class="bank-card-name">Amex</div>
+                </div>
+                <div class="bank-card" onclick="selectBank(this,'Capital One')">
+                  <div class="bank-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+                  <div class="bank-card-name">Capital One</div>
+                </div>
+                <div class="bank-card" onclick="selectBank(this,'Citi')">
+                  <div class="bank-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+                  <div class="bank-card-name">Citi</div>
+                </div>
+                <div class="bank-card" onclick="selectBank(this,'Bilt')">
+                  <div class="bank-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+                  <div class="bank-card-name">Bilt</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:16px;padding:20px;">
+              <div class="field-grid" style="margin-bottom:14px;">
+                <div class="field-group">
+                  <label class="field-label">Points Program</label>
+                  <input class="field-input" type="text" value="Amex Membership Rewards" readonly style="color:var(--accent-gold);" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Transfer Partner</label>
+                  <select class="field-input field-select">
+                    <option>Delta SkyMiles</option>
+                    <option selected>Air Canada Aeroplan</option>
+                    <option>ANA Mileage Club</option>
+                    <option>Cathay Pacific Asia Miles</option>
+                    <option>Emirates Skywards</option>
+                    <option>Etihad Guest</option>
+                    <option>British Airways Avios</option>
+                    <option>Singapore Airlines KrisFlyer</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Airline to Book</label>
+                  <select class="field-input field-select">
+                    <option selected>TAP Air Portugal (Star Alliance)</option>
+                    <option>Lufthansa</option>
+                    <option>United Airlines</option>
+                    <option>Singapore Airlines</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Cabin Class</label>
+                  <select class="field-input field-select">
+                    <option>Economy</option>
+                    <option selected>Business</option>
+                    <option>First Class</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Total Miles Required</label>
+                  <input class="field-input" type="text" value="70,000 miles" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Taxes &amp; Fees (USD)</label>
+                  <input class="field-input" type="text" value="$280" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Departure City</label>
+                  <input class="field-input" type="text" value="New York (JFK)" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Arrival City</label>
+                  <input class="field-input" type="text" value="Lisbon (LIS)" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Departure Date &amp; Time</label>
+                  <input class="field-input" type="text" value="Oct 5, 2026 · 7:45 PM" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Arrival Date &amp; Time</label>
+                  <input class="field-input" type="text" value="Oct 6, 2026 · 9:20 AM" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Duration</label>
+                  <input class="field-input" type="text" value="7h 35m" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Stops</label>
+                  <select class="field-input field-select">
+                    <option selected>Nonstop</option>
+                    <option>1 Stop</option>
+                    <option>2 Stops</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FLIGHT COUNTER + SAVE -->
+        <div class="flight-save-row" style="max-width:700px;">
+          <button class="btn-primary" onclick="saveFlight()">Save Flight</button>
+          <span class="add-another-link" onclick="addAnotherFlight()">+ Add Another Flight</span>
+          <div class="flight-counter" id="flightCounter">
+            <div class="flight-dot filled"></div>
+            <div class="flight-dot"></div>
+            <div class="flight-dot"></div>
+            <div class="flight-dot"></div>
+            <div class="flight-dot"></div>
+            <div class="flight-dot"></div>
+            <span style="margin-left:4px;font-size:11px;color:var(--text-muted);">1 of up to 6 flights</span>
+          </div>
+          <button class="btn-ghost" style="margin-left:auto;" onclick="goToStep(3)">← Back</button>
+        </div>
+
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- SECTION SELECTOR POPUP -->
+<div class="popup-overlay" id="sectionPopup">
+  <div class="popup" style="max-width:580px;">
+    <div class="popup-title">What would you like to add?</div>
+    <div class="popup-sub">Select the section you want to build next for Sarah &amp; Michael's trip. You can complete all three before moving on.</div>
+    <div class="section-options" style="grid-template-columns:repeat(3,1fr);">
+
+      <div class="section-option selected" onclick="selectSection(this,'flights')">
+        <div class="section-option-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 2L11 13"/>
+            <path d="M22 2L15 22l-4-9-9-4 19-7z"/>
+          </svg>
+        </div>
+        <div class="section-option-name">Flights</div>
+        <div class="section-option-desc">Cash or points &amp; miles</div>
+      </div>
+
+      <div class="section-option" onclick="selectSection(this,'accommodation')">
+        <div class="section-option-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 22V8l9-6 9 6v14"/>
+            <path d="M9 22V12h6v10"/>
+            <rect x="9" y="12" width="6" height="10"/>
+          </svg>
+        </div>
+        <div class="section-option-name">Accommodation</div>
+        <div class="section-option-desc">Hotels, Airbnb, resorts</div>
+      </div>
+
+      <div class="section-option" onclick="selectSection(this,'transportation')">
+        <div class="section-option-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13" rx="2"/>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/>
+            <circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+        </div>
+        <div class="section-option-name">Transportation</div>
+        <div class="section-option-desc">Transfers, car rental, trains</div>
+      </div>
+
+    </div>
+    <div class="popup-actions">
+      <div class="btn-primary" onclick="goToSelectedSection()">Continue</div>
+      <div class="btn-ghost" onclick="closeSectionPopup()">Cancel</div>
+    </div>
+  </div>
+</div>
+
+<!-- ITINERARY POPUP -->
+<div class="popup-overlay" id="itineraryPopup">
+  <div class="popup" style="max-width:500px;text-align:center;">
+    <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,rgba(201,169,110,0.15),rgba(212,132,138,0.1));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+        <line x1="8" y1="14" x2="8" y2="14"/>
+        <line x1="12" y1="14" x2="12" y2="14"/>
+        <line x1="16" y1="14" x2="16" y2="14"/>
+        <line x1="8" y1="18" x2="8" y2="18"/>
+        <line x1="12" y1="18" x2="12" y2="18"/>
+      </svg>
+    </div>
+    <div class="popup-title" style="margin-bottom:10px;">Ready to build the itinerary?</div>
+    <div class="popup-sub" style="margin-bottom:28px;">Flights, accommodation, and transportation are all set. Would you like to start building the day-by-day itinerary for Sarah &amp; Michael's trip now?</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="btn-primary" style="text-align:center;" onclick="closeItineraryPopup('yes')">Yes, build the itinerary now</div>
+      <div style="display:flex;gap:10px;">
+        <div class="btn-ghost" style="flex:1;text-align:center;" onclick="closeItineraryPopup('later')">Save for now   continue later</div>
+        <div class="btn-ghost" style="flex:1;text-align:center;" onclick="closeItineraryPopup('na')">N/A for this trip</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentStep = 1;
+  let selectedSection = 'flights';
+  let flightCount = 1;
+
+  // Start on step 1
+  goToStep(4); setTimeout(function(){ switchFlightTab('points'); }, 100);
+
+  function goToStep(n) {
+    currentStep = n;
+    document.querySelectorAll('.upload-step').forEach(s => s.classList.remove('visible'));
+    const el = document.getElementById('step' + n);
+    if (el) el.classList.add('visible');
+
+    // Update workflow bar
+    const steps = ['wStep1','wStep2','wStep3','wStep4','wStep5'];
+    steps.forEach((id, i) => {
+      const el = document.getElementById(id);
+      const circle = el.querySelector('.step-circle');
+      const label = el.querySelector('.step-label');
+      const stepNum = i + 1;
+      if (stepNum < n) {
+        circle.className = 'step-circle done'; circle.textContent = '✓';
+        label.className = 'step-label done';
+        el.className = 'workflow-step done';
+      } else if (stepNum === n) {
+        circle.className = 'step-circle active'; circle.textContent = stepNum;
+        label.className = 'step-label active';
+        el.className = 'workflow-step active';
+      } else {
+        circle.className = 'step-circle pending'; circle.textContent = stepNum;
+        label.className = 'step-label pending';
+        el.className = 'workflow-step pending';
+      }
+    });
+  }
+
+  function simulateUpload(step) {
+    const uploaded = document.getElementById('uploaded' + step);
+    const processing = document.getElementById('processing' + step);
+    const nextBtn = document.getElementById('nextBtn' + step);
+    const zone = document.getElementById('uploadZone' + step);
+
+    zone.style.opacity = '0.5';
+    zone.style.pointerEvents = 'none';
+    uploaded.classList.add('visible');
+
+    setTimeout(() => {
+      processing.classList.add('visible');
+      let items = processing.querySelectorAll('.processing-item');
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i < items.length) {
+          items[i].className = 'processing-item done';
+          items[i].querySelector('.p-dot').className = 'p-dot done';
+          if (i + 1 < items.length) {
+            items[i+1].className = 'processing-item active';
+            items[i+1].querySelector('.p-dot').className = 'p-dot active';
+          }
+          i++;
+        } else {
+          clearInterval(interval);
+          processing.querySelector('.processing-spinner').style.display = 'none';
+          processing.querySelector('.processing-title').textContent = step === 1 ? 'Questionnaire processed successfully!' : '✓ Profile built successfully!';
+          processing.querySelector('.processing-sub').textContent = step === 1 ? '22 fields extracted and ready.' : 'All fields auto-populated from both documents.';
+          processing.style.borderColor = 'rgba(141,175,155,0.3)';
+          nextBtn.disabled = false;
+        }
+      }, 700);
+    }, 800);
+  }
+
+  function saveAndContinue() {
+    document.getElementById('sectionPopup').classList.add('open');
+  }
+
+  function closeSectionPopup() {
+    document.getElementById('sectionPopup').classList.remove('open');
+  }
+
+  function selectSection(el, name) {
+    document.querySelectorAll('.section-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedSection = name;
+  }
+
+  function goToSelectedSection() {
+    closeSectionPopup();
+    goToStep(4);
+  }
+
+  function openItineraryPopup() {
+    document.getElementById('itineraryPopup').classList.add('open');
+  }
+
+  function closeItineraryPopup(choice) {
+    document.getElementById('itineraryPopup').classList.remove('open');
+    if (choice === 'yes') {
+      alert('Opening day-by-day itinerary builder for Sarah & Michael...');
+    } else if (choice === 'later') {
+      alert('Trip saved. You can continue building the itinerary anytime from the Client Trips page.');
+      window.location = 'client-trips.html';
+    } else if (choice === 'na') {
+      alert('Noted. This trip will not include a day-by-day itinerary.');
+      window.location = 'client-trips.html';
+    }
+  }
+
+  function switchFlightTab(type) {
+    document.getElementById('cashTab').classList.toggle('active', type === 'cash');
+    document.getElementById('pointsTab').classList.toggle('active', type === 'points');
+    document.getElementById('cashSection').classList.toggle('visible', type === 'cash');
+    document.getElementById('pointsSection').classList.toggle('visible', type === 'points');
+  }
+
+  function selectBank(el, name) {
+    document.querySelectorAll('.bank-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    const programs = {
+      'Chase': 'Chase Ultimate Rewards',
+      'Amex': 'Amex Membership Rewards',
+      'Capital One': 'Capital One Miles',
+      'Citi': 'Citi ThankYou Points',
+      'Bilt': 'Bilt Rewards'
+    };
+    document.querySelector('#pointsSection .field-input[readonly]').value = programs[name] || '';
+  }
+
+  function saveFlight() {
+    if (flightCount < 6) flightCount++;
+    const dots = document.querySelectorAll('.flight-dot');
+    dots.forEach((d, i) => d.classList.toggle('filled', i < flightCount));
+    document.querySelector('#flightCounter span').textContent = flightCount + ' of up to 6 flights';
+    // After saving, show the itinerary popup as a demo of the full flow
+    setTimeout(() => openItineraryPopup(), 300);
+  }
+
+  function addAnotherFlight() {
+    if (flightCount >= 6) { alert('Maximum 6 flights reached.'); return; }
+    document.querySelector('#step4 .step-desc').textContent = 'Upload or paste the next flight. You can add up to 6 flights total.';
+    document.querySelector('.generated-badge').textContent = '✨ Ready for next flight upload';
+  }
+
+  function regenHero() {
+    const imgs = ['assets/lisbon.jpg','assets/paris.jpg','assets/tokyo.jpg','assets/amalfi.jpg'];
+    const current = document.getElementById('heroImg').src;
+    const next = imgs.find(i => !current.includes(i.split('/')[1])) || imgs[0];
+    document.getElementById('heroImg').src = next;
+    document.querySelector('.hero-ai-badge').textContent = 'AI Regenerated';
+  }
+
+  function toggleUrlInput() {
+    const row = document.getElementById('urlInputRow');
+    row.classList.toggle('visible');
+  }
+
+  function applyUrl() {
+    const url = document.getElementById('heroUrlInput').value;
+    if (url) {
+      document.getElementById('heroImg').src = url;
+      document.querySelector('.hero-ai-badge').textContent = 'From URL';
+      document.getElementById('urlInputRow').classList.remove('visible');
+    }
+  }
+
+  function previewHero(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('heroImg').src = e.target.result;
+        document.querySelector('.hero-ai-badge').textContent = 'Custom Upload';
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  function addDestination() {
+    const input = document.getElementById('destInput');
+    const val = input.value.trim();
+    if (!val) return;
+    const tag = document.createElement('div');
+    tag.className = 'dest-tag';
+    tag.innerHTML = '📍 ' + val + ' <span class="dest-tag-remove" onclick="removeTag(this)"></span>';
+    document.getElementById('destTags').appendChild(tag);
+    input.value = '';
+  }
+
+  function removeTag(el) {
+    el.closest('.dest-tag').remove();
+  }
+
+  document.getElementById('destInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addDestination();
+  });
+</script>
+
+</body>
+</html>

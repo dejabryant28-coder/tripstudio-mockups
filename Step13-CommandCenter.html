@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trip Studio   Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deep: #0D0B0F; --bg-card: #16121A; --bg-card2: #1C1722;
+      --accent-gold: #C9A96E; --accent-gold2: #E8C98A;
+      --accent-rose: #D4848A; --accent-sage: #8DAF9B; --accent-lavender: #B8A9C9;
+      --text-primary: #F5EFE6; --text-muted: #9A8F8A; --text-label: #C9A96E;
+      --border: rgba(201,169,110,0.18); --border-subtle: rgba(255,255,255,0.06);
+      --sidebar-w: 248px;
+    }
+    html, body { height: 100%; background: var(--bg-deep); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 99px; }
+    .layout { display: flex; height: 100vh; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: linear-gradient(180deg, #110E15 0%, #0D0B0F 100%); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: relative; z-index: 10; flex-shrink: 0; }
+    .sidebar::before { content: ''; position: absolute; top: 0; right: 0; width: 1px; height: 100%; background: linear-gradient(180deg, transparent, var(--accent-gold), transparent); opacity: 0.3; }
+    .sidebar-brand { padding: 28px 24px 20px; border-bottom: 1px solid var(--border-subtle); }
+    .brand-logo { display: flex; align-items: center; gap: 10px; }
+    .brand-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .brand-sub { font-size: 10px; font-weight: 500; color: var(--text-label); letter-spacing: 0.14em; text-transform: uppercase; }
+    .sidebar-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
+    .nav-section-label { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); padding: 0 12px; margin: 20px 0 8px; }
+    .nav-section-label:first-child { margin-top: 0; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; color: var(--text-muted); font-size: 13.5px; text-decoration: none; position: relative; margin-bottom: 2px; }
+    .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+    .nav-item.active { background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(212,132,138,0.08)); color: var(--accent-gold2); font-weight: 500; border: 1px solid rgba(201,169,110,0.2); }
+    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 60%; background: linear-gradient(180deg, var(--accent-gold), var(--accent-rose)); border-radius: 0 3px 3px 0; }
+    .nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+    .nav-badge { margin-left: auto; background: var(--accent-rose); color: white; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+    .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--border-subtle); }
+    .user-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gold), var(--accent-rose)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; font-family: 'Playfair Display', serif; border: 2px solid rgba(201,169,110,0.3); letter-spacing: 0.02em; }
+
+    /* MAIN */
+    .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; background: rgba(13,11,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 5; }
+    .page-breadcrumb { font-size: 12px; color: var(--text-muted); }
+    .page-breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .page-breadcrumb a:hover { color: var(--accent-gold); }
+    .page-breadcrumb span { color: var(--accent-gold); }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .topbar-search { position: relative; }
+    .topbar-search input { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 8px 14px 8px 36px; font-size: 12.5px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; outline: none; width: 220px; transition: border-color 0.2s ease; }
+    .topbar-search input:focus { border-color: var(--accent-gold); }
+    .topbar-search input::placeholder { color: var(--text-muted); }
+    .topbar-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+    .topbar-notif { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+    .notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: var(--accent-rose); border-radius: 50%; border: 1.5px solid var(--bg-deep); }
+
+    /* CONTENT */
+    .content { padding: 28px 32px 60px; display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+
+    /* PAGE HEADER */
+    .page-header { grid-column: 1 / -1; display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
+    .page-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-label); margin-bottom: 6px; }
+    .page-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .page-desc { font-size: 13px; color: var(--text-muted); }
+
+    /* BUTTONS */
+    .btn-primary { padding: 12px 24px; background: linear-gradient(135deg, var(--accent-gold), #B8905A); border-radius: 10px; font-size: 13px; font-weight: 600; color: #0D0B0F; cursor: pointer; transition: all 0.2s ease; border: none; white-space: nowrap; }
+    .btn-primary:hover { box-shadow: 0 6px 20px rgba(201,169,110,0.35); transform: translateY(-1px); }
+    .btn-ghost { padding: 12px 20px; background: transparent; border: 1px solid var(--border-subtle); border-radius: 10px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
+    .btn-ghost:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+    .btn-sage { padding: 12px 24px; background: linear-gradient(135deg, var(--accent-sage), #6B9E8A); border-radius: 10px; font-size: 13px; font-weight: 600; color: #0D0B0F; cursor: pointer; transition: all 0.2s ease; border: none; white-space: nowrap; }
+    .btn-sage:hover { box-shadow: 0 6px 20px rgba(141,175,155,0.35); transform: translateY(-1px); }
+    .btn-rose { padding: 12px 24px; background: linear-gradient(135deg, var(--accent-rose), #C06870); border-radius: 10px; font-size: 13px; font-weight: 600; color: white; cursor: pointer; transition: all 0.2s ease; border: none; white-space: nowrap; }
+
+    /* SECTION CARD */
+    .section-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
+    .section-card-header { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .section-card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+    .section-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-gold); }
+    .section-card-body { padding: 16px 18px; }
+
+    /* TRACKING TIMELINE */
+    .tracking-timeline { display: flex; flex-direction: column; gap: 0; }
+    .track-event { display: flex; align-items: flex-start; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border-subtle); position: relative; }
+    .track-event:last-child { border-bottom: none; }
+    .track-icon { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .track-icon-sent { background: rgba(184,169,201,0.15); border: 1px solid rgba(184,169,201,0.25); }
+    .track-icon-opened { background: rgba(201,169,110,0.15); border: 1px solid rgba(201,169,110,0.25); }
+    .track-icon-clicked { background: rgba(141,175,155,0.15); border: 1px solid rgba(141,175,155,0.25); }
+    .track-icon-waiting { background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); }
+    .track-info { flex: 1; }
+    .track-label { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+    .track-meta { font-size: 11.5px; color: var(--text-muted); }
+    .track-time { font-size: 11px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+    .track-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 99px; }
+    .badge-live { background: rgba(141,175,155,0.15); color: var(--accent-sage); }
+    .badge-waiting { background: rgba(201,169,110,0.12); color: var(--accent-gold); animation: pulseGold 2s infinite; }
+    @keyframes pulseGold { 0%,100%{opacity:1}50%{opacity:0.5} }
+    .badge-pending { background: rgba(255,255,255,0.05); color: var(--text-muted); }
+
+    /* FOLLOW-UP CARD */
+    .followup-card { background: rgba(201,169,110,0.06); border: 1px solid rgba(201,169,110,0.18); border-radius: 14px; padding: 16px 18px; margin-bottom: 14px; }
+    .followup-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+    .followup-sub { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px; }
+    .followup-preview { background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; font-size: 12.5px; color: var(--text-muted); line-height: 1.7; font-style: italic; }
+    .followup-preview strong { color: var(--text-primary); font-style: normal; }
+    .followup-actions { display: flex; gap: 10px; }
+
+    /* CLIENT RESPONSE CARD */
+    .response-card { border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
+    .response-card.approved { background: rgba(141,175,155,0.07); border: 1px solid rgba(141,175,155,0.3); }
+    .response-card.edits { background: rgba(201,169,110,0.07); border: 1px solid rgba(201,169,110,0.3); }
+    .response-card.declined { background: rgba(212,132,138,0.07); border: 1px solid rgba(212,132,138,0.3); }
+    .response-card-header { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 12px; }
+    .response-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .response-icon-approved { background: rgba(141,175,155,0.2); }
+    .response-icon-edits { background: rgba(201,169,110,0.2); }
+    .response-icon-declined { background: rgba(212,132,138,0.2); }
+    .response-title { font-size: 14px; font-weight: 600; }
+    .response-title-approved { color: var(--accent-sage); }
+    .response-title-edits { color: var(--accent-gold); }
+    .response-title-declined { color: var(--accent-rose); }
+    .response-card-body { padding: 16px 18px; }
+
+    /* EDIT REQUEST */
+    .edit-request-box { background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 11px; padding: 14px 16px; margin-bottom: 14px; }
+    .edit-request-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+    .edit-request-text { font-size: 13px; color: var(--text-primary); line-height: 1.7; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px; }
+
+    .ai-applied-box { background: rgba(141,175,155,0.07); border: 1px solid rgba(141,175,155,0.25); border-radius: 11px; padding: 14px 16px; margin-bottom: 14px; }
+    .ai-applied-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-sage); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .ai-change-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(141,175,155,0.1); font-size: 12.5px; }
+    .ai-change-item:last-child { border-bottom: none; }
+    .ai-change-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-sage); flex-shrink: 0; margin-top: 5px; }
+    .ai-change-text { color: var(--text-muted); }
+    .ai-change-text strong { color: var(--text-primary); }
+
+    /* UNLOCK CARD */
+    .unlock-card { background: linear-gradient(135deg, rgba(201,169,110,0.12), rgba(212,132,138,0.07)); border: 1px solid var(--border); border-radius: 16px; padding: 20px 22px; margin-bottom: 16px; }
+    .unlock-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+    .unlock-sub { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
+    .unlock-features { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .unlock-feature { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-muted); }
+    .unlock-feature-check { color: var(--accent-sage); font-weight: 600; }
+
+    /* GOODWILL CARD */
+    .goodwill-card { background: rgba(184,169,201,0.07); border: 1px solid rgba(184,169,201,0.2); border-radius: 16px; padding: 18px 20px; margin-bottom: 16px; }
+    .goodwill-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+    .goodwill-sub { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px; }
+    .day-select-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .day-select-pill { padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: 1px solid var(--border-subtle); color: var(--text-muted); background: var(--bg-card2); }
+    .day-select-pill:hover { border-color: var(--accent-lavender); color: var(--accent-lavender); }
+    .day-select-pill.selected { border-color: var(--accent-lavender); color: var(--accent-lavender); background: rgba(184,169,201,0.1); }
+
+    /* RIGHT SIDEBAR */
+    .right-sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+    /* TRIP SNAPSHOT */
+    .trip-snapshot { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; overflow: hidden; }
+    .trip-snapshot-hero { height: 100px; background-size: cover; background-position: center; position: relative; }
+    .trip-snapshot-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent, rgba(22,18,26,0.9)); }
+    .trip-snapshot-info { position: absolute; bottom: 10px; left: 14px; }
+    .trip-snapshot-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--text-primary); }
+    .trip-snapshot-dest { font-size: 11px; color: var(--accent-gold); }
+    .trip-snapshot-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 7px; }
+    .snap-row { display: flex; justify-content: space-between; font-size: 12px; }
+    .snap-label { color: var(--text-muted); }
+    .snap-value { font-weight: 500; color: var(--text-primary); }
+
+    /* STAGE TRACKER */
+    .stage-tracker { display: flex; flex-direction: column; gap: 6px; }
+    .stage-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 9px; font-size: 12.5px; }
+    .stage-item.done { background: rgba(141,175,155,0.07); color: var(--accent-sage); }
+    .stage-item.active { background: rgba(201,169,110,0.09); color: var(--accent-gold); border: 1px solid rgba(201,169,110,0.2); }
+    .stage-item.pending { color: var(--text-muted); }
+    .stage-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .stage-dot.done { background: var(--accent-sage); }
+    .stage-dot.active { background: var(--accent-gold); animation: pulseGold 2s infinite; }
+    .stage-dot.pending { background: var(--border-subtle); }
+
+    /* POPUP */
+    .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+    .popup-overlay.open { opacity: 1; pointer-events: all; }
+    .popup { background: var(--bg-card); border: 1px solid var(--border); border-radius: 22px; padding: 32px; max-width: 520px; width: 90%; transform: scale(0.95); transition: transform 0.25s ease; }
+    .popup-overlay.open .popup { transform: scale(1); }
+    .popup-icon { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(212,132,138,0.1)); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+    .popup-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; text-align: center; }
+    .popup-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; text-align: center; }
+    .popup-actions { display: flex; flex-direction: column; gap: 10px; }
+    .popup-btn-row { display: flex; gap: 10px; }
+    .popup-email-preview { background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 12.5px; color: var(--text-muted); line-height: 1.7; }
+    .popup-email-preview strong { color: var(--text-primary); }
+    .popup-email-preview a { color: var(--accent-gold); }
+    .popup-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+    <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <div class="brand-icon"><img src="assets/globe-mascot.png" alt="" style="width:36px;height:36px;border-radius:10px;object-fit:contain;" /></div>
+        <div class="brand-name">
+          <div class="brand-title">Trip Studio</div>
+          <div class="brand-sub">BY MAME DEE</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">MAIN</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item  active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Client Trips
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Trip
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Vault
+      </a>
+      <div class="nav-section-label">SETTINGS</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item" style="color:var(--text-muted);font-size:12.5px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Exit to WordPress
+      </a>
+      <div class="user-card" style="margin-top:8px;">
+        <img src="assets/agent-dee.png" alt="Agent Dee" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,169,110,0.3);" />
+        <div>
+          <div class="user-name">Agent Dee</div>
+          <div class="user-role" style="color:var(--accent-gold);">AI Assistant</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="page-breadcrumb">
+        <a href="client-trips.html">Client Trips</a> &nbsp;/&nbsp;
+        <a href="new-client.html">Sarah &amp; Michael</a> &nbsp;/&nbsp;
+        <span>Command Center</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <span class="topbar-search-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          <input type="text" placeholder="Search trips, clients, destinations..." />
+        </div>
+        <div class="topbar-notif"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="notif-dot"></span></div>
+        <span style="font-size:13px;color:var(--text-primary);font-weight:500;">Good morning, <span style="color:var(--accent-gold);font-family:'Playfair Display',serif;font-style:italic;">Deja</span></span>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Command Center &nbsp;·&nbsp; Sarah &amp; Michael &nbsp;·&nbsp; Lisbon, Portugal</div>
+          <h1 class="page-title">Waiting for Their Response</h1>
+          <p class="page-desc">Preview sent 2 days ago. Track opens, manage responses, and take action when they decide.</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-ghost" onclick="window.location='dream-preview.html'">View Preview Page</button>
+          <button class="btn-primary" onclick="openFollowUpPopup()">Send Follow-up</button>
+        </div>
+      </div>
+
+      <!-- LEFT COLUMN -->
+      <div>
+
+        <!-- PREVIEW TRACKING -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <div class="section-card-title"><div class="section-dot"></div>Preview Activity Tracking</div>
+            <span style="font-size:11px;color:var(--text-muted);">Last checked: just now</span>
+          </div>
+          <div class="section-card-body">
+            <div class="tracking-timeline">
+
+              <div class="track-event">
+                <div class="track-icon track-icon-sent">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-lavender)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 19-7z"/></svg>
+                </div>
+                <div class="track-info">
+                  <div class="track-label">Preview email sent</div>
+                  <div class="track-meta">Sent to sarah.thompson@email.com from support@mamedeeworld.com</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                  <span class="track-badge badge-live">Delivered</span>
+                  <span class="track-time">Jun 23 &nbsp;·&nbsp; 2:14 PM</span>
+                </div>
+              </div>
+
+              <div class="track-event">
+                <div class="track-icon track-icon-sent">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-lavender)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                </div>
+                <div class="track-info">
+                  <div class="track-label">Text message sent</div>
+                  <div class="track-meta">Sent to (555) 847-2910 &nbsp;&middot;&nbsp; Check your inbox reminder</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                  <span class="track-badge badge-live">Delivered</span>
+                  <span class="track-time">Jun 23 &nbsp;·&nbsp; 2:14 PM</span>
+                </div>
+              </div>
+
+              <div class="track-event">
+                <div class="track-icon track-icon-opened">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+                <div class="track-info">
+                  <div class="track-label">Email opened</div>
+                  <div class="track-meta">Opened on iPhone &nbsp;&middot;&nbsp; 1 open recorded</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                  <span class="track-badge badge-live">Confirmed</span>
+                  <span class="track-time">Jun 23 &nbsp;·&nbsp; 6:47 PM</span>
+                </div>
+              </div>
+
+              <div class="track-event">
+                <div class="track-icon track-icon-clicked">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                </div>
+                <div class="track-info">
+                  <div class="track-label">Preview link accessed</div>
+                  <div class="track-meta">mamedeeworld.com/trip/sarah-michael-lisbon-2026 &nbsp;&middot;&nbsp; 3 visits</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                  <span class="track-badge badge-live">Active</span>
+                  <span class="track-time">Jun 24 &nbsp;·&nbsp; 11:22 AM</span>
+                </div>
+              </div>
+
+              <div class="track-event">
+                <div class="track-icon track-icon-waiting">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="track-info">
+                  <div class="track-label">Awaiting client decision</div>
+                  <div class="track-meta">No response selected yet &nbsp;&middot;&nbsp; 2 days since last visit</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                  <span class="track-badge badge-waiting">Waiting</span>
+                  <span class="track-time">Now</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- IN-TRIP SOCIAL NUDGE -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <div class="section-card-title"><div class="section-dot" style="background:var(--accent-lavender)"></div>In-Trip Social Nudge</div>
+            <span style="font-size:11px;color:var(--text-muted);">Auto-sends on Day 2 or 3 of their trip</span>
+          </div>
+          <div class="section-card-body">
+            <div style="background:rgba(184,169,201,0.07);border:1px solid rgba(184,169,201,0.2);border-radius:12px;padding:14px 16px;margin-bottom:14px;">
+              <div style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-lavender);margin-bottom:8px;">Text Message Preview</div>
+              <div style="font-size:13px;color:var(--text-primary);line-height:1.7;">Hey Sarah! Hope you and Michael are having the most amazing time in Lisbon. If you get a great shot, we would love to see it! Tag us @mamedeeworld and use #DreamToDestination so we can share your adventure.</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">Sends automatically on Day 2 of trip &nbsp;&middot;&nbsp; (555) 847-2910</div>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button class="btn-primary" style="font-size:12px;padding:10px 18px;" onclick="alert('In-trip nudge scheduled!')">Schedule Nudge</button>
+              <button class="btn-ghost" style="font-size:12px;padding:10px 18px;">Edit Message</button>
+              <button class="btn-ghost" style="font-size:12px;padding:10px 18px;">Send Now</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOLLOW-UP SECTION -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <div class="section-card-title"><div class="section-dot" style="background:var(--accent-gold)"></div>Follow-up</div>
+            <span style="font-size:11px;color:var(--text-muted);">Auto-suggested after 3 days of no response</span>
+          </div>
+          <div class="section-card-body">
+            <div class="followup-card">
+              <div class="followup-title">Friendly follow-up ready to send</div>
+              <div class="followup-sub">It has been 2 days since Sarah &amp; Michael last visited the preview. A gentle nudge is recommended. Review the message below before sending.</div>
+              <div class="followup-preview">
+                <strong>Subject:</strong> Just checking in on your Lisbon trip<br/><br/>
+                Hi Sarah &amp; Michael,<br/><br/>
+                I just wanted to check in and see if you had a chance to look over your Lisbon dream trip preview. I put a lot of love into building this for you and I would love to hear your thoughts.<br/><br/>
+                If you have any questions or want to talk through anything, just reply to this email. I am here for you.<br/><br/>
+                <a href="#">View Your Trip Preview Again &rarr;</a>
+              </div>
+              <div class="followup-actions">
+                <button class="btn-primary" onclick="sendFollowUp()">Send Follow-up Email + Text</button>
+                <button class="btn-ghost" onclick="openFollowUpPopup()">Edit Message</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLIENT RESPONSE SECTION -->
+        <div style="margin-bottom:8px;">
+          <div style="font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">Client Response &nbsp;&middot;&nbsp; Simulate a response below</div>
+          <div style="display:flex;gap:10px;margin-bottom:16px;">
+            <button class="btn-sage" style="flex:1;" onclick="showResponse('approved')">They Approved</button>
+            <button class="btn-primary" style="flex:1;" onclick="showResponse('edits')">They Want Edits</button>
+            <button class="btn-rose" style="flex:1;" onclick="showResponse('declined')">They Declined</button>
+          </div>
+        </div>
+
+        <!-- APPROVED RESPONSE -->
+        <div class="response-card approved" id="responseApproved" style="display:none;">
+          <div class="response-card-header">
+            <div class="response-icon response-icon-approved">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <div class="response-title response-title-approved">Sarah &amp; Michael approved the trip!</div>
+              <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">Received Jun 25 &nbsp;&middot;&nbsp; 9:14 AM &nbsp;&middot;&nbsp; "Yes, this is the trip! Unlock it."</div>
+            </div>
+          </div>
+          <div class="response-card-body">
+            <div class="unlock-card">
+              <div class="unlock-title">Ready to unlock the full trip?</div>
+              <div class="unlock-sub">Once you confirm payment has been received, click the button below to unlock the full trip for Sarah &amp; Michael. They will instantly gain access to all booking links, hotel confirmations, flight details, and the complete day-by-day itinerary.</div>
+              <div class="unlock-features">
+                <div class="unlock-feature"><span class="unlock-feature-check">&#10003;</span> All booking links activated</div>
+                <div class="unlock-feature"><span class="unlock-feature-check">&#10003;</span> Hotel confirmation PDFs shared</div>
+                <div class="unlock-feature"><span class="unlock-feature-check">&#10003;</span> Full day-by-day itinerary revealed</div>
+                <div class="unlock-feature"><span class="unlock-feature-check">&#10003;</span> Activity and restaurant booking links unlocked</div>
+                <div class="unlock-feature"><span class="unlock-feature-check">&#10003;</span> Emergency contacts and travel tips included</div>
+              </div>
+              <div style="display:flex;gap:10px;">
+                <button class="btn-sage" style="flex:1;" onclick="markPaidAndUnlock()">Mark Paid &amp; Unlock Trip</button>
+                <button class="btn-ghost" onclick="">Payment Not Yet Received</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EDITS RESPONSE -->
+        <div class="response-card edits" id="responseEdits" style="display:none;">
+          <div class="response-card-header">
+            <div class="response-icon response-icon-edits">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+            <div>
+              <div class="response-title response-title-edits">Sarah &amp; Michael requested edits</div>
+              <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">Received Jun 25 &nbsp;&middot;&nbsp; 10:02 AM</div>
+            </div>
+          </div>
+          <div class="response-card-body">
+
+            <div class="edit-request-box">
+              <div class="edit-request-label">Their Edit Request</div>
+              <div class="edit-request-text">"We love it! But we would prefer the Memmo Alfama hotel instead of the Bairro Alto Hotel. Also, can you swap the Fado dinner on Day 1 for something a bit more casual? We are tired from the flight and want something low-key. And can you add a wine tasting experience somewhere in the itinerary?"</div>
+            </div>
+
+            <div class="ai-applied-box">
+              <div class="ai-applied-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Dee applied 3 changes automatically
+              </div>
+              <div class="ai-change-item"><div class="ai-change-dot"></div><div class="ai-change-text">Accommodation switched from <strong>Bairro Alto Hotel</strong> to <strong>Memmo Alfama</strong>. Budget updated to $2,520.</div></div>
+              <div class="ai-change-item"><div class="ai-change-dot"></div><div class="ai-change-text">Day 1 dinner changed from <strong>Tasca do Chico (Fado)</strong> to <strong>Zé da Mouraria</strong>   casual, local, low-key. 4.3 stars.</div></div>
+              <div class="ai-change-item"><div class="ai-change-dot"></div><div class="ai-change-text">Added <strong>Quinta do Crasto Wine Tasting</strong> to Day 4. 4.6 stars. ~$65 for 2. Google Maps link attached.</div></div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-bottom:14px;">
+              <button class="btn-primary" onclick="approveEdits()">Approve All Changes</button>
+              <button class="btn-ghost">Edit Manually</button>
+            </div>
+
+            <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">After approving, Dee will generate an updated email to Sarah &amp; Michael explaining what changed and inviting them to review the updated preview.</div>
+          </div>
+        </div>
+
+        <!-- DECLINED RESPONSE -->
+        <div class="response-card declined" id="responseDeclined" style="display:none;">
+          <div class="response-card-header">
+            <div class="response-icon response-icon-declined">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-rose)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            </div>
+            <div>
+              <div class="response-title response-title-declined">Sarah &amp; Michael passed on the trip</div>
+              <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">Received Jun 25 &nbsp;&middot;&nbsp; 11:30 AM &nbsp;&middot;&nbsp; "Not what I'm looking for."</div>
+            </div>
+          </div>
+          <div class="response-card-body">
+
+            <div class="goodwill-card">
+              <div class="goodwill-title">Send a Goodwill Message</div>
+              <div class="goodwill-sub">No hard feelings. Send a warm thank-you with 2-3 travel tips for Lisbon, and gift them one sample day from the itinerary as a gesture of goodwill. They will remember you.</div>
+
+              <div style="font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Choose a sample day to gift</div>
+              <div class="day-select-row">
+                <div class="day-select-pill selected" onclick="selectDay(this)">Day 1 &nbsp;&middot;&nbsp; Arrival</div>
+                <div class="day-select-pill" onclick="selectDay(this)">Day 2 &nbsp;&middot;&nbsp; Belem</div>
+                <div class="day-select-pill" onclick="selectDay(this)">Day 3 &nbsp;&middot;&nbsp; Sintra</div>
+              </div>
+
+              <div style="background:var(--bg-card2);border:1px solid var(--border-subtle);border-radius:10px;padding:13px 15px;margin-bottom:14px;font-size:12.5px;color:var(--text-muted);line-height:1.7;">
+                <strong style="color:var(--text-primary);">Subject:</strong> Wishing you an amazing Lisbon trip<br/><br/>
+                Hi Sarah &amp; Michael,<br/><br/>
+                Thank you so much for the opportunity to work on your trip. I truly enjoyed our consultation and building this plan for you. I hope you have an absolutely incredible time in Lisbon.<br/><br/>
+                A few tips from me to you: try the Pasteis de Belem in the morning, take Tram 28 through Alfama at least once, and do not miss the sunset from Miradouro da Graca.<br/><br/>
+                As a little gift, here is your Day 1 itinerary to keep. Wishing you the best adventure!<br/><br/>
+                With love, Deja &nbsp;&middot;&nbsp; Mame Dee Travel World
+              </div>
+
+              <div style="display:flex;gap:10px;">
+                <button class="btn-ghost" style="flex:1;" onclick="openGoodwillPopup()">Preview Full Message</button>
+                <button class="btn-primary" style="flex:1;" onclick="sendGoodwill()">Send Goodwill Message</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- /left -->
+
+      <!-- RIGHT SIDEBAR -->
+      <div class="right-sidebar">
+
+        <!-- TRIP SNAPSHOT -->
+        <div class="trip-snapshot">
+          <div class="trip-snapshot-hero" style="background-image:url('assets/lisbon.jpg');">
+            <div class="trip-snapshot-overlay"></div>
+            <div class="trip-snapshot-info">
+              <div class="trip-snapshot-name">Sarah &amp; Michael</div>
+              <div class="trip-snapshot-dest">Lisbon, Portugal</div>
+            </div>
+          </div>
+          <div class="trip-snapshot-body">
+            <div class="snap-row"><span class="snap-label">Dates</span><span class="snap-value">Oct 5 – 14, 2026</span></div>
+            <div class="snap-row"><span class="snap-label">Travelers</span><span class="snap-value">2 Adults</span></div>
+            <div class="snap-row"><span class="snap-label">Budget</span><span class="snap-value">$10,000</span></div>
+            <div class="snap-row"><span class="snap-label">Est. Cost</span><span class="snap-value" style="color:var(--accent-sage);">$6,548</span></div>
+            <div class="snap-row"><span class="snap-label">Preview Sent</span><span class="snap-value">Jun 23, 2026</span></div>
+            <div class="snap-row"><span class="snap-label">Link Visits</span><span class="snap-value" style="color:var(--accent-gold);">3 visits</span></div>
+          </div>
+        </div>
+
+        <!-- STAGE TRACKER -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <div class="section-card-title"><div class="section-dot" style="background:var(--accent-lavender)"></div>Trip Stage</div>
+          </div>
+          <div class="section-card-body">
+            <div class="stage-tracker">
+              <div class="stage-item done"><div class="stage-dot done"></div>Questionnaire received</div>
+              <div class="stage-item done"><div class="stage-dot done"></div>Consultation completed</div>
+              <div class="stage-item done"><div class="stage-dot done"></div>Trip built</div>
+              <div class="stage-item done"><div class="stage-dot done"></div>Budget finalized</div>
+              <div class="stage-item done"><div class="stage-dot done"></div>Preview sent</div>
+              <div class="stage-item done"><div class="stage-dot done"></div>Preview opened &amp; link visited</div>
+              <div class="stage-item active" id="stageWaiting"><div class="stage-dot active"></div>Waiting for client decision</div>
+              <div class="stage-item pending" id="stageApproval"><div class="stage-dot pending"></div>Client approved</div>
+              <div class="stage-item pending" id="stagePayment"><div class="stage-dot pending"></div>Payment received</div>
+              <div class="stage-item pending" id="stageUnlocked"><div class="stage-dot pending"></div>Trip unlocked</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <div class="section-card-title"><div class="section-dot" style="background:var(--accent-sage)"></div>Quick Actions</div>
+          </div>
+          <div class="section-card-body" style="display:flex;flex-direction:column;gap:8px;">
+            <div style="padding:11px 14px;background:var(--bg-card2);border:1px solid var(--border-subtle);border-radius:10px;font-size:13px;color:var(--text-primary);cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.borderColor='var(--border-subtle)'" onclick="window.location='dream-preview.html'">View Preview Page</div>
+            <div style="padding:11px 14px;background:var(--bg-card2);border:1px solid var(--border-subtle);border-radius:10px;font-size:13px;color:var(--text-primary);cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.borderColor='var(--border-subtle)'" onclick="window.location='itinerary.html'">Edit Itinerary</div>
+            <div style="padding:11px 14px;background:var(--bg-card2);border:1px solid var(--border-subtle);border-radius:10px;font-size:13px;color:var(--text-primary);cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.borderColor='var(--border-subtle)'" onclick="window.location='budget.html'">View Budget</div>
+            <div style="padding:11px 14px;background:var(--bg-card2);border:1px solid var(--border-subtle);border-radius:10px;font-size:13px;color:var(--text-primary);cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.borderColor='var(--border-subtle)'" onclick="openFollowUpPopup()">Send Follow-up</div>
+            <div style="padding:11px 14px;background:rgba(212,132,138,0.06);border:1px solid rgba(212,132,138,0.2);border-radius:10px;font-size:13px;color:var(--accent-rose);cursor:pointer;">Archive Trip</div>
+          </div>
+        </div>
+
+      </div><!-- /right-sidebar -->
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- FOLLOW-UP POPUP -->
+<div class="popup-overlay" id="followUpPopup">
+  <div class="popup">
+    <div class="popup-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    </div>
+    <div class="popup-title">Send Follow-up</div>
+    <div class="popup-sub">Review the follow-up message before it goes out to Sarah &amp; Michael.</div>
+    <div class="popup-section-label">Email Preview</div>
+    <div class="popup-email-preview">
+      <strong>Subject:</strong> Just checking in on your Lisbon trip<br/><br/>
+      Hi Sarah &amp; Michael,<br/><br/>
+      I just wanted to check in and see if you had a chance to look over your Lisbon dream trip preview. I put a lot of love into building this for you and I would love to hear your thoughts.<br/><br/>
+      <a href="#">View Your Trip Preview Again &rarr;</a>
+    </div>
+    <div class="popup-actions">
+      <div class="btn-primary" style="text-align:center;padding:13px;border-radius:10px;cursor:pointer;" onclick="sendFollowUp()">Send Email + Text</div>
+      <div class="popup-btn-row">
+        <div class="btn-ghost" style="flex:1;text-align:center;" onclick="closeFollowUpPopup()">Cancel</div>
+        <div class="btn-ghost" style="flex:1;text-align:center;" onclick="closeFollowUpPopup()">Edit Message</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showResponse(type) {
+    document.getElementById('responseApproved').style.display = 'none';
+    document.getElementById('responseEdits').style.display = 'none';
+    document.getElementById('responseDeclined').style.display = 'none';
+    document.getElementById('response' + type.charAt(0).toUpperCase() + type.slice(1)).style.display = 'block';
+    document.getElementById('response' + type.charAt(0).toUpperCase() + type.slice(1)).scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Update stage tracker
+    if (type === 'approved') {
+      document.getElementById('stageWaiting').className = 'stage-item done';
+      document.getElementById('stageWaiting').querySelector('.stage-dot').className = 'stage-dot done';
+      document.getElementById('stageApproval').className = 'stage-item active';
+      document.getElementById('stageApproval').querySelector('.stage-dot').className = 'stage-dot active';
+    }
+  }
+
+  function markPaidAndUnlock() {
+    document.getElementById('stageApproval').className = 'stage-item done';
+    document.getElementById('stageApproval').querySelector('.stage-dot').className = 'stage-dot done';
+    document.getElementById('stagePayment').className = 'stage-item done';
+    document.getElementById('stagePayment').querySelector('.stage-dot').className = 'stage-dot done';
+    document.getElementById('stageUnlocked').className = 'stage-item active';
+    document.getElementById('stageUnlocked').querySelector('.stage-dot').className = 'stage-dot active';
+    alert('Trip unlocked for Sarah & Michael! They now have access to all booking links, hotel confirmations, and the full itinerary. A confirmation email has been sent to sarah.thompson@email.com.');
+  }
+
+  function approveEdits() {
+    alert('Changes approved! Dee is generating an update email to Sarah & Michael explaining what was changed. You will be able to review it before it sends.');
+  }
+
+  function openFollowUpPopup() {
+    document.getElementById('followUpPopup').classList.add('open');
+  }
+
+  function closeFollowUpPopup() {
+    document.getElementById('followUpPopup').classList.remove('open');
+  }
+
+  function sendFollowUp() {
+    closeFollowUpPopup();
+    alert('Follow-up email and text message sent to Sarah & Michael!');
+  }
+
+  function selectDay(btn) {
+    document.querySelectorAll('.day-select-pill').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+
+  function sendGoodwill() {
+    alert('Goodwill message sent to Sarah & Michael with their Day 1 sample itinerary. They will remember you!');
+  }
+
+  function openGoodwillPopup() {
+    alert('Full goodwill message preview would open here.');
+  }
+
+  document.getElementById('followUpPopup').addEventListener('click', function(e) {
+    if (e.target === this) closeFollowUpPopup();
+  });
+</script>
+
+</body>
+</html>

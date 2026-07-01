@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trip Studio Mockups - Manus 1.6</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deep: #0D0B0F; --bg-card: #16121A; --bg-card2: #1C1722;
+      --accent-gold: #C9A96E; --accent-gold2: #E8C98A;
+      --accent-rose: #D4848A; --accent-sage: #8DAF9B;
+      --text-primary: #F5EFE6; --text-muted: #9A8F8A; --text-label: #C9A96E;
+      --border: rgba(201,169,110,0.18); --border-subtle: rgba(255,255,255,0.06);
+    }
+    body { background: var(--bg-deep); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; min-height: 100vh; padding: 48px 32px; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 99px; }
+    .header { text-align: center; margin-bottom: 48px; }
+    .header h1 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .header p { font-size: 14px; color: var(--text-muted); }
+    .header .badge { display: inline-block; margin-top: 10px; background: rgba(201,169,110,0.15); border: 1px solid rgba(201,169,110,0.3); color: var(--accent-gold); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 14px; border-radius: 99px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
+    .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 24px; transition: all 0.2s ease; text-decoration: none; color: inherit; display: block; }
+    .card:hover { border-color: var(--border); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    .card-step { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+    .card-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+    .card-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
+    .card-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
+    .tag-exists { background: rgba(141,175,155,0.15); color: var(--accent-sage); border: 1px solid rgba(141,175,155,0.25); }
+    .tag-build { background: rgba(212,132,138,0.12); color: var(--accent-rose); border: 1px solid rgba(212,132,138,0.25); }
+    .tag-fix { background: rgba(201,169,110,0.12); color: var(--accent-gold); border: 1px solid rgba(201,169,110,0.25); }
+    .card-link { display: flex; align-items: center; gap: 6px; margin-top: 14px; font-size: 12px; font-weight: 600; color: var(--accent-gold); }
+    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); max-width: 1100px; margin: 32px auto 12px; }
+    .section-label:first-of-type { margin-top: 0; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Trip Studio Mockups</h1>
+    <p>Manus 1.6 HTML Reference Files for Claude Coding</p>
+    <span class="badge">All pages are exact visual targets</span>
+  </div>
+
+  <div class="section-label">Existing Pages — Needs Fixes</div>
+  <div class="grid">
+
+    <a class="card" href="Step02-ClientTrips.html" target="_blank">
+      <div class="card-step">Step 02</div>
+      <div class="card-title">Client Trips</div>
+      <div class="card-desc">All trips listed with cards, filters, search, sort dropdown, grid/list toggle, and empty state card.</div>
+      <span class="card-tag tag-fix">Needs Fixes</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+    <a class="card" href="Step04-NewClient-UploadQuestionnaire.html" target="_blank">
+      <div class="card-step">Step 04</div>
+      <div class="card-title">New Client — Upload Questionnaire</div>
+      <div class="card-desc">Step 1 of wizard: drag-and-drop questionnaire upload with processing animation and 5-step progress bar.</div>
+      <span class="card-tag tag-fix">Needs Fixes</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+    <a class="card" href="Step05-NewClient-UploadConsultation.html" target="_blank">
+      <div class="card-step">Step 05</div>
+      <div class="card-title">New Client — Upload Consultation</div>
+      <div class="card-desc">Step 2 of wizard: consultation notes upload, shows questionnaire already processed status.</div>
+      <span class="card-tag tag-fix">Needs Fixes</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+    <a class="card" href="Step06-NewClient-GeneratedClientProfile.html" target="_blank">
+      <div class="card-step">Step 06</div>
+      <div class="card-title">New Client — Generated Client Profile</div>
+      <div class="card-desc">Step 3: AI-populated profile with hero image builder (Regenerate, Upload Image, Paste URL + AI badge).</div>
+      <span class="card-tag tag-fix">Needs Fixes</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+    <a class="card" href="Step07-SectionSelectorPopup.html" target="_blank">
+      <div class="card-step">Step 07</div>
+      <div class="card-title">Section Selector Popup</div>
+      <div class="card-desc">Modal popup asking which section to build next: Flights, Accommodation, or Transportation.</div>
+      <span class="card-tag tag-fix">Needs Fixes</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+    <a class="card" href="Step07b-FlightBuilderCashTab.html" target="_blank">
+      <div class="card-step">Step 07b</div>
+      <div class="card-title">Flight Builder — Cash Tab</div>
+      <div class="card-desc">Flight form with Cash payment selected. Upload PDF/URL, auto-extracted badge, all form fields, flight counter.</div>
+      <span class="card-tag tag-fix">Needs Fixes</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+    <a class="card" href="Step07c-FlightBuilderPointsandMilesTab.html" target="_blank">
+      <div class="card-step">Step 07c</div>
+      <div class="card-title">Flight Builder — Points &amp; Miles Tab</div>
+      <div class="card-desc">Flight form with Points/Miles: selectable bank cards (Chase, Amex, Capital One, Citi, Bilt), transfer partners.</div>
+      <span class="card-tag tag-fix">Needs Fixes</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+  </div>
+
+  <div class="section-label">Pages to Build from Scratch</div>
+  <div class="grid">
+
+    <a class="card" href="Step08-AccommodationBuilder.html" target="_blank">
+      <div class="card-step">Step 08</div>
+      <div class="card-title">Accommodation Builder</div>
+      <div class="card-desc">3 hotel options side-by-side with photos and rates. Auto-saves to Vault on confirm.</div>
+      <span class="card-tag tag-build">Build from Scratch</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+    <a class="card" href="Step09-TransportationBuilder.html" target="_blank">
+      <div class="card-step">Step 09</div>
+      <div class="card-title">Transportation Builder</div>
+      <div class="card-desc">Rideshare apps by destination, transit cards, private transfers.</div>
+      <span class="card-tag tag-build">Build from Scratch</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+    <a class="card" href="Step10-ItineraryBuilder.html" target="_blank">
+      <div class="card-step">Step 10</div>
+      <div class="card-title">Itinerary Builder</div>
+      <div class="card-desc">Day-by-day drag-and-drop with morning/afternoon/evening slots, AI day vibes, Vault autocomplete.</div>
+      <span class="card-tag tag-build">Build from Scratch</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+    <a class="card" href="Step11-BudgetCalculator.html" target="_blank">
+      <div class="card-step">Step 11</div>
+      <div class="card-title">Budget Calculator</div>
+      <div class="card-desc">Live-updating cost breakdown with per-person/total toggle and category toggles.</div>
+      <span class="card-tag tag-build">Build from Scratch</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+    <a class="card" href="Step12-TripDetailOverview.html" target="_blank">
+      <div class="card-step">Step 12</div>
+      <div class="card-title">Trip Detail Overview</div>
+      <div class="card-desc">Full trip summary with checklist, quick actions, and all builder sections collapsed/expanded.</div>
+      <span class="card-tag tag-build">Build from Scratch</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+    <a class="card" href="Step13-CommandCenter.html" target="_blank">
+      <div class="card-step">Step 13</div>
+      <div class="card-title">Command Center</div>
+      <div class="card-desc">Email tracking, follow-up automation, Mark Paid and Unlock button.</div>
+      <span class="card-tag tag-build">Build from Scratch</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+    <a class="card" href="Step14-DreamPreviewAdmin.html" target="_blank">
+      <div class="card-step">Step 14</div>
+      <div class="card-title">Dream Preview Admin</div>
+      <div class="card-desc">Day lock controls, email/SMS preview and send panel.</div>
+      <span class="card-tag tag-build">Build from Scratch</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+    <a class="card" href="Step15-TripUnlockedClientPage.html" target="_blank">
+      <div class="card-step">Step 15</div>
+      <div class="card-title">Trip Unlocked — Client Page</div>
+      <div class="card-desc">What the client sees after payment: full trip with all booking links, confirmations, and itinerary.</div>
+      <span class="card-tag tag-build">Build from Scratch</span>
+      <div class="card-link">Open Mockup →</div>
+    </a>
+
+  </div>
+
+  <div class="section-label">Reference Documents</div>
+  <div class="grid">
+    <a class="card" href="TRANSITION-GUIDE-AND-PROMPT.md" target="_blank">
+      <div class="card-step">Reference</div>
+      <div class="card-title">Transition Guide &amp; Prompt</div>
+      <div class="card-desc">Master reference document: what exists, what needs fixing, what needs building, and the full Claude prompt.</div>
+      <span class="card-tag tag-exists">Reference Doc</span>
+      <div class="card-link">Open Document →</div>
+    </a>
+  </div>
+
+</body>
+</html>

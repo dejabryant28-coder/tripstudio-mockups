@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trip Studio   Dream Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deep: #0D0B0F; --bg-card: #16121A; --bg-card2: #1C1722;
+      --accent-gold: #C9A96E; --accent-gold2: #E8C98A;
+      --accent-rose: #D4848A; --accent-sage: #8DAF9B; --accent-lavender: #B8A9C9;
+      --text-primary: #F5EFE6; --text-muted: #9A8F8A; --text-label: #C9A96E;
+      --border: rgba(201,169,110,0.18); --border-subtle: rgba(255,255,255,0.06);
+      --sidebar-w: 248px;
+    }
+    html, body { height: 100%; background: var(--bg-deep); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 99px; }
+    .layout { display: flex; height: 100vh; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: linear-gradient(180deg, #110E15 0%, #0D0B0F 100%); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: relative; z-index: 10; flex-shrink: 0; }
+    .sidebar::before { content: ''; position: absolute; top: 0; right: 0; width: 1px; height: 100%; background: linear-gradient(180deg, transparent, var(--accent-gold), transparent); opacity: 0.3; }
+    .sidebar-brand { padding: 28px 24px 20px; border-bottom: 1px solid var(--border-subtle); }
+    .brand-logo { display: flex; align-items: center; gap: 10px; }
+    .brand-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .brand-sub { font-size: 10px; font-weight: 500; color: var(--text-label); letter-spacing: 0.14em; text-transform: uppercase; }
+    .sidebar-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
+    .nav-section-label { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); padding: 0 12px; margin: 20px 0 8px; }
+    .nav-section-label:first-child { margin-top: 0; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; color: var(--text-muted); font-size: 13.5px; text-decoration: none; position: relative; margin-bottom: 2px; }
+    .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+    .nav-item.active { background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(212,132,138,0.08)); color: var(--accent-gold2); font-weight: 500; border: 1px solid rgba(201,169,110,0.2); }
+    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 60%; background: linear-gradient(180deg, var(--accent-gold), var(--accent-rose)); border-radius: 0 3px 3px 0; }
+    .nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+    .nav-badge { margin-left: auto; background: var(--accent-rose); color: white; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+    .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--border-subtle); }
+    .user-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gold), var(--accent-rose)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; font-family: 'Playfair Display', serif; border: 2px solid rgba(201,169,110,0.3); letter-spacing: 0.02em; }
+
+    /* MAIN */
+    .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; background: rgba(13,11,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 5; }
+    .page-breadcrumb { font-size: 12px; color: var(--text-muted); }
+    .page-breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .page-breadcrumb a:hover { color: var(--accent-gold); }
+    .page-breadcrumb span { color: var(--accent-gold); }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .topbar-search { position: relative; }
+    .topbar-search input { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 8px 14px 8px 36px; font-size: 12.5px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; outline: none; width: 220px; transition: border-color 0.2s ease; }
+    .topbar-search input:focus { border-color: var(--accent-gold); }
+    .topbar-search input::placeholder { color: var(--text-muted); }
+    .topbar-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+    .topbar-notif { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+    .notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: var(--accent-rose); border-radius: 50%; border: 1.5px solid var(--bg-deep); }
+
+    /* CONTENT */
+    .content { padding: 28px 32px 60px; display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
+
+    /* PAGE HEADER */
+    .page-header { grid-column: 1 / -1; display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
+    .page-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-label); margin-bottom: 6px; }
+    .page-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .page-desc { font-size: 13px; color: var(--text-muted); }
+    .btn-primary { padding: 12px 24px; background: linear-gradient(135deg, var(--accent-gold), #B8905A); border-radius: 10px; font-size: 13px; font-weight: 600; color: #0D0B0F; cursor: pointer; transition: all 0.2s ease; border: none; white-space: nowrap; }
+    .btn-primary:hover { box-shadow: 0 6px 20px rgba(201,169,110,0.35); transform: translateY(-1px); }
+    .btn-ghost { padding: 12px 20px; background: transparent; border: 1px solid var(--border-subtle); border-radius: 10px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
+    .btn-ghost:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+    .btn-rose { padding: 12px 24px; background: linear-gradient(135deg, var(--accent-rose), #C06870); border-radius: 10px; font-size: 13px; font-weight: 600; color: white; cursor: pointer; transition: all 0.2s ease; border: none; white-space: nowrap; }
+    .btn-rose:hover { box-shadow: 0 6px 20px rgba(212,132,138,0.35); transform: translateY(-1px); }
+
+    /* PREVIEW WINDOW */
+    .preview-window { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 18px; overflow: hidden; }
+    .preview-window-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card2); border-bottom: 1px solid var(--border-subtle); }
+    .preview-dots { display: flex; gap: 6px; }
+    .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .preview-dot-red { background: #FF5F57; }
+    .preview-dot-yellow { background: #FEBC2E; }
+    .preview-dot-green { background: #28C840; }
+    .preview-url-bar { flex: 1; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 7px; padding: 6px 12px; font-size: 11.5px; color: var(--text-muted); font-family: 'DM Sans', monospace; }
+    .preview-open-btn { font-size: 11px; color: var(--text-label); cursor: pointer; padding: 5px 12px; border: 1px solid rgba(201,169,110,0.2); border-radius: 7px; transition: all 0.2s ease; white-space: nowrap; }
+    .preview-open-btn:hover { background: rgba(201,169,110,0.1); }
+
+    /* CLIENT PAGE MOCKUP */
+    .client-page-mockup { padding: 0; }
+    .client-cover { position: relative; height: 320px; overflow: hidden; }
+    .client-cover-img { width: 100%; height: 100%; object-fit: cover; }
+    .client-cover-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(13,11,15,0.4) 0%, rgba(13,11,15,0.75) 100%); }
+    .client-cover-content { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; }
+    .client-cover-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(201,169,110,0.8); margin-bottom: 12px; }
+    .client-cover-title { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; font-style: italic; color: white; margin-bottom: 10px; line-height: 1.2; }
+    .client-cover-sub { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-style: italic; color: rgba(245,239,230,0.75); margin-bottom: 16px; }
+    .client-cover-stat { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(201,169,110,0.7); }
+    .client-cover-did-you-know { position: absolute; bottom: 16px; left: 20px; right: 20px; background: rgba(13,11,15,0.7); backdrop-filter: blur(8px); border: 1px solid rgba(201,169,110,0.2); border-radius: 10px; padding: 10px 14px; font-size: 11.5px; color: rgba(245,239,230,0.8); line-height: 1.5; }
+    .client-cover-did-you-know strong { color: var(--accent-gold); }
+
+    .client-body { padding: 20px; }
+    .client-section-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+
+    /* DAY LOCK CONTROLS */
+    .day-lock-grid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .day-lock-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 10px; transition: all 0.2s ease; }
+    .day-lock-item:hover { border-color: var(--border); }
+    .day-lock-num { width: 28px; height: 28px; border-radius: 8px; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--accent-gold); flex-shrink: 0; }
+    .day-lock-info { flex: 1; }
+    .day-lock-label { font-size: 12.5px; font-weight: 500; color: var(--text-primary); }
+    .day-lock-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .day-lock-controls { display: flex; gap: 6px; align-items: center; }
+    .lock-btn { display: flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 99px; font-size: 10.5px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; border: 1px solid var(--border-subtle); color: var(--text-muted); background: transparent; }
+    .lock-btn.unlocked { border-color: rgba(141,175,155,0.35); color: var(--accent-sage); background: rgba(141,175,155,0.08); }
+    .lock-btn.locked { border-color: rgba(212,132,138,0.35); color: var(--accent-rose); background: rgba(212,132,138,0.08); }
+    .lock-btn.partial { border-color: rgba(201,169,110,0.35); color: var(--accent-gold); background: rgba(201,169,110,0.08); }
+
+    /* ACTIVITY VISIBILITY */
+    .activity-visibility { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; padding: 10px 12px; background: rgba(255,255,255,0.02); border-radius: 9px; border: 1px solid var(--border-subtle); }
+    .activity-vis-item { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; }
+    .activity-vis-name { color: var(--text-muted); }
+    .vis-toggle { display: flex; gap: 4px; }
+    .vis-opt { padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; border: 1px solid var(--border-subtle); color: var(--text-muted); }
+    .vis-opt.show { border-color: rgba(141,175,155,0.35); color: var(--accent-sage); background: rgba(141,175,155,0.08); }
+    .vis-opt.hide { border-color: rgba(212,132,138,0.2); color: var(--text-muted); }
+
+    /* RIGHT SIDEBAR */
+    .preview-sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+    /* SECTION CARD */
+    .section-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; overflow: hidden; }
+    .section-card-header { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .section-card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+    .section-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-gold); }
+    .section-card-body { padding: 16px 18px; }
+
+    /* PREVIEW LINK */
+    .preview-link-row { display: flex; align-items: center; gap: 8px; padding: 11px 14px; background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 10px; margin-bottom: 12px; }
+    .preview-link-text { flex: 1; font-size: 12px; color: var(--accent-gold); font-family: 'DM Sans', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .preview-link-copy { font-size: 11px; color: var(--text-muted); cursor: pointer; padding: 4px 10px; border: 1px solid var(--border-subtle); border-radius: 7px; transition: all 0.2s ease; white-space: nowrap; }
+    .preview-link-copy:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+    /* EMAIL PREVIEW */
+    .email-preview-box { background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+    .email-preview-header { padding: 12px 14px; border-bottom: 1px solid var(--border-subtle); }
+    .email-field { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 4px; }
+    .email-field:last-child { margin-bottom: 0; }
+    .email-field-label { color: var(--text-muted); min-width: 40px; }
+    .email-field-value { color: var(--text-primary); }
+    .email-preview-body { padding: 14px; }
+    .email-subject { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+    .email-body-text { font-size: 12.5px; color: var(--text-muted); line-height: 1.7; }
+    .email-body-text strong { color: var(--text-primary); }
+    .email-body-text a { color: var(--accent-gold); }
+    .email-regen-btn { font-size: 11px; color: var(--text-label); cursor: pointer; transition: color 0.2s ease; }
+    .email-regen-btn:hover { color: var(--accent-gold2); }
+
+    /* TEXT MESSAGE PREVIEW */
+    .sms-preview { background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+    .sms-bubble { background: rgba(201,169,110,0.12); border: 1px solid rgba(201,169,110,0.2); border-radius: 14px 14px 4px 14px; padding: 12px 14px; font-size: 12.5px; color: var(--text-primary); line-height: 1.6; }
+    .sms-from { font-size: 10.5px; color: var(--text-muted); margin-top: 6px; text-align: right; }
+
+    /* STATUS TRACKER */
+    .status-tracker { display: flex; flex-direction: column; gap: 8px; }
+    .status-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; font-size: 12.5px; }
+    .status-item.done { background: rgba(141,175,155,0.07); color: var(--accent-sage); }
+    .status-item.waiting { background: rgba(201,169,110,0.07); color: var(--accent-gold); }
+    .status-item.pending { color: var(--text-muted); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .status-dot.done { background: var(--accent-sage); }
+    .status-dot.waiting { background: var(--accent-gold); animation: pulse 2s infinite; }
+    .status-dot.pending { background: var(--border-subtle); }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* SEND CONFIRMATION POPUP */
+    .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+    .popup-overlay.open { opacity: 1; pointer-events: all; }
+    .popup { background: var(--bg-card); border: 1px solid var(--border); border-radius: 22px; padding: 32px; max-width: 480px; width: 90%; transform: scale(0.95); transition: transform 0.25s ease; text-align: center; }
+    .popup-overlay.open .popup { transform: scale(1); }
+    .popup-icon { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, rgba(212,132,138,0.15), rgba(201,169,110,0.1)); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+    .popup-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .popup-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+    .popup-actions { display: flex; flex-direction: column; gap: 10px; }
+    .popup-btn-row { display: flex; gap: 10px; }
+
+    /* SENT SUCCESS */
+    .sent-banner { display: none; padding: 14px 18px; background: rgba(141,175,155,0.1); border: 1px solid rgba(141,175,155,0.3); border-radius: 12px; margin-bottom: 14px; }
+    .sent-banner.visible { display: flex; align-items: center; gap: 12px; }
+    .sent-banner-text { font-size: 13px; color: var(--accent-sage); }
+    .sent-banner-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+    <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <div class="brand-icon"><img src="assets/globe-mascot.png" alt="" style="width:36px;height:36px;border-radius:10px;object-fit:contain;" /></div>
+        <div class="brand-name">
+          <div class="brand-title">Trip Studio</div>
+          <div class="brand-sub">BY MAME DEE</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">MAIN</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item  active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Client Trips
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Trip
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Vault
+      </a>
+      <div class="nav-section-label">SETTINGS</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item" style="color:var(--text-muted);font-size:12.5px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Exit to WordPress
+      </a>
+      <div class="user-card" style="margin-top:8px;">
+        <img src="assets/agent-dee.png" alt="Agent Dee" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,169,110,0.3);" />
+        <div>
+          <div class="user-name">Agent Dee</div>
+          <div class="user-role" style="color:var(--accent-gold);">AI Assistant</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="page-breadcrumb">
+        <a href="client-trips.html">Client Trips</a> &nbsp;/&nbsp;
+        <a href="new-client.html">Sarah &amp; Michael</a> &nbsp;/&nbsp;
+        <span>Dream Preview</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <span class="topbar-search-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          <input type="text" placeholder="Search trips, clients, destinations..." />
+        </div>
+        <div class="topbar-notif"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="notif-dot"></span></div>
+        <span style="font-size:13px;color:var(--text-primary);font-weight:500;">Good morning, <span style="color:var(--accent-gold);font-family:'Playfair Display',serif;font-style:italic;">Deja</span></span>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <div>
+          <div class="page-eyebrow">Dream Preview &nbsp;·&nbsp; Sarah &amp; Michael &nbsp;·&nbsp; Lisbon, Portugal</div>
+          <h1 class="page-title">Review &amp; Send the Dream Preview</h1>
+          <p class="page-desc">This is exactly what Sarah &amp; Michael will see. Set which days and activities are visible, then send the preview email.</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-ghost" onclick="window.location='budget.html'">Back to Budget</button>
+          <button class="btn-rose" onclick="openSendPopup()">Send Dream Preview</button>
+        </div>
+      </div>
+
+      <!-- LEFT: PREVIEW WINDOW + LOCK CONTROLS -->
+      <div>
+
+        <!-- SENT BANNER (hidden until sent) -->
+        <div class="sent-banner" id="sentBanner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <div>
+            <div class="sent-banner-text">Dream Preview sent to sarah.thompson@email.com</div>
+            <div class="sent-banner-sub">Sent just now &nbsp;·&nbsp; Text message also sent &nbsp;·&nbsp; Waiting for client to open</div>
+          </div>
+        </div>
+
+        <!-- BROWSER PREVIEW WINDOW -->
+        <div class="preview-window" style="margin-bottom:20px;">
+          <div class="preview-window-bar">
+            <div class="preview-dots">
+              <div class="preview-dot preview-dot-red"></div>
+              <div class="preview-dot preview-dot-yellow"></div>
+              <div class="preview-dot preview-dot-green"></div>
+            </div>
+            <div class="preview-url-bar">mamedeeworld.com/trip/sarah-michael-lisbon-2026</div>
+            <div class="preview-open-btn" onclick="alert('Opening client preview in new tab...')">Open in New Tab</div>
+          </div>
+
+          <!-- CLIENT PAGE MOCKUP -->
+          <div class="client-page-mockup">
+
+            <!-- LOGO HEADER -->
+            <div style="padding:14px 20px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(255,255,255,0.06);">
+              <img src="https://mamedeeworld.com/wp-content/uploads/2023/05/WhatsApp-Image-2023-07-27-at-10.39.56-AM.jpeg" style="height:36px;object-fit:contain;opacity:0.85;" alt="Mame Dee Travel World" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" />
+              <div style="display:none;font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--text-primary);letter-spacing:0.04em;">Mame Dee Travel World</div>
+            </div>
+
+            <!-- COVER PAGE -->
+            <div class="client-cover">
+              <img class="client-cover-img" src="assets/lisbon.jpg" alt="Lisbon" />
+              <div class="client-cover-overlay"></div>
+              <div class="client-cover-content">
+                <div class="client-cover-eyebrow">Your Dream Trip Awaits</div>
+                <div class="client-cover-title">Lisbon, Portugal</div>
+                <div class="client-cover-sub">A journey crafted just for you by Mame Dee Travel World</div>
+                <div class="client-cover-stat">October 5 &ndash; 14, 2026 &nbsp;&middot;&nbsp; 9 Nights &nbsp;&middot;&nbsp; 2 Travelers</div>
+              </div>
+              <div class="client-cover-did-you-know">
+                <strong>Did you know?</strong> Lisbon is one of Europe's oldest cities, pre-dating Rome by centuries. The city's iconic yellow trams have been running since 1873.
+              </div>
+            </div>
+
+            <!-- TRIP PREVIEW BODY -->
+            <div class="client-body">
+              <div style="display:flex;gap:16px;margin-bottom:16px;">
+                <div style="flex:1;padding:14px;background:rgba(201,169,110,0.07);border:1px solid rgba(201,169,110,0.18);border-radius:12px;">
+                  <div style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-gold);margin-bottom:6px;">Day 1 &nbsp;·&nbsp; Unlocked</div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:3px;">Arrival Day   Welcome to Lisbon</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);">Flight &rarr; Hotel Check-in &rarr; Fado Dinner</div>
+                </div>
+                <div style="flex:1;padding:14px;background:rgba(212,132,138,0.06);border:1px solid rgba(212,132,138,0.18);border-radius:12px;">
+                  <div style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-rose);margin-bottom:6px;">Days 2-9 &nbsp;·&nbsp; Locked</div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:3px;">Full Itinerary</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);">Unlocked after booking confirmation</div>
+                </div>
+              </div>
+
+              <div style="padding:14px;background:var(--bg-card2);border:1px solid var(--border-subtle);border-radius:12px;margin-bottom:14px;">
+                <div style="font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Your Accommodation Options</div>
+                <div style="display:flex;gap:10px;">
+                  <div style="flex:1;padding:10px;background:rgba(201,169,110,0.08);border:1px solid rgba(201,169,110,0.2);border-radius:9px;text-align:center;">
+                    <div style="font-size:12px;font-weight:600;color:var(--text-primary);">Bairro Alto Hotel</div>
+                    <div style="font-size:10.5px;color:var(--accent-gold);margin-top:2px;">Recommended</div>
+                  </div>
+                  <div style="flex:1;padding:10px;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:9px;text-align:center;">
+                    <div style="font-size:12px;font-weight:600;color:var(--text-muted);">Memmo Alfama</div>
+                    <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;">Option 2</div>
+                  </div>
+                  <div style="flex:1;padding:10px;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:9px;text-align:center;">
+                    <div style="font-size:12px;font-weight:600;color:var(--text-muted);">Hotel Avenida Palace</div>
+                    <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;">Option 3</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding:14px;background:rgba(141,175,155,0.06);border:1px solid rgba(141,175,155,0.18);border-radius:12px;text-align:center;">
+                <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">Ready to make this trip a reality?</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Review your trip details, choose your accommodation, and approve your plan.</div>
+                <div style="display:inline-flex;padding:11px 28px;background:linear-gradient(135deg,var(--accent-gold),#B8905A);border-radius:10px;font-size:13px;font-weight:600;color:#0D0B0F;cursor:pointer;">Approve My Trip</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY & ACTIVITY LOCK CONTROLS -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <div class="section-card-title"><div class="section-dot" style="background:var(--accent-rose)"></div>Day &amp; Activity Visibility</div>
+            <span style="font-size:11px;color:var(--text-label);cursor:pointer;" onclick="unlockAll()">Unlock All</span>
+          </div>
+          <div class="section-card-body">
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Control which days and activities your client can see on the preview page. Locked days show a teaser. Partial means only selected activities are visible.</div>
+
+            <div class="day-lock-grid">
+
+              <div class="day-lock-item">
+                <div class="day-lock-num">1</div>
+                <div class="day-lock-info">
+                  <div class="day-lock-label">Arrival Day   Welcome to Lisbon</div>
+                  <div class="day-lock-sub">Oct 5 &nbsp;&middot;&nbsp; 3 stops</div>
+                </div>
+                <div class="day-lock-controls">
+                  <div class="lock-btn unlocked" onclick="cycleLock(this)">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    Unlocked
+                  </div>
+                </div>
+              </div>
+
+              <div class="day-lock-item">
+                <div class="day-lock-num">2</div>
+                <div class="day-lock-info">
+                  <div class="day-lock-label">Belem and Pasteis Morning</div>
+                  <div class="day-lock-sub">Oct 6 &nbsp;&middot;&nbsp; 4 stops</div>
+                </div>
+                <div class="day-lock-controls">
+                  <div class="lock-btn partial" onclick="cycleLock(this)">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    Partial
+                  </div>
+                </div>
+              </div>
+
+              <!-- ACTIVITY VISIBILITY FOR DAY 2 -->
+              <div style="padding-left:38px;">
+                <div class="activity-visibility">
+                  <div class="activity-vis-item">
+                    <span class="activity-vis-name">Belem Tower &amp; Monastery</span>
+                    <div class="vis-toggle">
+                      <div class="vis-opt show" onclick="toggleVis(this,'show')">Show</div>
+                      <div class="vis-opt" onclick="toggleVis(this,'hide')">Hide</div>
+                    </div>
+                  </div>
+                  <div class="activity-vis-item">
+                    <span class="activity-vis-name">Pasteis de Belem</span>
+                    <div class="vis-toggle">
+                      <div class="vis-opt show" onclick="toggleVis(this,'show')">Show</div>
+                      <div class="vis-opt" onclick="toggleVis(this,'hide')">Hide</div>
+                    </div>
+                  </div>
+                  <div class="activity-vis-item">
+                    <span class="activity-vis-name">Sunset at Miradouro</span>
+                    <div class="vis-toggle">
+                      <div class="vis-opt" onclick="toggleVis(this,'show')">Show</div>
+                      <div class="vis-opt show" onclick="toggleVis(this,'hide')">Hide</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="day-lock-item">
+                <div class="day-lock-num">3</div>
+                <div class="day-lock-info">
+                  <div class="day-lock-label">Sintra Day Trip</div>
+                  <div class="day-lock-sub">Oct 7 &nbsp;&middot;&nbsp; 3 stops</div>
+                </div>
+                <div class="day-lock-controls">
+                  <div class="lock-btn locked" onclick="cycleLock(this)">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    Locked
+                  </div>
+                </div>
+              </div>
+
+              <div class="day-lock-item">
+                <div class="day-lock-num">4-9</div>
+                <div class="day-lock-info">
+                  <div class="day-lock-label">Remaining Days</div>
+                  <div class="day-lock-sub">Oct 8–14 &nbsp;&middot;&nbsp; All locked</div>
+                </div>
+                <div class="day-lock-controls">
+                  <div class="lock-btn locked" onclick="cycleLock(this)">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    Locked
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /left -->
+
+      <!-- RIGHT SIDEBAR -->
+      <div class="preview-sidebar">
+
+        <!-- PREVIEW LINK -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <div class="section-card-title"><div class="section-dot"></div>Preview Link</div>
+          </div>
+          <div class="section-card-body">
+            <div class="preview-link-row">
+              <div class="preview-link-text">mamedeeworld.com/trip/sarah-michael-lisbon-2026</div>
+              <div class="preview-link-copy" onclick="copyLink()">Copy</div>
+            </div>
+            <div style="font-size:11.5px;color:var(--text-muted);line-height:1.6;">This link is unique to Sarah &amp; Michael. It will be included in the email and text message automatically.</div>
+          </div>
+        </div>
+
+        <!-- EMAIL PREVIEW -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <div class="section-card-title"><div class="section-dot" style="background:var(--accent-rose)"></div>Email Preview</div>
+            <span class="email-regen-btn" onclick="regenEmail()">Regenerate</span>
+          </div>
+          <div class="section-card-body">
+            <div class="email-preview-box">
+              <div class="email-preview-header">
+                <div class="email-field"><span class="email-field-label">From:</span><span class="email-field-value">support@mamedeeworld.com</span></div>
+                <div class="email-field"><span class="email-field-label">To:</span><span class="email-field-value">sarah.thompson@email.com</span></div>
+                <div class="email-field"><span class="email-field-label">Subject:</span><span class="email-field-value" style="color:var(--accent-gold);">Your Lisbon Dream Trip Preview is Ready</span></div>
+              </div>
+              <div class="email-preview-body">
+                <div class="email-subject">Your Dream Trip to Lisbon is Here</div>
+                <div class="email-body-text">
+                  Hi <strong>Sarah &amp; Michael</strong>,<br/><br/>
+                  Your personalized trip preview for <strong>Lisbon, Portugal</strong> is ready and waiting for you.<br/><br/>
+                  I have put together a curated plan built around your travel style, budget, and the anniversary celebration you deserve. Take a look, explore your accommodation options, and let me know what you think.<br/><br/>
+                  <a href="#">View Your Dream Trip Preview &rarr;</a><br/><br/>
+                  If you love it, simply click <strong>Approve My Trip</strong> and we will get everything locked in.<br/><br/>
+                  Questions? Just reply to this email.<br/><br/>
+                  With love,<br/>
+                  <strong>Deja &nbsp;&middot;&nbsp; Mame Dee Travel World</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TEXT MESSAGE PREVIEW -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <div class="section-card-title"><div class="section-dot" style="background:var(--accent-sage)"></div>Text Message</div>
+            <span class="email-regen-btn" onclick="regenSMS()">Regenerate</span>
+          </div>
+          <div class="section-card-body">
+            <div class="sms-preview">
+              <div class="sms-bubble" id="smsBubble">
+                Hi Sarah &amp; Michael! Your Lisbon dream trip preview from Mame Dee Travel World is in your inbox. Check your primary inbox (and spam/junk just in case) for an email from support@mamedeeworld.com. Your trip is ready to review!
+              </div>
+              <div class="sms-from">From: Mame Dee Travel World &nbsp;&middot;&nbsp; To: (555) 847-2910</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATUS TRACKER -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <div class="section-card-title"><div class="section-dot" style="background:var(--accent-lavender)"></div>Preview Status</div>
+          </div>
+          <div class="section-card-body">
+            <div class="status-tracker" id="statusTracker">
+              <div class="status-item done"><div class="status-dot done"></div>Trip built &amp; reviewed</div>
+              <div class="status-item done"><div class="status-dot done"></div>Budget finalized</div>
+              <div class="status-item waiting" id="statusSend"><div class="status-dot waiting"></div>Preview not yet sent</div>
+              <div class="status-item pending" id="statusOpen"><div class="status-dot pending"></div>Waiting for client to open</div>
+              <div class="status-item pending" id="statusApprove"><div class="status-dot pending"></div>Waiting for approval</div>
+              <div class="status-item pending" id="statusPayment"><div class="status-dot pending"></div>Payment pending</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /preview-sidebar -->
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- SEND CONFIRMATION POPUP -->
+<div class="popup-overlay" id="sendPopup">
+  <div class="popup">
+    <div class="popup-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 2L11 13"/>
+        <path d="M22 2L15 22l-4-9-9-4 19-7z"/>
+      </svg>
+    </div>
+    <div class="popup-title">Send Dream Preview?</div>
+    <div class="popup-sub">This will send the preview email from <strong>support@mamedeeworld.com</strong> to <strong>sarah.thompson@email.com</strong> and a text message to <strong>(555) 847-2910</strong>. Ready to go?</div>
+    <div class="popup-actions">
+      <div class="btn-rose" style="text-align:center;padding:13px;border-radius:10px;cursor:pointer;" onclick="sendPreview()">Send Now</div>
+      <div class="popup-btn-row">
+        <div class="btn-ghost" style="flex:1;text-align:center;" onclick="closeSendPopup()">Cancel</div>
+        <div class="btn-ghost" style="flex:1;text-align:center;" onclick="closeSendPopup()">Edit Email First</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openSendPopup() {
+    document.getElementById('sendPopup').classList.add('open');
+  }
+
+  function closeSendPopup() {
+    document.getElementById('sendPopup').classList.remove('open');
+  }
+
+  function sendPreview() {
+    closeSendPopup();
+    // Show sent banner
+    document.getElementById('sentBanner').classList.add('visible');
+    // Update status tracker
+    document.getElementById('statusSend').className = 'status-item done';
+    document.getElementById('statusSend').innerHTML = '<div class="status-dot done"></div>Preview sent &nbsp;&middot;&nbsp; Just now';
+    document.getElementById('statusOpen').className = 'status-item waiting';
+    document.getElementById('statusOpen').querySelector('.status-dot').className = 'status-dot waiting';
+    // Scroll to top
+    document.querySelector('.main').scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function cycleLock(btn) {
+    const states = ['unlocked', 'partial', 'locked'];
+    const labels = ['Unlocked', 'Partial', 'Locked'];
+    const icons = [
+      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>',
+      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>'
+    ];
+    const current = states.findIndex(s => btn.classList.contains(s));
+    const next = (current + 1) % states.length;
+    btn.className = 'lock-btn ' + states[next];
+    btn.innerHTML = icons[next] + ' ' + labels[next];
+  }
+
+  function unlockAll() {
+    document.querySelectorAll('.lock-btn').forEach(btn => {
+      btn.className = 'lock-btn unlocked';
+      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Unlocked';
+    });
+  }
+
+  function toggleVis(btn, action) {
+    const row = btn.closest('.vis-toggle');
+    row.querySelectorAll('.vis-opt').forEach(b => b.classList.remove('show'));
+    btn.classList.add('show');
+  }
+
+  function copyLink() {
+    const link = 'mamedeeworld.com/trip/sarah-michael-lisbon-2026';
+    navigator.clipboard.writeText(link).catch(() => {});
+    const btn = event.target;
+    btn.textContent = 'Copied!';
+    btn.style.color = 'var(--accent-sage)';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 2000);
+  }
+
+  const emailVariants = [
+    { subject: 'Your Lisbon Dream Trip Preview is Ready', greeting: 'Hi Sarah &amp; Michael,', body: 'Your personalized trip preview for <strong>Lisbon, Portugal</strong> is ready and waiting for you.<br/><br/>I have put together a curated plan built around your travel style, budget, and the anniversary celebration you deserve. Take a look, explore your accommodation options, and let me know what you think.' },
+    { subject: 'Deja here   Your Lisbon trip is ready to review!', greeting: 'Sarah &amp; Michael,', body: 'I am so excited to share this with you. Your <strong>Lisbon dream trip</strong> is fully built and ready for your eyes.<br/><br/>From the Fado dinner in Chiado to a day trip through the fairy-tale palaces of Sintra, this trip was designed with your anniversary in mind. Go take a look.' },
+  ];
+  let emailIdx = 0;
+
+  function regenEmail() {
+    emailIdx = (emailIdx + 1) % emailVariants.length;
+    const v = emailVariants[emailIdx];
+    document.querySelector('.email-subject').textContent = v.subject.replace(/ /g, ' ');
+    document.querySelector('.email-body-text').innerHTML = v.greeting + '<br/><br/>' + v.body + '<br/><br/><a href="#">View Your Dream Trip Preview &rarr;</a><br/><br/>If you love it, simply click <strong>Approve My Trip</strong> and we will get everything locked in.<br/><br/>With love,<br/><strong>Deja &nbsp;&middot;&nbsp; Mame Dee Travel World</strong>';
+  }
+
+  const smsVariants = [
+    'Hi Sarah &amp; Michael! Your Lisbon dream trip preview from Mame Dee Travel World is in your inbox. Check your primary inbox (and spam/junk just in case) for an email from support@mamedeeworld.com. Your trip is ready to review!',
+    'Sarah &amp; Michael, your personalized Lisbon trip preview is waiting for you! Check your inbox from support@mamedeeworld.com   and check spam too just in case. So excited for you both!',
+  ];
+  let smsIdx = 0;
+
+  function regenSMS() {
+    smsIdx = (smsIdx + 1) % smsVariants.length;
+    document.getElementById('smsBubble').innerHTML = smsVariants[smsIdx];
+  }
+</script>
+
+</body>
+</html>

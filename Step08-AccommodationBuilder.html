@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trip Studio   Accommodation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deep: #0D0B0F; --bg-card: #16121A; --bg-card2: #1C1722;
+      --accent-gold: #C9A96E; --accent-gold2: #E8C98A;
+      --accent-rose: #D4848A; --accent-blush: #F2C4C4;
+      --accent-sage: #8DAF9B; --accent-lavender: #B8A9C9;
+      --text-primary: #F5EFE6; --text-muted: #9A8F8A; --text-label: #C9A96E;
+      --border: rgba(201,169,110,0.18); --border-subtle: rgba(255,255,255,0.06);
+      --sidebar-w: 248px;
+    }
+    html, body { height: 100%; background: var(--bg-deep); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 99px; }
+    .layout { display: flex; height: 100vh; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: linear-gradient(180deg, #110E15 0%, #0D0B0F 100%); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: relative; z-index: 10; flex-shrink: 0; }
+    .sidebar::before { content: ''; position: absolute; top: 0; right: 0; width: 1px; height: 100%; background: linear-gradient(180deg, transparent, var(--accent-gold), transparent); opacity: 0.3; }
+    .sidebar-brand { padding: 28px 24px 20px; border-bottom: 1px solid var(--border-subtle); }
+    .brand-logo { display: flex; align-items: center; gap: 10px; }
+    .brand-icon { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+    .brand-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .brand-sub { font-size: 10px; font-weight: 500; color: var(--text-label); letter-spacing: 0.14em; text-transform: uppercase; }
+    .sidebar-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
+    .nav-section-label { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); padding: 0 12px; margin: 20px 0 8px; }
+    .nav-section-label:first-child { margin-top: 0; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; color: var(--text-muted); font-size: 13.5px; text-decoration: none; position: relative; margin-bottom: 2px; }
+    .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+    .nav-item.active { background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(212,132,138,0.08)); color: var(--accent-gold2); font-weight: 500; border: 1px solid rgba(201,169,110,0.2); }
+    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 60%; background: linear-gradient(180deg, var(--accent-gold), var(--accent-rose)); border-radius: 0 3px 3px 0; }
+    .nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+    .nav-badge { margin-left: auto; background: var(--accent-rose); color: white; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+    .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--border-subtle); }
+    .user-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gold), var(--accent-rose)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; font-family: 'Playfair Display', serif; border: 2px solid rgba(201,169,110,0.3); letter-spacing: 0.02em; }
+    .user-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .user-role { font-size: 11px; color: var(--text-label); }
+
+    /* MAIN */
+    .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+    /* TOPBAR */
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; background: rgba(13,11,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 5; }
+    .page-breadcrumb { font-size: 12px; color: var(--text-muted); }
+    .page-breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .page-breadcrumb a:hover { color: var(--accent-gold); }
+    .page-breadcrumb span { color: var(--accent-gold); }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .topbar-search { position: relative; }
+    .topbar-search input { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 8px 14px 8px 36px; font-size: 12.5px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; outline: none; width: 220px; transition: border-color 0.2s ease; }
+    .topbar-search input:focus { border-color: var(--accent-gold); }
+    .topbar-search input::placeholder { color: var(--text-muted); }
+    .topbar-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+    .topbar-notif { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+    .notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: var(--accent-rose); border-radius: 50%; border: 1.5px solid var(--bg-deep); }
+
+    /* WORKFLOW BAR */
+    .workflow-bar { background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); padding: 16px 32px; }
+    .workflow-steps { display: flex; align-items: center; gap: 0; max-width: 900px; }
+    .workflow-step { display: flex; align-items: center; gap: 10px; flex: 1; position: relative; }
+    .workflow-step:not(:last-child)::after { content: ''; position: absolute; left: 32px; right: -10px; top: 15px; height: 2px; background: var(--border-subtle); z-index: 0; }
+    .workflow-step.done:not(:last-child)::after { background: var(--accent-gold); opacity: 0.5; }
+    .step-circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; position: relative; z-index: 1; }
+    .step-circle.done { background: linear-gradient(135deg, var(--accent-gold), #B8905A); color: #0D0B0F; }
+    .step-circle.active { background: linear-gradient(135deg, var(--accent-rose), #C06870); color: white; box-shadow: 0 0 0 4px rgba(212,132,138,0.2); }
+    .step-circle.pending { background: var(--bg-card2); border: 2px solid var(--border-subtle); color: var(--text-muted); }
+    .step-label { font-size: 11px; font-weight: 500; white-space: nowrap; }
+    .step-label.done { color: var(--accent-gold); }
+    .step-label.active { color: var(--text-primary); }
+    .step-label.pending { color: var(--text-muted); }
+
+    /* OPTION TABS */
+    .option-tabs { display: flex; gap: 8px; padding: 24px 32px 0; }
+    .option-tab { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: 1px solid var(--border-subtle); color: var(--text-muted); background: var(--bg-card); }
+    .option-tab.active { background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(212,132,138,0.08)); color: var(--accent-gold2); border-color: rgba(201,169,110,0.3); }
+    .option-tab.completed { border-color: rgba(141,175,155,0.3); color: var(--accent-sage); background: rgba(141,175,155,0.06); }
+    .option-tab.recommended-tab { border-color: rgba(201,169,110,0.5); color: var(--accent-gold); background: rgba(201,169,110,0.1); }
+    .option-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: 0.6; }
+    .add-option-tab { display: flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: 1px dashed rgba(201,169,110,0.25); color: var(--text-muted); background: transparent; }
+    .add-option-tab:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+    /* CONTENT */
+    .content { padding: 20px 32px 60px; }
+
+    /* INPUT SOURCE ROW */
+    .source-row { display: flex; gap: 10px; margin-bottom: 24px; }
+    .source-btn { flex: 1; padding: 14px 18px; background: var(--bg-card); border: 1.5px dashed rgba(201,169,110,0.22); border-radius: 13px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.22s ease; }
+    .source-btn:hover, .source-btn.active { border-color: var(--accent-gold); background: rgba(201,169,110,0.05); }
+    .source-btn-icon { width: 36px; height: 36px; border-radius: 9px; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .source-btn-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .source-btn-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* MANUAL SEARCH ROW */
+    .manual-search-row { display: flex; gap: 10px; margin-bottom: 20px; }
+    .manual-search-input { flex: 1; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 16px 12px 40px; font-size: 13.5px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s ease; position: relative; }
+    .manual-search-wrap { flex: 1; position: relative; }
+    .manual-search-wrap input { width: 100%; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 16px 12px 42px; font-size: 13.5px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s ease; }
+    .manual-search-wrap input:focus { border-color: var(--accent-gold); }
+    .manual-search-wrap input::placeholder { color: var(--text-muted); }
+    .manual-search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+    .manual-search-btn { padding: 12px 22px; background: linear-gradient(135deg, var(--accent-gold), #B8905A); border-radius: 10px; font-size: 13px; font-weight: 600; color: #0D0B0F; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; }
+    .manual-search-btn:hover { box-shadow: 0 4px 16px rgba(201,169,110,0.3); }
+
+    /* AUTOCOMPLETE DROPDOWN */
+    .autocomplete-dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; z-index: 50; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.5); display: none; }
+    .autocomplete-dropdown.open { display: block; }
+    .autocomplete-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; transition: background 0.15s ease; border-bottom: 1px solid var(--border-subtle); }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover { background: rgba(201,169,110,0.07); }
+    .autocomplete-thumb { width: 40px; height: 40px; border-radius: 8px; background-size: cover; background-position: center; flex-shrink: 0; background-color: var(--bg-card2); }
+    .autocomplete-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .autocomplete-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .autocomplete-type { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; margin-left: auto; flex-shrink: 0; }
+    .type-luxury { background: rgba(201,169,110,0.15); color: var(--accent-gold); }
+    .type-boutique { background: rgba(184,169,201,0.15); color: var(--accent-lavender); }
+    .type-midtier { background: rgba(141,175,155,0.15); color: var(--accent-sage); }
+
+    /* GENERATED BADGE */
+    .generated-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 12px; border-radius: 99px; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.2); color: var(--accent-gold); margin-bottom: 16px; }
+
+    /* MAIN FORM GRID */
+    .form-grid { display: grid; grid-template-columns: 1fr 360px; gap: 24px; }
+
+    /* HERO BUILDER */
+    .hero-builder { border-radius: 16px; overflow: hidden; position: relative; height: 220px; background: var(--bg-card); border: 1px solid var(--border-subtle); margin-bottom: 18px; }
+    .hero-img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-overlay-dark { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(13,11,15,0.88) 100%); }
+    .hero-actions-bar { position: absolute; top: 12px; right: 12px; display: flex; gap: 7px; }
+    .hero-action-btn { padding: 6px 13px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; backdrop-filter: blur(8px); transition: all 0.2s ease; }
+    .hero-btn-regen { background: rgba(201,169,110,0.88); color: #0D0B0F; }
+    .hero-btn-regen:hover { background: var(--accent-gold); }
+    .hero-btn-upload { background: rgba(13,11,15,0.72); color: var(--text-primary); border: 1px solid rgba(255,255,255,0.14); }
+    .hero-btn-upload:hover { border-color: var(--accent-gold); }
+    .hero-property-label { position: absolute; bottom: 14px; left: 18px; font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text-primary); text-shadow: 0 2px 12px rgba(0,0,0,0.6); }
+    .hero-ai-badge { position: absolute; bottom: 14px; right: 14px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 99px; background: rgba(201,169,110,0.2); border: 1px solid rgba(201,169,110,0.35); color: var(--accent-gold); backdrop-filter: blur(8px); }
+
+    /* PROFILE SECTION */
+    .profile-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; margin-bottom: 14px; overflow: hidden; }
+    .profile-section-header { padding: 13px 17px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .profile-section-title { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: 7px; }
+    .section-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-gold); }
+    .profile-section-body { padding: 15px 17px; }
+
+    /* FIELDS */
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .field-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 11px; }
+    .field-group { display: flex; flex-direction: column; gap: 5px; }
+    .field-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .field-input { background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 9px; padding: 10px 13px; font-size: 13px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s ease; width: 100%; }
+    .field-input:focus { border-color: var(--accent-gold); }
+    .field-input::placeholder { color: var(--text-muted); }
+    .field-select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239A8F8A' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+    .field-input option { background: var(--bg-card2); }
+    .field-textarea { resize: vertical; min-height: 72px; line-height: 1.6; }
+
+    /* NIGHTS STEPPER */
+    .nights-stepper { display: flex; align-items: center; gap: 0; background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 9px; overflow: hidden; }
+    .stepper-btn { width: 36px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; color: var(--text-muted); transition: all 0.2s ease; background: transparent; border: none; font-family: 'DM Sans', sans-serif; }
+    .stepper-btn:hover { background: rgba(201,169,110,0.1); color: var(--accent-gold); }
+    .stepper-value { flex: 1; text-align: center; font-size: 14px; font-weight: 600; color: var(--text-primary); padding: 10px 0; border-left: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); }
+
+    /* AMENITY TAGS */
+    .amenity-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+    .amenity-tag { display: flex; align-items: center; gap: 6px; padding: 5px 12px; background: rgba(141,175,155,0.1); border: 1px solid rgba(141,175,155,0.22); border-radius: 99px; font-size: 12px; color: var(--accent-sage); cursor: pointer; transition: all 0.2s ease; }
+    .amenity-tag.selected { background: rgba(141,175,155,0.2); border-color: rgba(141,175,155,0.4); }
+    .amenity-tag:hover { background: rgba(141,175,155,0.18); }
+
+    /* LOYALTY PROGRAM */
+    .loyalty-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(201,169,110,0.06); border: 1px solid rgba(201,169,110,0.18); border-radius: 10px; }
+    .loyalty-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(201,169,110,0.12); border: 1px solid rgba(201,169,110,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .loyalty-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .loyalty-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .loyalty-enroll-btn { margin-left: auto; font-size: 11px; font-weight: 600; padding: 6px 14px; border-radius: 99px; background: rgba(201,169,110,0.15); border: 1px solid rgba(201,169,110,0.3); color: var(--accent-gold); cursor: pointer; white-space: nowrap; transition: all 0.2s ease; }
+    .loyalty-enroll-btn:hover { background: rgba(201,169,110,0.28); }
+
+    /* RECOMMENDATION REASON */
+    .rec-reason { background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 13px 15px; font-size: 12.5px; color: var(--text-muted); line-height: 1.7; font-style: italic; font-family: 'Cormorant Garamond', serif; font-size: 15px; }
+
+    /* RIGHT SIDEBAR */
+    .right-sidebar { display: flex; flex-direction: column; gap: 14px; }
+
+    /* OPTION STATUS CARD */
+    .option-status-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; overflow: hidden; }
+    .option-status-header { padding: 13px 17px; border-bottom: 1px solid var(--border-subtle); font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: 7px; }
+    .option-status-body { padding: 14px 17px; display: flex; flex-direction: column; gap: 8px; }
+    .option-status-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-radius: 9px; font-size: 12.5px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; }
+    .option-status-item.active-opt { background: rgba(201,169,110,0.1); border-color: rgba(201,169,110,0.25); color: var(--accent-gold2); }
+    .option-status-item.done-opt { background: rgba(141,175,155,0.07); border-color: rgba(141,175,155,0.2); color: var(--accent-sage); }
+    .option-status-item.pending-opt { color: var(--text-muted); background: var(--bg-card2); }
+    .option-status-right { display: flex; align-items: center; gap: 8px; }
+    .opt-check { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+    .opt-check.done { background: rgba(141,175,155,0.2); color: var(--accent-sage); }
+    .opt-check.pending { background: var(--bg-card2); border: 1.5px solid var(--border-subtle); }
+
+    /* RECOMMEND BUTTON */
+    .recommend-btn { width: 100%; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.2s ease; border: 1.5px solid rgba(201,169,110,0.35); color: var(--accent-gold); background: rgba(201,169,110,0.08); }
+    .recommend-btn:hover { background: rgba(201,169,110,0.18); border-color: var(--accent-gold); }
+    .recommend-btn.is-recommended { background: linear-gradient(135deg, var(--accent-gold), #B8905A); color: #0D0B0F; border-color: transparent; }
+
+    /* TOTAL CALC */
+    .total-calc { background: linear-gradient(135deg, rgba(201,169,110,0.1), rgba(212,132,138,0.06)); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+    .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; margin-bottom: 6px; }
+    .total-row:last-child { margin-bottom: 0; padding-top: 8px; border-top: 1px solid var(--border-subtle); }
+    .total-label { color: var(--text-muted); }
+    .total-value { font-weight: 600; color: var(--text-primary); }
+    .total-value.gold { color: var(--accent-gold); font-family: 'Playfair Display', serif; font-size: 18px; }
+
+    /* SAVE ROW */
+    .save-row { display: flex; align-items: center; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-subtle); }
+    .btn-primary { padding: 13px 28px; background: linear-gradient(135deg, var(--accent-gold), #B8905A); border-radius: 10px; font-size: 13px; font-weight: 600; color: #0D0B0F; cursor: pointer; transition: all 0.2s ease; border: none; }
+    .btn-primary:hover { box-shadow: 0 6px 20px rgba(201,169,110,0.35); transform: translateY(-1px); }
+    .btn-ghost { padding: 13px 24px; background: transparent; border: 1px solid var(--border-subtle); border-radius: 10px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; }
+    .btn-ghost:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+    /* POPUP */
+    .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+    .popup-overlay.open { opacity: 1; pointer-events: all; }
+    .popup { background: var(--bg-card); border: 1px solid var(--border); border-radius: 22px; padding: 32px; max-width: 480px; width: 90%; transform: scale(0.95); transition: transform 0.25s ease; text-align: center; }
+    .popup-overlay.open .popup { transform: scale(1); }
+    .popup-icon { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(212,132,138,0.1)); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+    .popup-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .popup-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+    .popup-actions { display: flex; flex-direction: column; gap: 10px; }
+    .popup-btn-row { display: flex; gap: 10px; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+    <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <div class="brand-icon"><img src="assets/globe-mascot.png" alt="" style="width:36px;height:36px;border-radius:10px;object-fit:contain;" /></div>
+        <div class="brand-name">
+          <div class="brand-title">Trip Studio</div>
+          <div class="brand-sub">BY MAME DEE</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">MAIN</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item  active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Client Trips
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Trip
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Vault
+      </a>
+      <div class="nav-section-label">SETTINGS</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item" style="color:var(--text-muted);font-size:12.5px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Exit to WordPress
+      </a>
+      <div class="user-card" style="margin-top:8px;">
+        <img src="assets/agent-dee.png" alt="Agent Dee" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,169,110,0.3);" />
+        <div>
+          <div class="user-name">Agent Dee</div>
+          <div class="user-role" style="color:var(--accent-gold);">AI Assistant</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="page-breadcrumb">
+        <a href="client-trips.html">Client Trips</a> &nbsp;/&nbsp;
+        <a href="new-client.html">Sarah &amp; Michael</a> &nbsp;/&nbsp;
+        <span>Accommodation</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <span class="topbar-search-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+          <input type="text" placeholder="Search trips, clients, destinations..." />
+        </div>
+        <div class="topbar-notif">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span class="notif-dot"></span>
+        </div>
+        <span style="font-size:13px;color:var(--text-primary);font-weight:500;">Good morning, <span style="color:var(--accent-gold);font-family:'Playfair Display',serif;font-style:italic;">Deja</span></span>
+      </div>
+    </div>
+
+    <!-- WORKFLOW BAR -->
+    <div class="workflow-bar">
+      <div class="workflow-steps">
+        <div class="workflow-step done">
+          <div class="step-circle done">&#10003;</div>
+          <span class="step-label done">Profile</span>
+        </div>
+        <div class="workflow-step done">
+          <div class="step-circle done">&#10003;</div>
+          <span class="step-label done">Flights</span>
+        </div>
+        <div class="workflow-step active">
+          <div class="step-circle active">3</div>
+          <span class="step-label active">Accommodation</span>
+        </div>
+        <div class="workflow-step pending">
+          <div class="step-circle pending">4</div>
+          <span class="step-label pending">Transportation</span>
+        </div>
+        <div class="workflow-step pending">
+          <div class="step-circle pending">5</div>
+          <span class="step-label pending">Itinerary</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPTION TABS -->
+    <div class="option-tabs">
+      <div class="option-tab active" id="tab1" onclick="switchOption(1)">
+        <div class="option-dot"></div>
+        Option 1
+      </div>
+      <div class="option-tab" id="tab2" onclick="switchOption(2)">
+        <div class="option-dot"></div>
+        Option 2
+      </div>
+      <div class="add-option-tab" id="addTab3" onclick="addOption3()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add 3rd Option
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- PAGE HEADER -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-label);margin-bottom:6px;">Accommodation · Option <span id="optionNum">1</span> of <span id="optionTotal">2</span></div>
+        <h1 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">Add Accommodation</h1>
+        <p style="font-size:13px;color:var(--text-muted);">Upload a screenshot or booking URL, or search by property name. Dee will auto-populate all details.</p>
+      </div>
+
+      <!-- INPUT SOURCE ROW -->
+      <div class="source-row">
+        <div class="source-btn active" onclick="setSource('upload')">
+          <div class="source-btn-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="source-btn-label">Upload Screenshot or PDF</div>
+            <div class="source-btn-sub">Booking confirmation, hotel page, or screenshot</div>
+          </div>
+        </div>
+        <div class="source-btn" onclick="setSource('url')">
+          <div class="source-btn-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <div>
+            <div class="source-btn-label">Paste URL</div>
+            <div class="source-btn-sub">Booking.com, Hotels.com, Airbnb, or direct link</div>
+          </div>
+        </div>
+        <div class="source-btn" onclick="setSource('manual')">
+          <div class="source-btn-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+          </div>
+          <div>
+            <div class="source-btn-label">Search by Name</div>
+            <div class="source-btn-sub">Type a property name and Dee will find it</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANUAL SEARCH (shown when source = manual) -->
+      <div id="manualSearchRow" style="display:none;margin-bottom:20px;">
+        <div class="manual-search-wrap" style="position:relative;">
+          <span class="manual-search-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+          <input type="text" placeholder="Start typing a hotel or property name..." id="propertySearch" oninput="showAutocomplete(this.value)" />
+          <div class="autocomplete-dropdown" id="autocompleteDropdown">
+            <div class="autocomplete-item" onclick="selectProperty('Bairro Alto Hotel', 'Chiado, Lisbon', 'Luxury', 'assets/lisbon.jpg')">
+              <div class="autocomplete-thumb" style="background-image:url('assets/lisbon.jpg')"></div>
+              <div>
+                <div class="autocomplete-name">Bairro Alto Hotel</div>
+                <div class="autocomplete-meta">Chiado, Lisbon · 5-star · From $420/night</div>
+              </div>
+              <span class="autocomplete-type type-luxury">Luxury</span>
+            </div>
+            <div class="autocomplete-item" onclick="selectProperty('Memmo Alfama', 'Alfama, Lisbon', 'Boutique', 'assets/amalfi.jpg')">
+              <div class="autocomplete-thumb" style="background-image:url('assets/amalfi.jpg')"></div>
+              <div>
+                <div class="autocomplete-name">Memmo Alfama</div>
+                <div class="autocomplete-meta">Alfama, Lisbon · Boutique · From $280/night</div>
+              </div>
+              <span class="autocomplete-type type-boutique">Boutique</span>
+            </div>
+            <div class="autocomplete-item" onclick="selectProperty('Hotel Avenida Palace', 'Baixa, Lisbon', 'Mid-tier', 'assets/paris.jpg')">
+              <div class="autocomplete-thumb" style="background-image:url('assets/paris.jpg')"></div>
+              <div>
+                <div class="autocomplete-name">Hotel Avenida Palace</div>
+                <div class="autocomplete-meta">Baixa, Lisbon · 4-star · From $195/night</div>
+              </div>
+              <span class="autocomplete-type type-midtier">Mid-tier</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- URL INPUT (shown when source = url) -->
+      <div id="urlInputRow" style="display:none;margin-bottom:20px;">
+        <div style="display:flex;gap:10px;">
+          <input type="url" class="field-input" placeholder="https://www.booking.com/hotel/..." style="flex:1;" />
+          <div class="manual-search-btn" onclick="simulateAutoFill()">Extract Details</div>
+        </div>
+      </div>
+
+      <div class="generated-badge" id="generatedBadge">Auto-populated from Booking.com listing</div>
+
+      <!-- MAIN FORM GRID -->
+      <div class="form-grid">
+        <div>
+
+          <!-- HERO IMAGE -->
+          <div class="hero-builder">
+            <img class="hero-img" src="assets/lisbon.jpg" alt="Property hero" id="heroImg" />
+            <div class="hero-overlay-dark"></div>
+            <div class="hero-actions-bar">
+              <div class="hero-action-btn hero-btn-regen">Regenerate</div>
+              <div class="hero-action-btn hero-btn-upload" onclick="document.getElementById('heroUpload').click()">Upload Image</div>
+            </div>
+            <input type="file" id="heroUpload" accept="image/*" style="display:none;" onchange="previewHero(this)" />
+            <div class="hero-property-label" id="heroLabel">Bairro Alto Hotel</div>
+            <div class="hero-ai-badge">AI Generated</div>
+          </div>
+
+          <!-- PROPERTY DETAILS -->
+          <div class="profile-section">
+            <div class="profile-section-header">
+              <div class="profile-section-title"><div class="section-dot"></div>Property Details</div>
+            </div>
+            <div class="profile-section-body">
+              <div class="field-grid" style="margin-bottom:12px;">
+                <div class="field-group">
+                  <label class="field-label">Property Name</label>
+                  <input class="field-input" type="text" value="Bairro Alto Hotel" id="propName" oninput="updateHeroLabel(this.value)" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Location / Neighborhood</label>
+                  <input class="field-input" type="text" value="Chiado, Lisbon, Portugal" />
+                </div>
+              </div>
+              <div class="field-grid-3">
+                <div class="field-group">
+                  <label class="field-label">Hotel Type</label>
+                  <select class="field-input field-select" id="hotelType">
+                    <option selected>Luxury</option>
+                    <option>Boutique</option>
+                    <option>Mid-tier</option>
+                    <option>Budget</option>
+                    <option>Airbnb</option>
+                    <option>Hostel</option>
+                    <option>Resort</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Room Type</label>
+                  <input class="field-input" type="text" value="Deluxe King Room" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Number of Beds</label>
+                  <select class="field-input field-select">
+                    <option>1 King</option>
+                    <option>2 Queen</option>
+                    <option>2 Twin</option>
+                    <option>1 Queen</option>
+                    <option>Studio</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DATES & PRICING -->
+          <div class="profile-section">
+            <div class="profile-section-header">
+              <div class="profile-section-title"><div class="section-dot" style="background:var(--accent-rose)"></div>Dates &amp; Pricing</div>
+            </div>
+            <div class="profile-section-body">
+              <div class="field-grid" style="margin-bottom:12px;">
+                <div class="field-group">
+                  <label class="field-label">Check-in Date</label>
+                  <input class="field-input" type="date" value="2026-10-05" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Check-out Date</label>
+                  <input class="field-input" type="date" value="2026-10-14" />
+                </div>
+              </div>
+              <div class="field-grid-3">
+                <div class="field-group">
+                  <label class="field-label">Nights</label>
+                  <div class="nights-stepper">
+                    <button class="stepper-btn" onclick="changeNights(-1)">&#8722;</button>
+                    <div class="stepper-value" id="nightsVal">9</div>
+                    <button class="stepper-btn" onclick="changeNights(1)">&#43;</button>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Price Per Night</label>
+                  <input class="field-input" type="text" value="$420" id="pricePerNight" oninput="calcTotal()" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Total Cost</label>
+                  <input class="field-input" type="text" value="$3,780" id="totalCost" readonly style="color:var(--accent-gold);font-weight:600;" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AMENITIES -->
+          <div class="profile-section">
+            <div class="profile-section-header">
+              <div class="profile-section-title"><div class="section-dot" style="background:var(--accent-sage)"></div>Amenities</div>
+            </div>
+            <div class="profile-section-body">
+              <div class="amenity-tags">
+                <div class="amenity-tag selected" onclick="toggleAmenity(this)">Breakfast Included</div>
+                <div class="amenity-tag selected" onclick="toggleAmenity(this)">Free WiFi</div>
+                <div class="amenity-tag selected" onclick="toggleAmenity(this)">Rooftop Pool</div>
+                <div class="amenity-tag" onclick="toggleAmenity(this)">Airport Transfer</div>
+                <div class="amenity-tag selected" onclick="toggleAmenity(this)">Spa &amp; Wellness</div>
+                <div class="amenity-tag" onclick="toggleAmenity(this)">Free Parking</div>
+                <div class="amenity-tag selected" onclick="toggleAmenity(this)">Concierge Service</div>
+                <div class="amenity-tag" onclick="toggleAmenity(this)">Room Service</div>
+                <div class="amenity-tag" onclick="toggleAmenity(this)">Gym</div>
+                <div class="amenity-tag" onclick="toggleAmenity(this)">Pet Friendly</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LOYALTY PROGRAM -->
+          <div class="profile-section">
+            <div class="profile-section-header">
+              <div class="profile-section-title"><div class="section-dot" style="background:var(--accent-lavender)"></div>Loyalty Program</div>
+            </div>
+            <div class="profile-section-body">
+              <div class="loyalty-row">
+                <div class="loyalty-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
+                <div>
+                  <div class="loyalty-name">Marriott Bonvoy</div>
+                  <div class="loyalty-sub">Earn points on every stay · Auto-detected from property</div>
+                </div>
+                <div class="loyalty-enroll-btn" onclick="window.open('https://www.marriott.com/loyalty/createAccount/createAccountPage1.mi','_blank')">Enroll Client</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RECOMMENDATION REASON -->
+          <div class="profile-section">
+            <div class="profile-section-header">
+              <div class="profile-section-title"><div class="section-dot" style="background:var(--accent-gold)"></div>Why I Recommend This</div>
+              <span style="font-size:11px;color:var(--text-label);cursor:pointer;">Regenerate</span>
+            </div>
+            <div class="profile-section-body">
+              <div class="rec-reason">
+                Bairro Alto Hotel sits in the heart of Lisbon's most romantic neighborhood, steps from Fado restaurants and historic viewpoints. The rooftop terrace offers panoramic views of the city and the Tagus River   ideal for a 5th anniversary celebration. The property's intimate scale and personalized service align perfectly with Sarah and Michael's preference for a romantic, unhurried experience.
+              </div>
+            </div>
+          </div>
+
+          <!-- SAVE ROW -->
+          <div class="save-row">
+            <button class="btn-primary" onclick="saveOption()">Save Option 1</button>
+            <button class="btn-ghost" onclick="window.location='new-client.html'">Back to Flights</button>
+          </div>
+
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <div class="right-sidebar">
+
+          <!-- OPTION STATUS -->
+          <div class="option-status-card">
+            <div class="option-status-header">
+              <div class="section-dot"></div>
+              Accommodation Options
+            </div>
+            <div class="option-status-body">
+              <div class="option-status-item active-opt" id="statusOpt1" onclick="switchOption(1)">
+                <span>Option 1 &nbsp;&middot;&nbsp; Bairro Alto Hotel</span>
+                <div class="option-status-right">
+                  <span style="font-size:10px;color:var(--accent-gold);">In Progress</span>
+                  <div class="opt-check pending"></div>
+                </div>
+              </div>
+              <div class="option-status-item pending-opt" id="statusOpt2" onclick="switchOption(2)">
+                <span>Option 2 &nbsp;&middot;&nbsp; Not added yet</span>
+                <div class="option-status-right">
+                  <div class="opt-check pending"></div>
+                </div>
+              </div>
+              <div class="option-status-item pending-opt" id="statusOpt3" style="display:none;" onclick="switchOption(3)">
+                <span>Option 3 &nbsp;&middot;&nbsp; Not added yet</span>
+                <div class="option-status-right">
+                  <div class="opt-check pending"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RECOMMEND BUTTON -->
+          <div>
+            <div class="recommend-btn" id="recommendBtn" onclick="toggleRecommend()">
+              Mark as My Recommendation
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px;line-height:1.5;">Your client can still choose any option, but this flags your top pick.</div>
+          </div>
+
+          <!-- TOTAL CALC -->
+          <div class="total-calc">
+            <div style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">Cost Summary</div>
+            <div class="total-row">
+              <span class="total-label">Price per night</span>
+              <span class="total-value">$420</span>
+            </div>
+            <div class="total-row">
+              <span class="total-label">Nights</span>
+              <span class="total-value" id="summaryNights">9</span>
+            </div>
+            <div class="total-row">
+              <span class="total-label">Total</span>
+              <span class="total-value gold" id="summaryTotal">$3,780</span>
+            </div>
+          </div>
+
+          <!-- TRIP CONTEXT -->
+          <div class="profile-section">
+            <div class="profile-section-header">
+              <div class="profile-section-title"><div class="section-dot" style="background:var(--accent-rose)"></div>Trip Context</div>
+            </div>
+            <div class="profile-section-body" style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text-muted);">Client</span><span style="color:var(--text-primary);font-weight:500;">Sarah &amp; Michael</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text-muted);">Destination</span><span style="color:var(--accent-gold);font-weight:500;">Lisbon, Portugal</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text-muted);">Travel Dates</span><span style="color:var(--text-primary);">Oct 5 – 14, 2026</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text-muted);">Style</span><span style="color:var(--text-primary);">Romantic / Luxury</span></div>
+              <div style="padding:10px 12px;background:rgba(212,132,138,0.08);border:1px solid rgba(212,132,138,0.2);border-radius:9px;margin-top:4px;">
+                <div style="font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-rose);margin-bottom:4px;">Allergy Alert</div>
+                <div style="font-size:11.5px;color:var(--text-muted);">Michael: shellfish allergy. Flag for hotel restaurant bookings.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- TRANSPORTATION PROMPT POPUP -->
+<div class="popup-overlay" id="transportPopup">
+  <div class="popup">
+    <div class="popup-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="1" y="3" width="15" height="13" rx="2"/>
+        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+        <circle cx="5.5" cy="18.5" r="2.5"/>
+        <circle cx="18.5" cy="18.5" r="2.5"/>
+      </svg>
+    </div>
+    <div class="popup-title">Add Transportation?</div>
+    <div class="popup-sub">Flights and accommodation are complete. Would you like to add transportation details for Sarah &amp; Michael's trip?</div>
+    <div class="popup-actions">
+      <div class="btn-primary" style="text-align:center;" onclick="closeTransportPopup('yes')">Yes, add transportation</div>
+      <div class="popup-btn-row">
+        <div class="btn-ghost" style="flex:1;text-align:center;" onclick="closeTransportPopup('skip')">Skip for now</div>
+        <div class="btn-ghost" style="flex:1;text-align:center;" onclick="closeTransportPopup('na')">Not needed for this trip</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let nights = 9;
+  let isRecommended = false;
+  let currentOption = 1;
+  let option3Added = false;
+  let savedOptions = {};
+
+  function setSource(type) {
+    document.querySelectorAll('.source-btn').forEach(b => b.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    document.getElementById('manualSearchRow').style.display = type === 'manual' ? 'block' : 'none';
+    document.getElementById('urlInputRow').style.display = type === 'url' ? 'block' : 'none';
+  }
+
+  function showAutocomplete(val) {
+    const dd = document.getElementById('autocompleteDropdown');
+    dd.classList.toggle('open', val.length > 1);
+  }
+
+  function selectProperty(name, location, type, img) {
+    document.getElementById('propertySearch').value = name;
+    document.getElementById('autocompleteDropdown').classList.remove('open');
+    document.getElementById('propName').value = name;
+    document.getElementById('heroLabel').textContent = name;
+    document.getElementById('heroImg').src = img;
+    document.getElementById('generatedBadge').textContent = 'Auto-populated from property search';
+    // Set hotel type
+    const sel = document.getElementById('hotelType');
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].text === type) { sel.selectedIndex = i; break; }
+    }
+  }
+
+  function simulateAutoFill() {
+    document.getElementById('generatedBadge').textContent = 'Auto-populated from URL';
+  }
+
+  function updateHeroLabel(val) {
+    document.getElementById('heroLabel').textContent = val || 'Property Name';
+  }
+
+  function changeNights(delta) {
+    nights = Math.max(1, nights + delta);
+    document.getElementById('nightsVal').textContent = nights;
+    document.getElementById('summaryNights').textContent = nights;
+    calcTotal();
+  }
+
+  function calcTotal() {
+    const priceStr = document.getElementById('pricePerNight').value.replace(/[^0-9.]/g, '');
+    const price = parseFloat(priceStr) || 0;
+    const total = price * nights;
+    const fmt = '$' + total.toLocaleString();
+    document.getElementById('totalCost').value = fmt;
+    document.getElementById('summaryTotal').textContent = fmt;
+  }
+
+  function toggleAmenity(el) {
+    el.classList.toggle('selected');
+  }
+
+  function toggleRecommend() {
+    isRecommended = !isRecommended;
+    const btn = document.getElementById('recommendBtn');
+    btn.classList.toggle('is-recommended', isRecommended);
+    btn.textContent = isRecommended ? 'Recommended Option' : 'Mark as My Recommendation';
+    if (isRecommended) {
+      document.getElementById('tab' + currentOption).classList.add('recommended-tab');
+    } else {
+      document.getElementById('tab' + currentOption).classList.remove('recommended-tab');
+    }
+  }
+
+  function switchOption(n) {
+    currentOption = n;
+    document.querySelectorAll('.option-tab').forEach(t => t.classList.remove('active'));
+    const tab = document.getElementById('tab' + n);
+    if (tab) tab.classList.add('active');
+    document.getElementById('optionNum').textContent = n;
+    document.getElementById('recommendBtn').textContent = 'Mark as My Recommendation';
+    document.getElementById('recommendBtn').classList.remove('is-recommended');
+    isRecommended = false;
+  }
+
+  function addOption3() {
+    if (option3Added) return;
+    option3Added = true;
+    const tab = document.createElement('div');
+    tab.className = 'option-tab';
+    tab.id = 'tab3';
+    tab.innerHTML = '<div class="option-dot"></div> Option 3';
+    tab.onclick = () => switchOption(3);
+    document.getElementById('addTab3').before(tab);
+    document.getElementById('addTab3').style.display = 'none';
+    document.getElementById('statusOpt3').style.display = 'flex';
+    document.getElementById('optionTotal').textContent = '3';
+    switchOption(3);
+  }
+
+  function saveOption() {
+    savedOptions[currentOption] = true;
+    const statusEl = document.getElementById('statusOpt' + currentOption);
+    statusEl.className = 'option-status-item done-opt';
+    statusEl.querySelector('.opt-check').className = 'opt-check done';
+    statusEl.querySelector('.opt-check').textContent = '✓';
+    const tabEl = document.getElementById('tab' + currentOption);
+    if (tabEl) tabEl.classList.add('completed');
+
+    const totalOptions = option3Added ? 3 : 2;
+    const savedCount = Object.keys(savedOptions).length;
+
+    if (savedCount >= 2 && currentOption < totalOptions) {
+      // Move to next option
+      switchOption(currentOption + 1);
+    } else if (savedCount >= totalOptions || (savedCount >= 2 && !option3Added)) {
+      // All options done   show transport popup
+      setTimeout(() => document.getElementById('transportPopup').classList.add('open'), 400);
+    } else if (currentOption < totalOptions) {
+      switchOption(currentOption + 1);
+    }
+  }
+
+  function closeTransportPopup(choice) {
+    document.getElementById('transportPopup').classList.remove('open');
+    if (choice === 'yes') {
+      alert('Opening Transportation builder for Sarah & Michael...');
+    } else if (choice === 'skip') {
+      alert('Accommodation saved. You can add transportation later from the trip page.');
+      window.location = 'client-trips.html';
+    } else {
+      alert('Noted. Moving to the next step.');
+      window.location = 'client-trips.html';
+    }
+  }
+
+  function previewHero(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => { document.getElementById('heroImg').src = e.target.result; };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // Close autocomplete on outside click
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.manual-search-wrap')) {
+      document.getElementById('autocompleteDropdown').classList.remove('open');
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trip Studio   Budget</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deep: #0D0B0F; --bg-card: #16121A; --bg-card2: #1C1722;
+      --accent-gold: #C9A96E; --accent-gold2: #E8C98A;
+      --accent-rose: #D4848A; --accent-blush: #F2C4C4;
+      --accent-sage: #8DAF9B; --accent-lavender: #B8A9C9;
+      --text-primary: #F5EFE6; --text-muted: #9A8F8A; --text-label: #C9A96E;
+      --border: rgba(201,169,110,0.18); --border-subtle: rgba(255,255,255,0.06);
+      --sidebar-w: 248px;
+    }
+    html, body { height: 100%; background: var(--bg-deep); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; overflow-x: hidden; }
+
+    /* FULL PAGE BACKGROUND */
+    .main {
+      position: relative;
+    }
+    .main::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-w);
+      right: 0;
+      bottom: 0;
+      background: url('assets/lisbon.jpg') center center / cover no-repeat;
+      opacity: 0.05;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .main > * { position: relative; z-index: 1; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 99px; }
+    .layout { display: flex; height: 100vh; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: linear-gradient(180deg, #110E15 0%, #0D0B0F 100%); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: relative; z-index: 10; flex-shrink: 0; }
+    .sidebar::before { content: ''; position: absolute; top: 0; right: 0; width: 1px; height: 100%; background: linear-gradient(180deg, transparent, var(--accent-gold), transparent); opacity: 0.3; }
+    .sidebar-brand { padding: 28px 24px 20px; border-bottom: 1px solid var(--border-subtle); }
+    .brand-logo { display: flex; align-items: center; gap: 10px; }
+    .brand-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .brand-sub { font-size: 10px; font-weight: 500; color: var(--text-label); letter-spacing: 0.14em; text-transform: uppercase; }
+    .sidebar-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
+    .nav-section-label { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); padding: 0 12px; margin: 20px 0 8px; }
+    .nav-section-label:first-child { margin-top: 0; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; color: var(--text-muted); font-size: 13.5px; text-decoration: none; position: relative; margin-bottom: 2px; }
+    .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+    .nav-item.active { background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(212,132,138,0.08)); color: var(--accent-gold2); font-weight: 500; border: 1px solid rgba(201,169,110,0.2); }
+    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 60%; background: linear-gradient(180deg, var(--accent-gold), var(--accent-rose)); border-radius: 0 3px 3px 0; }
+    .nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+    .nav-badge { margin-left: auto; background: var(--accent-rose); color: white; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+    .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--border-subtle); }
+    .user-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gold), var(--accent-rose)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; font-family: 'Playfair Display', serif; border: 2px solid rgba(201,169,110,0.3); letter-spacing: 0.02em; }
+
+    /* MAIN */
+    .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; background: rgba(13,11,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 5; }
+    .page-breadcrumb { font-size: 12px; color: var(--text-muted); }
+    .page-breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .page-breadcrumb a:hover { color: var(--accent-gold); }
+    .page-breadcrumb span { color: var(--accent-gold); }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .topbar-search { position: relative; }
+    .topbar-search input { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 8px 14px 8px 36px; font-size: 12.5px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; outline: none; width: 220px; transition: border-color 0.2s ease; }
+    .topbar-search input:focus { border-color: var(--accent-gold); }
+    .topbar-search input::placeholder { color: var(--text-muted); }
+    .topbar-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+    .topbar-notif { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+    .notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: var(--accent-rose); border-radius: 50%; border: 1.5px solid var(--bg-deep); }
+
+    /* HERO BANNER */
+    .budget-hero {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .budget-hero-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.18;
+    }
+    .budget-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(13,11,15,0.3) 0%, rgba(13,11,15,0.95) 100%);
+    }
+    .budget-hero-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      gap: 40px;
+    }
+    .budget-hero-left { flex: 1; }
+    .budget-hero-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-label); margin-bottom: 8px; }
+    .budget-hero-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+    .budget-hero-quote { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic; color: rgba(245,239,230,0.6); }
+    .budget-hero-right { text-align: right; }
+    .budget-client-budget-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .budget-client-budget-value { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--accent-gold); }
+    .budget-client-budget-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* CONTENT */
+    .content { padding: 28px 32px 60px; display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+
+    /* BUDGET CATEGORIES */
+    .categories { display: flex; flex-direction: column; gap: 14px; }
+
+    .budget-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; overflow: hidden; transition: all 0.2s ease; }
+    .budget-card:hover { border-color: var(--border); }
+
+    .budget-card-header { padding: 16px 20px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--border-subtle); }
+    .budget-card-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .icon-flight { background: rgba(184,169,201,0.15); border: 1px solid rgba(184,169,201,0.25); }
+    .icon-hotel { background: rgba(141,175,155,0.15); border: 1px solid rgba(141,175,155,0.25); }
+    .icon-transport { background: rgba(201,169,110,0.15); border: 1px solid rgba(201,169,110,0.25); }
+    .icon-activity { background: rgba(212,132,138,0.15); border: 1px solid rgba(212,132,138,0.25); }
+    .icon-food { background: rgba(201,169,110,0.12); border: 1px solid rgba(201,169,110,0.2); }
+    .icon-misc { background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); }
+    .icon-entry { background: rgba(184,169,201,0.1); border: 1px solid rgba(184,169,201,0.2); }
+
+    .budget-card-info { flex: 1; }
+    .budget-card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+    .budget-card-sub { font-size: 11.5px; color: var(--text-muted); }
+
+    .budget-card-amount { text-align: right; }
+    .budget-amount-value { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--text-primary); }
+    .budget-amount-per { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+
+    .budget-card-body { padding: 14px 20px; }
+
+    /* LINE ITEMS */
+    .line-items { display: flex; flex-direction: column; gap: 0; }
+    .line-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border-subtle); }
+    .line-item:last-child { border-bottom: none; }
+    .line-item-label { font-size: 12.5px; color: var(--text-muted); }
+    .line-item-value { font-size: 12.5px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+    .override-btn { font-size: 10px; color: var(--text-label); cursor: pointer; padding: 2px 8px; border-radius: 99px; border: 1px solid rgba(201,169,110,0.2); transition: all 0.2s ease; }
+    .override-btn:hover { background: rgba(201,169,110,0.1); }
+
+    /* FLIGHT TOGGLE */
+    .flight-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(184,169,201,0.06); border: 1px solid rgba(184,169,201,0.15); border-radius: 10px; margin-top: 10px; }
+    .flight-toggle-label { font-size: 12.5px; color: var(--text-muted); }
+    .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; inset: 0; background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 99px; transition: 0.3s; }
+    .toggle-slider::before { content: ''; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background: var(--text-muted); border-radius: 50%; transition: 0.3s; }
+    .toggle-switch input:checked + .toggle-slider { background: rgba(184,169,201,0.2); border-color: rgba(184,169,201,0.4); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); background: var(--accent-lavender); }
+
+    /* ACTIVITY TOUR TYPE */
+    .tour-type-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .tour-type-btn { flex: 1; padding: 8px 12px; border-radius: 9px; font-size: 12px; font-weight: 500; text-align: center; cursor: pointer; transition: all 0.2s ease; border: 1px solid var(--border-subtle); color: var(--text-muted); background: var(--bg-card2); }
+    .tour-type-btn:hover { border-color: var(--accent-gold); color: var(--text-primary); }
+    .tour-type-btn.active { border-color: var(--accent-gold); color: var(--accent-gold); background: rgba(201,169,110,0.1); }
+
+    /* ACTIVITY LINE ITEMS WITH TOGGLE */
+    .activity-line { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border-subtle); }
+    .activity-line:last-child { border-bottom: none; }
+    .activity-line-name { flex: 1; font-size: 12.5px; color: var(--text-muted); }
+    .activity-type-toggle { display: flex; background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 7px; overflow: hidden; }
+    .activity-type-opt { padding: 4px 10px; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; color: var(--text-muted); }
+    .activity-type-opt.active { background: rgba(201,169,110,0.15); color: var(--accent-gold); }
+    .activity-price { font-size: 12.5px; font-weight: 600; color: var(--text-primary); min-width: 60px; text-align: right; }
+
+    /* OVERRIDE INPUT */
+    .override-input-row { display: flex; gap: 8px; margin-top: 8px; }
+    .override-input { flex: 1; background: var(--bg-card2); border: 1px solid rgba(201,169,110,0.25); border-radius: 9px; padding: 8px 12px; font-size: 13px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; outline: none; }
+    .override-input:focus { border-color: var(--accent-gold); }
+    .override-apply { padding: 8px 16px; background: rgba(201,169,110,0.15); border: 1px solid rgba(201,169,110,0.25); border-radius: 9px; font-size: 12px; font-weight: 600; color: var(--accent-gold); cursor: pointer; white-space: nowrap; }
+    .override-apply:hover { background: rgba(201,169,110,0.28); }
+
+    /* RIGHT SIDEBAR */
+    .budget-sidebar { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 20px; }
+
+    /* TOTAL CARD */
+    .total-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+    .total-card-hero { position: relative; height: 120px; overflow: hidden; }
+    .total-card-hero img { width: 100%; height: 100%; object-fit: cover; opacity: 0.3; }
+    .total-card-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent, rgba(22,18,26,0.95)); }
+    .total-card-hero-text { position: absolute; bottom: 14px; left: 18px; right: 18px; }
+    .total-card-hero-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+    .total-card-hero-value { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--accent-gold); line-height: 1; }
+    .total-card-body { padding: 16px 18px; }
+
+    .total-line { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border-subtle); font-size: 12.5px; }
+    .total-line:last-child { border-bottom: none; }
+    .total-line-label { color: var(--text-muted); }
+    .total-line-value { font-weight: 600; color: var(--text-primary); }
+    .total-line-value.gold { color: var(--accent-gold); }
+    .total-line-value.sage { color: var(--accent-sage); }
+    .total-line-value.rose { color: var(--accent-rose); }
+
+    .total-divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+    .total-grand { display: flex; justify-content: space-between; align-items: center; padding: 10px 0 4px; }
+    .total-grand-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .total-grand-value { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--accent-gold); }
+
+    /* BUDGET VS ACTUAL */
+    .budget-vs-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 18px; }
+    .budget-vs-title { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+    .budget-bar-wrap { margin-bottom: 12px; }
+    .budget-bar-labels { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; }
+    .budget-bar-track { height: 8px; background: var(--bg-card2); border-radius: 99px; overflow: hidden; }
+    .budget-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent-sage), var(--accent-gold)); transition: width 0.5s ease; }
+    .budget-bar-fill.over { background: linear-gradient(90deg, var(--accent-gold), var(--accent-rose)); }
+    .budget-status { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 10px; margin-top: 12px; font-size: 12.5px; }
+    .budget-status.under { background: rgba(141,175,155,0.08); border: 1px solid rgba(141,175,155,0.2); color: var(--accent-sage); }
+    .budget-status.over { background: rgba(212,132,138,0.08); border: 1px solid rgba(212,132,138,0.2); color: var(--accent-rose); }
+
+    /* PER PERSON */
+    .per-person-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 18px; }
+    .per-person-title { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+    .per-person-value { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .per-person-sub { font-size: 12px; color: var(--text-muted); }
+
+    /* BUTTONS */
+    .btn-primary { padding: 13px 28px; background: linear-gradient(135deg, var(--accent-gold), #B8905A); border-radius: 10px; font-size: 13px; font-weight: 600; color: #0D0B0F; cursor: pointer; transition: all 0.2s ease; border: none; }
+    .btn-primary:hover { box-shadow: 0 6px 20px rgba(201,169,110,0.35); transform: translateY(-1px); }
+    .btn-ghost { padding: 13px 24px; background: transparent; border: 1px solid var(--border-subtle); border-radius: 10px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; }
+    .btn-ghost:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+    <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <div class="brand-icon"><img src="assets/globe-mascot.png" alt="" style="width:36px;height:36px;border-radius:10px;object-fit:contain;" /></div>
+        <div class="brand-name">
+          <div class="brand-title">Trip Studio</div>
+          <div class="brand-sub">BY MAME DEE</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">MAIN</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item  active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Client Trips
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Trip
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Vault
+      </a>
+      <div class="nav-section-label">SETTINGS</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item" style="color:var(--text-muted);font-size:12.5px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Exit to WordPress
+      </a>
+      <div class="user-card" style="margin-top:8px;">
+        <img src="assets/agent-dee.png" alt="Agent Dee" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,169,110,0.3);" />
+        <div>
+          <div class="user-name">Agent Dee</div>
+          <div class="user-role" style="color:var(--accent-gold);">AI Assistant</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="page-breadcrumb">
+        <a href="client-trips.html">Client Trips</a> &nbsp;/&nbsp;
+        <a href="new-client.html">Sarah &amp; Michael</a> &nbsp;/&nbsp;
+        <span>Budget</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <span class="topbar-search-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          <input type="text" placeholder="Search trips, clients, destinations..." />
+        </div>
+        <div class="topbar-notif"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="notif-dot"></span></div>
+        <span style="font-size:13px;color:var(--text-primary);font-weight:500;">Good morning, <span style="color:var(--accent-gold);font-family:'Playfair Display',serif;font-style:italic;">Deja</span></span>
+      </div>
+    </div>
+
+    <!-- HERO BANNER -->
+    <div class="budget-hero">
+      <img class="budget-hero-img" src="assets/lisbon.jpg" alt="Lisbon" />
+      <div class="budget-hero-overlay"></div>
+      <div class="budget-hero-content">
+        <div class="budget-hero-left">
+          <div class="budget-hero-eyebrow">Budget Overview &nbsp;·&nbsp; Sarah &amp; Michael &nbsp;·&nbsp; Lisbon, Portugal</div>
+          <div class="budget-hero-title">Every great trip starts with a clear plan.</div>
+          <div class="budget-hero-quote">"Travel is the only thing you buy that makes you richer."</div>
+        </div>
+        <div class="budget-hero-right">
+          <div class="budget-client-budget-label">Client Budget</div>
+          <div class="budget-client-budget-value">$10,000</div>
+          <div class="budget-client-budget-sub">2 travelers &nbsp;·&nbsp; 9 nights &nbsp;·&nbsp; Oct 5–14, 2026</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- LEFT: CATEGORIES -->
+      <div class="categories">
+
+        <!-- FLIGHTS -->
+        <div class="budget-card">
+          <div class="budget-card-header">
+            <div class="budget-card-icon icon-flight">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-lavender)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 19-7z"/></svg>
+            </div>
+            <div class="budget-card-info">
+              <div class="budget-card-title">Flights</div>
+              <div class="budget-card-sub">TAP Air Portugal &nbsp;·&nbsp; JFK &rarr; LIS &nbsp;·&nbsp; Round Trip</div>
+            </div>
+            <div class="budget-card-amount">
+              <div class="budget-amount-value" style="color:var(--accent-lavender);">$1,840</div>
+              <div class="budget-amount-per">$920 per person</div>
+            </div>
+          </div>
+          <div class="budget-card-body">
+            <div class="line-items">
+              <div class="line-item">
+                <span class="line-item-label">Outbound: JFK &rarr; LIS (Oct 5)</span>
+                <span class="line-item-value">$920 &nbsp;<span class="override-btn">Edit</span></span>
+              </div>
+              <div class="line-item">
+                <span class="line-item-label">Return: LIS &rarr; JFK (Oct 14)</span>
+                <span class="line-item-value">$920 &nbsp;<span class="override-btn">Edit</span></span>
+              </div>
+            </div>
+            <div class="flight-toggle-row">
+              <div class="flight-toggle-label">Include flights in total budget calculation</div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="flightToggle" onchange="recalcTotal()" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.6;">Flights are excluded from the total by default. Toggle on to include them in the budget comparison. Your client will always see the flight cost regardless.</div>
+          </div>
+        </div>
+
+        <!-- ACCOMMODATION -->
+        <div class="budget-card">
+          <div class="budget-card-header">
+            <div class="budget-card-icon icon-hotel">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V8l9-6 9 6v14"/><path d="M9 22V12h6v10"/></svg>
+            </div>
+            <div class="budget-card-info">
+              <div class="budget-card-title">Accommodation</div>
+              <div class="budget-card-sub">Based on client selection during preview &nbsp;·&nbsp; 9 nights</div>
+            </div>
+            <div class="budget-card-amount">
+              <div class="budget-amount-value" style="color:var(--accent-sage);" id="hotelTotal">$3,780</div>
+              <div class="budget-amount-per">$420/night &nbsp;·&nbsp; 9 nights</div>
+            </div>
+          </div>
+          <div class="budget-card-body">
+            <div class="line-items">
+              <div class="line-item">
+                <span class="line-item-label">Option 1 &nbsp;·&nbsp; Bairro Alto Hotel (Recommended)</span>
+                <span class="line-item-value">$3,780 &nbsp;<span style="font-size:10px;background:rgba(201,169,110,0.12);color:var(--accent-gold);padding:2px 8px;border-radius:99px;">Recommended</span></span>
+              </div>
+              <div class="line-item">
+                <span class="line-item-label">Option 2 &nbsp;·&nbsp; Memmo Alfama</span>
+                <span class="line-item-value" style="color:var(--text-muted);">$2,520 &nbsp;<span class="override-btn">Select</span></span>
+              </div>
+              <div class="line-item">
+                <span class="line-item-label">Option 3 &nbsp;·&nbsp; Hotel Avenida Palace</span>
+                <span class="line-item-value" style="color:var(--text-muted);">$1,755 &nbsp;<span class="override-btn">Select</span></span>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:10px;line-height:1.6;">Total reflects the recommended option. Budget will update automatically when the client selects their preferred accommodation on the preview page.</div>
+          </div>
+        </div>
+
+        <!-- TRANSPORTATION -->
+        <div class="budget-card">
+          <div class="budget-card-header">
+            <div class="budget-card-icon icon-transport">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <div class="budget-card-info">
+              <div class="budget-card-title">Transportation</div>
+              <div class="budget-card-sub">Rideshare, transit card, private transfer &nbsp;·&nbsp; Worst-case estimate</div>
+            </div>
+            <div class="budget-card-amount">
+              <div class="budget-amount-value" id="transportTotal">$680</div>
+              <div class="budget-amount-per">$340 per person</div>
+            </div>
+          </div>
+          <div class="budget-card-body">
+            <div class="line-items">
+              <div class="line-item">
+                <span class="line-item-label">Airport Transfer (private, both ways)</span>
+                <span class="line-item-value">$170 &nbsp;<span class="override-btn">Edit</span></span>
+              </div>
+              <div class="line-item">
+                <span class="line-item-label">Rideshare (Uber/Bolt, 9 days, worst case)</span>
+                <span class="line-item-value">$360 &nbsp;<span class="override-btn">Edit</span></span>
+              </div>
+              <div class="line-item">
+                <span class="line-item-label">Sintra day trip (train, 2 people)</span>
+                <span class="line-item-value">$18 &nbsp;<span class="override-btn">Edit</span></span>
+              </div>
+              <div class="line-item">
+                <span class="line-item-label">Viva Viagem transit card (loaded)</span>
+                <span class="line-item-value">$132 &nbsp;<span class="override-btn">Edit</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTIVITIES -->
+        <div class="budget-card">
+          <div class="budget-card-header">
+            <div class="budget-card-icon icon-activity">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-rose)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="budget-card-info">
+              <div class="budget-card-title">Activities</div>
+              <div class="budget-card-sub">Select shared or private tour pricing per activity</div>
+            </div>
+            <div class="budget-card-amount">
+              <div class="budget-amount-value" style="color:var(--accent-rose);" id="activityTotal">$248</div>
+              <div class="budget-amount-per">$124 per person</div>
+            </div>
+          </div>
+          <div class="budget-card-body">
+            <div class="tour-type-row">
+              <div class="tour-type-btn active" onclick="setTourType(this,'shared')">All Shared</div>
+              <div class="tour-type-btn" onclick="setTourType(this,'private')">All Private</div>
+              <div class="tour-type-btn" onclick="setTourType(this,'general')">General Pricing</div>
+              <div class="tour-type-btn" onclick="setTourType(this,'mixed')">Mixed</div>
+            </div>
+            <div class="line-items">
+              <div class="activity-line">
+                <span class="activity-line-name">Belem Tower &amp; Jeronimos Monastery</span>
+                <div class="activity-type-toggle">
+                  <div class="activity-type-opt active" onclick="toggleActivityType(this,'shared')">Shared</div>
+                  <div class="activity-type-opt" onclick="toggleActivityType(this,'private')">Private</div>
+                </div>
+                <span class="activity-price">$44</span>
+              </div>
+              <div class="activity-line">
+                <span class="activity-line-name">Sintra Palace Tour</span>
+                <div class="activity-type-toggle">
+                  <div class="activity-type-opt active" onclick="toggleActivityType(this,'shared')">Shared</div>
+                  <div class="activity-type-opt" onclick="toggleActivityType(this,'private')">Private</div>
+                </div>
+                <span class="activity-price">$80</span>
+              </div>
+              <div class="activity-line">
+                <span class="activity-line-name">Fado Show &amp; Dinner Experience</span>
+                <div class="activity-type-toggle">
+                  <div class="activity-type-opt active" onclick="toggleActivityType(this,'shared')">Shared</div>
+                  <div class="activity-type-opt" onclick="toggleActivityType(this,'private')">Private</div>
+                </div>
+                <span class="activity-price">$124</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOOD & DINING -->
+        <div class="budget-card">
+          <div class="budget-card-header">
+            <div class="budget-card-icon icon-food">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            </div>
+            <div class="budget-card-info">
+              <div class="budget-card-title">Food &amp; Dining</div>
+              <div class="budget-card-sub">Based on itinerary restaurants &nbsp;·&nbsp; Worst-case estimate &nbsp;·&nbsp; 9 days</div>
+            </div>
+            <div class="budget-card-amount">
+              <div class="budget-amount-value" id="foodTotal">$1,440</div>
+              <div class="budget-amount-per">$720 per person</div>
+            </div>
+          </div>
+          <div class="budget-card-body">
+            <!-- MEAL PLAN SELECTOR -->
+            <div style="display:flex;gap:8px;margin-bottom:14px;">
+              <div class="tour-type-btn active" id="meal3btn" onclick="setMealPlan(this,'3')" style="flex:1;font-size:11.5px;">All 3 Meals</div>
+              <div class="tour-type-btn" id="meal2btn" onclick="setMealPlan(this,'2')" style="flex:1;font-size:11.5px;">2 Meals (B+D or L+D)</div>
+            </div>
+            <div class="line-items" id="mealLineItems">
+              <div class="line-item">
+                <span class="line-item-label">Breakfast, Lunch &amp; Dinner &nbsp;·&nbsp; 9 days &nbsp;·&nbsp; 2 people &nbsp;·&nbsp; Worst case</span>
+                <span class="line-item-value" id="mealLineValue">$1,440 &nbsp;<span class="override-btn" onclick="toggleFoodOverride()">Edit</span></span>
+              </div>
+            </div>
+            <div class="override-input-row" id="foodOverrideRow" style="display:none;">
+              <input class="override-input" type="text" placeholder="Enter custom food budget..." id="foodOverrideInput" />
+              <div class="override-apply" onclick="applyFoodOverride()">Apply</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MISCELLANEOUS & BUFFER -->
+        <div class="budget-card">
+          <div class="budget-card-header">
+            <div class="budget-card-icon icon-misc">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="budget-card-info">
+              <div class="budget-card-title">Miscellaneous &amp; Buffer</div>
+              <div class="budget-card-sub">Souvenirs, tips, unexpected costs, wiggle room</div>
+            </div>
+            <div class="budget-card-amount">
+              <div class="budget-amount-value" id="miscTotal">$400</div>
+              <div class="budget-amount-per">$200 per person</div>
+            </div>
+          </div>
+          <div class="budget-card-body">
+            <div class="line-items">
+              <div class="line-item">
+                <span class="line-item-label">Suggested buffer (5% of trip total)</span>
+                <span class="line-item-value">$400 &nbsp;<span class="override-btn" onclick="toggleMiscOverride()">Edit</span></span>
+              </div>
+            </div>
+            <div class="override-input-row" id="miscOverrideRow" style="display:none;">
+              <input class="override-input" type="text" placeholder="Enter custom buffer amount..." id="miscOverrideInput" />
+              <div class="override-apply" onclick="applyMiscOverride()">Apply</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTRY FEES & VISA -->
+        <div class="budget-card">
+          <div class="budget-card-header">
+            <div class="budget-card-icon icon-entry">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-lavender)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            </div>
+            <div class="budget-card-info">
+              <div class="budget-card-title">Entry Fees &amp; Visa</div>
+              <div class="budget-card-sub">Auto-generated from travel requirements &nbsp;·&nbsp; US citizens</div>
+            </div>
+            <div class="budget-card-amount">
+              <div class="budget-amount-value" style="color:var(--accent-sage);">$0</div>
+              <div class="budget-amount-per">No visa required</div>
+            </div>
+          </div>
+          <div class="budget-card-body">
+            <div class="line-items">
+              <div class="line-item">
+                <span class="line-item-label">Portugal Visa (US Citizens)</span>
+                <span class="line-item-value" style="color:var(--accent-sage);">Visa-Free</span>
+              </div>
+              <div class="line-item">
+                <span class="line-item-label">ETIAS (expected 2025, pending launch)</span>
+                <span class="line-item-value">~$14 total &nbsp;<span class="override-btn">Include</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SAVE ROW -->
+        <div style="display:flex;gap:12px;padding-top:8px;">
+          <button class="btn-primary" onclick="window.location='trip-detail.html'">Save &amp; Preview Trip</button>
+          <button class="btn-ghost" onclick="window.location='itinerary.html'">Back to Itinerary</button>
+        </div>
+
+      </div><!-- /categories -->
+
+      <!-- RIGHT SIDEBAR -->
+      <div class="budget-sidebar">
+
+        <!-- TOTAL CARD -->
+        <div class="total-card">
+          <div class="total-card-hero">
+            <img src="assets/lisbon.jpg" alt="Lisbon" />
+            <div class="total-card-hero-overlay"></div>
+            <div class="total-card-hero-text">
+              <div class="total-card-hero-label">Estimated Total</div>
+              <div class="total-card-hero-value" id="grandTotal">$6,548</div>
+            </div>
+          </div>
+          <div class="total-card-body">
+            <div class="total-line">
+              <span class="total-line-label">Flights</span>
+              <span class="total-line-value" style="color:var(--text-muted);font-size:11px;" id="flightLine">Excluded</span>
+            </div>
+            <div class="total-line">
+              <span class="total-line-label">Accommodation</span>
+              <span class="total-line-value sage">$3,780</span>
+            </div>
+            <div class="total-line">
+              <span class="total-line-label">Transportation</span>
+              <span class="total-line-value">$680</span>
+            </div>
+            <div class="total-line">
+              <span class="total-line-label">Activities</span>
+              <span class="total-line-value rose">$248</span>
+            </div>
+            <div class="total-line">
+              <span class="total-line-label">Food &amp; Dining</span>
+              <span class="total-line-value">$1,440</span>
+            </div>
+            <div class="total-line">
+              <span class="total-line-label">Misc &amp; Buffer</span>
+              <span class="total-line-value">$400</span>
+            </div>
+            <div class="total-line">
+              <span class="total-line-label">Entry Fees</span>
+              <span class="total-line-value sage">$0</span>
+            </div>
+            <div class="total-divider"></div>
+            <div class="total-grand">
+              <span class="total-grand-label">Total (excl. flights)</span>
+              <span class="total-grand-value" id="grandTotalBottom">$6,548</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BUDGET VS ACTUAL -->
+        <div class="budget-vs-card">
+          <div class="budget-vs-title">Budget vs Actual</div>
+          <div class="budget-bar-wrap">
+            <div class="budget-bar-labels">
+              <span style="color:var(--text-muted);font-size:11px;">$0</span>
+              <span style="color:var(--accent-gold);font-size:11px;">$6,548 used</span>
+              <span style="color:var(--text-muted);font-size:11px;">$10,000</span>
+            </div>
+            <div class="budget-bar-track">
+              <div class="budget-bar-fill" style="width:65.5%"></div>
+            </div>
+          </div>
+          <div class="budget-status under">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            $3,452 under budget &nbsp; &nbsp; Great value!
+          </div>
+        </div>
+
+        <!-- PER PERSON -->
+        <div class="per-person-card">
+          <div class="per-person-title">Per Person Breakdown</div>
+          <div class="per-person-value">$3,274</div>
+          <div class="per-person-sub">per person &nbsp;·&nbsp; excluding flights</div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-subtle);">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:var(--text-muted);">Per person with flights</span><span style="color:var(--text-primary);font-weight:600;">$4,194</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text-muted);">Client budget per person</span><span style="color:var(--accent-gold);font-weight:600;">$5,000</span></div>
+          </div>
+        </div>
+
+        <!-- DEE'S BUDGET NOTE -->
+        <div style="background:rgba(201,169,110,0.07);border:1px solid rgba(201,169,110,0.18);border-radius:14px;padding:16px;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-gold);margin-bottom:8px;">Dee's Budget Note</div>
+          <div style="font-size:12.5px;color:var(--text-muted);line-height:1.7;">This trip comes in well under the client's budget, leaving $3,452 in flexibility. Consider suggesting a room upgrade at Bairro Alto Hotel or adding a private Sintra tour to elevate the experience without exceeding their limit.</div>
+        </div>
+
+      </div><!-- /budget-sidebar -->
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<script>
+  function recalcTotal() {
+    const flightToggle = document.getElementById('flightToggle').checked;
+    const base = 6548;
+    const withFlights = base + 1840;
+    const total = flightToggle ? withFlights : base;
+    const fmt = '$' + total.toLocaleString();
+    document.getElementById('grandTotal').textContent = fmt;
+    document.getElementById('grandTotalBottom').textContent = fmt;
+    document.getElementById('flightLine').textContent = flightToggle ? '$1,840' : 'Excluded';
+    document.getElementById('flightLine').style.color = flightToggle ? 'var(--text-primary)' : 'var(--text-muted)';
+
+    // Update bar
+    const budget = 10000;
+    const pct = Math.min((total / budget) * 100, 100);
+    document.querySelector('.budget-bar-fill').style.width = pct + '%';
+    document.querySelector('.budget-bar-fill').classList.toggle('over', total > budget);
+    document.querySelectorAll('.budget-bar-labels span')[1].textContent = fmt + ' used';
+
+    const diff = budget - total;
+    const statusEl = document.querySelector('.budget-status');
+    if (diff >= 0) {
+      statusEl.className = 'budget-status under';
+      statusEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> $' + diff.toLocaleString() + ' under budget &nbsp; &nbsp; Great value!';
+    } else {
+      statusEl.className = 'budget-status over';
+      statusEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="12" y1="5" x2="12" y2="19"/></svg> $' + Math.abs(diff).toLocaleString() + ' over budget &nbsp; &nbsp; Review costs';
+    }
+  }
+
+  function setTourType(btn, type) {
+    btn.closest('.tour-type-row').querySelectorAll('.tour-type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const prices = { shared: [44, 80, 124], private: [180, 320, 480], general: [22, 40, 62], mixed: [44, 80, 124] };
+    const activityLines = document.querySelectorAll('.activity-line');
+    let total = 0;
+    activityLines.forEach((line, i) => {
+      const price = prices[type][i] || prices['shared'][i];
+      line.querySelector('.activity-price').textContent = '$' + price;
+      total += price;
+      const opts = line.querySelectorAll('.activity-type-opt');
+      if (type === 'shared') { opts[0].classList.add('active'); opts[1].classList.remove('active'); }
+      else if (type === 'private') { opts[1].classList.add('active'); opts[0].classList.remove('active'); }
+    });
+    document.getElementById('activityTotal').textContent = '$' + total;
+  }
+
+  function toggleActivityType(btn, type) {
+    const row = btn.closest('.activity-type-toggle');
+    row.querySelectorAll('.activity-type-opt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const priceEl = btn.closest('.activity-line').querySelector('.activity-price');
+    const currentPrice = parseInt(priceEl.textContent.replace('$',''));
+    priceEl.textContent = type === 'private' ? '$' + (currentPrice * 3) : '$' + Math.round(currentPrice / 3);
+  }
+
+  function toggleFoodOverride() {
+    const row = document.getElementById('foodOverrideRow');
+    row.style.display = row.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function applyFoodOverride() {
+    const val = document.getElementById('foodOverrideInput').value;
+    if (val) {
+      document.getElementById('foodTotal').textContent = val.startsWith('$') ? val : '$' + val;
+      document.getElementById('foodOverrideRow').style.display = 'none';
+    }
+  }
+
+  function setMealPlan(btn, plan) {
+    document.querySelectorAll('#meal3btn, #meal2btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const label3 = 'Breakfast, Lunch &amp; Dinner &nbsp;&middot;&nbsp; 9 days &nbsp;&middot;&nbsp; 2 people &nbsp;&middot;&nbsp; Worst case';
+    const label2 = 'Breakfast &amp; Dinner (2 meals) &nbsp;&middot;&nbsp; 9 days &nbsp;&middot;&nbsp; 2 people &nbsp;&middot;&nbsp; Worst case';
+    const price3 = '$1,440';
+    const price2 = '$1,080';
+    const lineLabel = document.querySelector('#mealLineItems .line-item .line-item-label');
+    const lineVal = document.getElementById('mealLineValue');
+    if (plan === '3') {
+      lineLabel.innerHTML = label3;
+      lineVal.innerHTML = price3 + ' &nbsp;<span class="override-btn" onclick="toggleFoodOverride()">Edit</span>';
+      document.getElementById('foodTotal').textContent = price3;
+    } else {
+      lineLabel.innerHTML = label2;
+      lineVal.innerHTML = price2 + ' &nbsp;<span class="override-btn" onclick="toggleFoodOverride()">Edit</span>';
+      document.getElementById('foodTotal').textContent = price2;
+    }
+  }
+
+  function toggleMiscOverride() {
+    const row = document.getElementById('miscOverrideRow');
+    row.style.display = row.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function applyMiscOverride() {
+    const val = document.getElementById('miscOverrideInput').value;
+    if (val) {
+      document.getElementById('miscTotal').textContent = val.startsWith('$') ? val : '$' + val;
+      document.getElementById('miscOverrideRow').style.display = 'none';
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trip Studio   Trip Detail</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deep: #0D0B0F; --bg-card: #16121A; --bg-card2: #1C1722;
+      --accent-gold: #C9A96E; --accent-gold2: #E8C98A; --accent-rose: #D4848A;
+      --accent-sage: #8DAF9B; --accent-lavender: #B8A9C9;
+      --text-primary: #F5EFE6; --text-muted: #9A8F8A; --text-label: #C9A96E;
+      --border: rgba(201,169,110,0.18); --border-subtle: rgba(255,255,255,0.06);
+      --sidebar-w: 248px;
+    }
+    html, body { height: 100%; background: var(--bg-deep); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 99px; }
+    .layout { display: flex; height: 100vh; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: linear-gradient(180deg, #110E15 0%, #0D0B0F 100%); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: relative; z-index: 10; }
+    .sidebar::before { content: ''; position: absolute; top: 0; right: 0; width: 1px; height: 100%; background: linear-gradient(180deg, transparent, var(--accent-gold), transparent); opacity: 0.3; }
+    .sidebar-brand { padding: 28px 24px 20px; border-bottom: 1px solid var(--border-subtle); }
+    .brand-logo { display: flex; align-items: center; gap: 10px; }
+    .brand-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent-gold), var(--accent-rose)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 4px 16px rgba(201,169,110,0.3); }
+    .brand-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .brand-sub { font-size: 10px; font-weight: 500; color: var(--text-label); letter-spacing: 0.14em; text-transform: uppercase; }
+    .sidebar-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
+    .nav-section-label { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); padding: 0 12px; margin: 20px 0 8px; }
+    .nav-section-label:first-child { margin-top: 0; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; color: var(--text-muted); font-size: 13.5px; text-decoration: none; position: relative; margin-bottom: 2px; }
+    .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+    .nav-item.active { background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(212,132,138,0.08)); color: var(--accent-gold2); font-weight: 500; border: 1px solid rgba(201,169,110,0.2); }
+    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 60%; background: linear-gradient(180deg, var(--accent-gold), var(--accent-rose)); border-radius: 0 3px 3px 0; }
+    .nav-badge { margin-left: auto; background: var(--accent-rose); color: white; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+    .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--border-subtle); }
+    .user-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gold), var(--accent-rose)); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: white; font-family: 'Playfair Display', serif; border: 2px solid rgba(201,169,110,0.3); }
+    .user-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .user-role { font-size: 11px; color: var(--text-label); }
+
+    /* MAIN */
+    .main { flex: 1; overflow-y: auto; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; background: rgba(13,11,15,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 5; }
+    .page-breadcrumb { font-size: 12px; color: var(--text-muted); }
+    .page-breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .page-breadcrumb a:hover { color: var(--accent-gold); }
+    .page-breadcrumb span { color: var(--accent-gold); }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .topbar-date { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: var(--text-muted); font-style: italic; }
+    .topbar-notif { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; position: relative; }
+    .notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: var(--accent-rose); border-radius: 50%; border: 1.5px solid var(--bg-deep); }
+
+    /* HERO */
+    .trip-hero { position: relative; height: 300px; overflow: hidden; }
+    .trip-hero-img { width: 100%; height: 100%; object-fit: cover; }
+    .trip-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(13,11,15,0.3) 0%, rgba(13,11,15,0.85) 100%); }
+    .trip-hero-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 28px 36px; display: flex; align-items: flex-end; justify-content: space-between; }
+    .trip-hero-left h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+    .trip-hero-left p { font-size: 14px; color: var(--accent-gold); font-weight: 500; }
+    .trip-hero-actions { display: flex; gap: 10px; }
+    .hero-btn { padding: 11px 22px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+    .hero-btn-primary { background: linear-gradient(135deg, var(--accent-gold), #B8905A); color: #0D0B0F; }
+    .hero-btn-primary:hover { box-shadow: 0 6px 20px rgba(201,169,110,0.35); }
+    .hero-btn-rose { background: rgba(212,132,138,0.2); color: var(--accent-rose); border: 1px solid rgba(212,132,138,0.35); }
+    .hero-btn-rose:hover { background: rgba(212,132,138,0.3); }
+    .hero-btn-ghost { background: rgba(255,255,255,0.08); color: var(--text-primary); border: 1px solid var(--border-subtle); }
+    .hero-btn-ghost:hover { border-color: var(--accent-gold); }
+
+    /* CONTENT */
+    .content { padding: 28px 36px 60px; display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+
+    /* CARDS */
+    .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; overflow: hidden; }
+    .card-header { padding: 16px 20px 14px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+    .card-title-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-gold); }
+    .card-body { padding: 18px 20px; }
+    .card-action { font-size: 11px; color: var(--text-label); cursor: pointer; }
+    .card-action:hover { color: var(--accent-gold2); }
+
+    /* PROGRESS */
+    .big-progress { display: flex; align-items: center; gap: 20px; padding: 16px 0; border-bottom: 1px solid var(--border-subtle); margin-bottom: 16px; }
+    .big-ring { flex-shrink: 0; }
+    .big-ring-label { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--accent-gold); text-anchor: middle; dominant-baseline: middle; }
+    .progress-details { flex: 1; }
+    .progress-details h3 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+    .progress-details p { font-size: 12px; color: var(--text-muted); }
+
+    /* CHECKLIST */
+    .checklist-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border-subtle); }
+    .checklist-item:last-child { border-bottom: none; }
+    .check-circle { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
+    .check-done { background: rgba(141,175,155,0.2); border: 1.5px solid var(--accent-sage); color: var(--accent-sage); }
+    .check-pending { background: transparent; border: 1.5px solid rgba(255,255,255,0.15); color: transparent; }
+    .check-urgent { background: rgba(212,132,138,0.15); border: 1.5px solid var(--accent-rose); color: var(--accent-rose); }
+    .checklist-label { font-size: 13px; color: var(--text-primary); flex: 1; }
+    .checklist-label.done { color: var(--text-muted); text-decoration: line-through; }
+    .checklist-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
+    .badge-done { background: rgba(141,175,155,0.15); color: var(--accent-sage); }
+    .badge-urgent { background: rgba(212,132,138,0.15); color: var(--accent-rose); }
+    .badge-pending { background: rgba(201,169,110,0.12); color: var(--accent-gold); }
+
+    /* ITINERARY */
+    .day-block { margin-bottom: 16px; }
+    .day-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-label); margin-bottom: 8px; }
+    .day-items { display: flex; flex-direction: column; gap: 6px; }
+    .day-item { background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+    .day-item-icon { font-size: 16px; flex-shrink: 0; }
+    .day-item-info { flex: 1; }
+    .day-item-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .day-item-detail { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .day-item-status { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 99px; }
+    .status-confirmed { background: rgba(141,175,155,0.15); color: var(--accent-sage); }
+    .status-pending { background: rgba(201,169,110,0.12); color: var(--accent-gold); }
+
+    /* SIDEBAR CARDS */
+    .sidebar-cards { display: flex; flex-direction: column; gap: 16px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .info-item { background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 10px 12px; }
+    .info-label { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+    .info-value { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+
+    /* UNLOCK CARD */
+    .unlock-card { background: linear-gradient(135deg, rgba(201,169,110,0.12), rgba(212,132,138,0.07)); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+    .unlock-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+    .unlock-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px; }
+    .unlock-features { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .unlock-feature { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+    .unlock-feature span { color: var(--accent-sage); }
+    .unlock-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent-gold), #B8905A); border-radius: 10px; font-size: 13px; font-weight: 600; color: #0D0B0F; cursor: pointer; text-align: center; transition: all 0.2s ease; }
+    .unlock-btn:hover { box-shadow: 0 6px 20px rgba(201,169,110,0.3); }
+
+    /* NOTES */
+    .notes-area { width: 100%; background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; resize: vertical; min-height: 80px; outline: none; transition: border-color 0.2s ease; }
+    .notes-area:focus { border-color: var(--accent-gold); }
+    .notes-area::placeholder { color: var(--text-muted); font-style: italic; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+    <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <div class="brand-icon"><img src="assets/globe-mascot.png" alt="" style="width:36px;height:36px;border-radius:10px;object-fit:contain;" /></div>
+        <div class="brand-name">
+          <div class="brand-title">Trip Studio</div>
+          <div class="brand-sub">BY MAME DEE</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">MAIN</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item  active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Client Trips
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Trip
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Vault
+      </a>
+      <div class="nav-section-label">SETTINGS</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item" style="color:var(--text-muted);font-size:12.5px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Exit to WordPress
+      </a>
+      <div class="user-card" style="margin-top:8px;">
+        <img src="assets/agent-dee.png" alt="Agent Dee" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,169,110,0.3);" />
+        <div>
+          <div class="user-name">Agent Dee</div>
+          <div class="user-role" style="color:var(--accent-gold);">AI Assistant</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="page-breadcrumb">
+        <a href="client-trips.html">Client Trips</a> &nbsp;/&nbsp; <span>Sarah &amp; Michael   Lisbon</span>
+      </div>
+      <div class="topbar-right">
+                <div style="position:relative;">
+          <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text-muted);pointer-events:none;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          <input type="text" placeholder="Search trips, clients, destinations..." style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:10px;padding:8px 14px 8px 36px;font-size:12.5px;color:var(--text-primary);font-family:'DM Sans',sans-serif;outline:none;width:240px;transition:border-color 0.2s ease;" onfocus="this.style.borderColor='var(--accent-gold)'" onblur="this.style.borderColor='var(--border-subtle)'" />
+        </div>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--text-muted);font-style:italic;">Thursday, June 25, 2026</span>
+        <div class="topbar-notif"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="notif-dot"></span></div>
+        <span style="font-size:13px;color:var(--text-primary);font-weight:500;">Good morning, <span style="color:var(--accent-gold);font-family:'Playfair Display',serif;font-style:italic;">Deja</span></span>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <div class="trip-hero">
+      <img class="trip-hero-img" src="assets/lisbon.jpg" alt="Lisbon, Portugal" />
+      <div class="trip-hero-overlay"></div>
+      <div class="trip-hero-content">
+        <div class="trip-hero-left">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent-gold);margin-bottom:6px;">Preview Sent · 80% Complete</div>
+          <h1>Sarah &amp; Michael</h1>
+          <p>📍 Lisbon, Portugal &nbsp;·&nbsp; Oct 5 – Oct 14, 2026</p>
+        </div>
+        <div class="trip-hero-actions">
+          <div class="hero-btn hero-btn-primary">📤 Send Preview</div>
+          <div class="hero-btn hero-btn-rose">🔓 Unlock Trip</div>
+          <div class="hero-btn hero-btn-ghost">✏️ Edit Trip</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT GRID -->
+    <div class="content">
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- PROGRESS + CHECKLIST -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><div class="card-title-dot"></div>Trip Progress</div>
+            <span class="card-action">Edit Checklist →</span>
+          </div>
+          <div class="card-body">
+            <div class="big-progress">
+              <div class="big-ring">
+                <svg width="80" height="80" viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="6"/>
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="url(#goldGrad)" stroke-width="6"
+                    stroke-dasharray="213.6" stroke-dashoffset="42.7" stroke-linecap="round"
+                    transform="rotate(-90 40 40)"/>
+                  <defs>
+                    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#C9A96E"/>
+                      <stop offset="100%" stop-color="#D4848A"/>
+                    </linearGradient>
+                  </defs>
+                  <text x="40" y="44" text-anchor="middle" font-family="Playfair Display,serif" font-size="16" font-weight="700" fill="#C9A96E">80%</text>
+                </svg>
+              </div>
+              <div class="progress-details">
+                <h3>Trip is 80% complete</h3>
+                <p>2 items remaining before this trip is ready to book.</p>
+              </div>
+            </div>
+
+            <div class="checklist-item">
+              <div class="check-circle check-done"></div>
+              <span class="checklist-label done">Questionnaire received from client</span>
+              <span class="checklist-badge badge-done">Done</span>
+            </div>
+            <div class="checklist-item">
+              <div class="check-circle check-done"></div>
+              <span class="checklist-label done">Consultation call completed</span>
+              <span class="checklist-badge badge-done">Done</span>
+            </div>
+            <div class="checklist-item">
+              <div class="check-circle check-done"></div>
+              <span class="checklist-label done">Trip preview page built</span>
+              <span class="checklist-badge badge-done">Done</span>
+            </div>
+            <div class="checklist-item">
+              <div class="check-circle check-done"></div>
+              <span class="checklist-label done">Preview sent to client</span>
+              <span class="checklist-badge badge-done">Done</span>
+            </div>
+            <div class="checklist-item">
+              <div class="check-circle check-urgent">!</div>
+              <span class="checklist-label">Client approval pending</span>
+              <span class="checklist-badge badge-urgent">Action Needed</span>
+            </div>
+            <div class="checklist-item">
+              <div class="check-circle check-pending"></div>
+              <span class="checklist-label" style="color:var(--text-muted);">Payment received</span>
+              <span class="checklist-badge badge-pending">Waiting</span>
+            </div>
+            <div class="checklist-item">
+              <div class="check-circle check-pending"></div>
+              <span class="checklist-label" style="color:var(--text-muted);">Bookings confirmed &amp; links unlocked</span>
+              <span class="checklist-badge badge-pending">Waiting</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ITINERARY -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><div class="card-title-dot" style="background:var(--accent-rose)"></div>Itinerary Overview</div>
+            <span class="card-action">Edit Itinerary →</span>
+          </div>
+          <div class="card-body">
+            <div class="day-block">
+              <div class="day-label">Day 1   Oct 5 · Arrival</div>
+              <div class="day-items">
+                <div class="day-item">
+                  <span class="day-item-icon"></span>
+                  <div class="day-item-info">
+                    <div class="day-item-name">Flight: JFK → LIS</div>
+                    <div class="day-item-detail">TAP Air Portugal · Departs 7:45 PM</div>
+                  </div>
+                  <span class="day-item-status status-pending">TBD</span>
+                </div>
+                <div class="day-item">
+                  <span class="day-item-icon"></span>
+                  <div class="day-item-info">
+                    <div class="day-item-name">Check-in: Bairro Alto Hotel</div>
+                    <div class="day-item-detail">5-star · Chiado neighborhood</div>
+                  </div>
+                  <span class="day-item-status status-pending">TBD</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="day-block">
+              <div class="day-label">Day 2   Oct 6 · Explore Alfama</div>
+              <div class="day-items">
+                <div class="day-item">
+                  <span class="day-item-icon"></span>
+                  <div class="day-item-info">
+                    <div class="day-item-name">São Jorge Castle Tour</div>
+                    <div class="day-item-detail">Guided tour · 10:00 AM</div>
+                  </div>
+                  <span class="day-item-status status-confirmed">Confirmed</span>
+                </div>
+                <div class="day-item">
+                  <span class="day-item-icon"></span>
+                  <div class="day-item-info">
+                    <div class="day-item-name">Fado Dinner Experience</div>
+                    <div class="day-item-detail">Tasca do Chico · 8:00 PM</div>
+                  </div>
+                  <span class="day-item-status status-confirmed">Confirmed</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="day-block">
+              <div class="day-label">Day 3   Oct 7 · Day Trip to Sintra</div>
+              <div class="day-items">
+                <div class="day-item">
+                  <span class="day-item-icon"></span>
+                  <div class="day-item-info">
+                    <div class="day-item-name">Train to Sintra</div>
+                    <div class="day-item-detail">Rossio Station · 9:15 AM</div>
+                  </div>
+                  <span class="day-item-status status-confirmed">Confirmed</span>
+                </div>
+                <div class="day-item">
+                  <span class="day-item-icon"></span>
+                  <div class="day-item-info">
+                    <div class="day-item-name">Pena Palace Visit</div>
+                    <div class="day-item-detail">Tickets included · 11:00 AM</div>
+                  </div>
+                  <span class="day-item-status status-pending">TBD</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTES -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><div class="card-title-dot" style="background:var(--accent-lavender)"></div>Advisor Notes</div>
+          </div>
+          <div class="card-body">
+            <textarea class="notes-area" placeholder="Add private notes about this trip, client preferences, special requests...">Sarah mentioned they want a romantic atmosphere   prioritize candlelit dinner options. Michael has a shellfish allergy   flag for all restaurant bookings. They're celebrating their 5th anniversary.</textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <div class="sidebar-cards">
+
+        <!-- TRIP INFO -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><div class="card-title-dot"></div>Trip Info</div>
+          </div>
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-item"><div class="info-label">Departure</div><div class="info-value">Oct 5, 2026</div></div>
+              <div class="info-item"><div class="info-label">Return</div><div class="info-value">Oct 14, 2026</div></div>
+              <div class="info-item"><div class="info-label">Duration</div><div class="info-value">9 Nights</div></div>
+              <div class="info-item"><div class="info-label">Travelers</div><div class="info-value">2 Adults</div></div>
+              <div class="info-item"><div class="info-label">Budget</div><div class="info-value">TBD</div></div>
+              <div class="info-item"><div class="info-label">Status</div><div class="info-value" style="color:var(--accent-sage);">Preview Sent</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLIENT INFO -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><div class="card-title-dot" style="background:var(--accent-rose)"></div>Client</div>
+            <span class="card-action">Edit →</span>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+              <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--accent-rose),var(--accent-blush));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:white;font-family:'Playfair Display',serif;flex-shrink:0;">S</div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--text-primary);">Sarah &amp; Michael</div>
+                <div style="font-size:11px;color:var(--text-muted);">sarah@email.com</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text-muted);">Trips Together</span><span style="color:var(--text-primary);font-weight:500;">1</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text-muted);">Occasion</span><span style="color:var(--text-primary);font-weight:500;">5th Anniversary</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text-muted);">Travel Style</span><span style="color:var(--text-primary);font-weight:500;">Romantic / Luxury</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- UNLOCK TRIP -->
+        <div class="unlock-card">
+          <div class="unlock-title">🔓 Unlock Full Trip</div>
+          <div class="unlock-desc">Once payment is received, unlock the full trip to give your client access to all booking links, hotel confirmations, and their complete itinerary.</div>
+          <div class="unlock-features">
+            <div class="unlock-feature"><span></span> All booking links activated</div>
+            <div class="unlock-feature"><span></span> Hotel confirmation PDFs shared</div>
+            <div class="unlock-feature"><span></span> Flight details revealed</div>
+            <div class="unlock-feature"><span></span> Activity vouchers unlocked</div>
+            <div class="unlock-feature"><span></span> Emergency contact info visible</div>
+          </div>
+          <div class="unlock-btn">🔓 &nbsp;Unlock This Trip</div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><div class="card-title-dot" style="background:var(--accent-sage)"></div>Quick Actions</div>
+          </div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:8px;">
+            <div style="padding:11px 14px;background:var(--bg-card2);border:1px solid var(--border-subtle);border-radius:10px;font-size:13px;color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:10px;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.borderColor='var(--border-subtle)'">📤 Send Preview Page</div>
+            <div style="padding:11px 14px;background:var(--bg-card2);border:1px solid var(--border-subtle);border-radius:10px;font-size:13px;color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:10px;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.borderColor='var(--border-subtle)'">📋 Copy Preview Link</div>
+            <div style="padding:11px 14px;background:var(--bg-card2);border:1px solid var(--border-subtle);border-radius:10px;font-size:13px;color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:10px;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.borderColor='var(--border-subtle)'">💬 Message Client</div>
+            <div style="padding:11px 14px;background:var(--bg-card2);border:1px solid var(--border-subtle);border-radius:10px;font-size:13px;color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:10px;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.borderColor='var(--border-subtle)'">📦 Archive Trip</div>
+            <div style="padding:11px 14px;background:rgba(212,132,138,0.08);border:1px solid rgba(212,132,138,0.2);border-radius:10px;font-size:13px;color:var(--accent-rose);cursor:pointer;display:flex;align-items:center;gap:10px;">🗑️ Delete Trip</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

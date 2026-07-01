@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sarah &amp; Michael   Lisbon Trip</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --warm-bg: #1A1410;
+      --warm-card: #221C17;
+      --warm-card2: #2A221B;
+      --gold: #C9A96E;
+      --gold2: #E8C98A;
+      --rose: #D4848A;
+      --sage: #8DAF9B;
+      --lavender: #B8A9C9;
+      --cream: #F5EFE6;
+      --muted: #9A8F8A;
+      --border: rgba(201,169,110,0.18);
+      --border-s: rgba(255,255,255,0.07);
+      --sidebar-w: 260px;
+    }
+    html, body { height: 100%; background: var(--warm-bg); color: var(--cream); font-family: 'DM Sans', sans-serif; font-size: 14px; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 99px; }
+
+    /* ─── LAYOUT ──────────────────────────────────── */
+    .app { display: flex; height: 100vh; }
+
+    /* ─── SIDEBAR ─────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: linear-gradient(180deg, #130F0B 0%, #1A1410 100%);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Subtle destination photo in sidebar background */
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url('assets/lisbon.jpg') center center / cover no-repeat;
+      opacity: 0.06;
+      pointer-events: none;
+    }
+
+    .sidebar-hero {
+      position: relative;
+      height: 160px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .sidebar-hero img { width: 100%; height: 100%; object-fit: cover; }
+    .sidebar-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(19,15,11,0.3) 0%, rgba(19,15,11,0.9) 100%); }
+    .sidebar-hero-info { position: absolute; bottom: 14px; left: 16px; right: 16px; }
+    .sidebar-client { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--cream); line-height: 1.2; }
+    .sidebar-dest { font-family: 'Playfair Display', serif; font-size: 13px; font-style: italic; color: var(--gold); }
+
+    .sidebar-countdown {
+      padding: 12px 16px;
+      background: rgba(201,169,110,0.08);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .cd-label { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .cd-units { display: flex; gap: 10px; }
+    .cd-unit { text-align: center; }
+    .cd-num { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--gold); line-height: 1; }
+    .cd-unit-label { font-size: 8px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 10px; position: relative; z-index: 1; }
+    .nav-section-label { font-size: 9px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); padding: 0 10px; margin: 16px 0 6px; }
+    .nav-section-label:first-child { margin-top: 4px; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 400;
+      margin-bottom: 2px;
+      position: relative;
+    }
+    .nav-item:hover { background: rgba(201,169,110,0.07); color: var(--cream); }
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(201,169,110,0.18), rgba(212,132,138,0.08));
+      color: var(--gold2);
+      font-weight: 500;
+      border: 1px solid rgba(201,169,110,0.22);
+    }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 50%;
+      transform: translateY(-50%);
+      width: 3px; height: 60%;
+      background: linear-gradient(180deg, var(--gold), var(--rose));
+      border-radius: 0 3px 3px 0;
+    }
+    .nav-icon { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .nav-badge { margin-left: auto; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: rgba(141,175,155,0.2); color: var(--sage); }
+
+    .sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--border-s); position: relative; z-index: 1; flex-shrink: 0; }
+    .sidebar-footer-brand { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 600; color: var(--cream); }
+    .sidebar-footer-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    /* ─── MAIN CONTENT ────────────────────────────── */
+    .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+    /* ─── TOPBAR ──────────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px;
+      background: rgba(26,20,16,0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-s);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      flex-shrink: 0;
+    }
+    .topbar-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--cream); }
+    .topbar-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .topbar-actions { display: flex; gap: 10px; }
+    .topbar-btn { display: flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+    .topbar-btn-gold { background: linear-gradient(135deg, var(--gold), #B8905A); color: #1A1410; }
+    .topbar-btn-gold:hover { box-shadow: 0 4px 14px rgba(201,169,110,0.35); }
+    .topbar-btn-ghost { background: transparent; border: 1px solid var(--border-s); color: var(--muted); }
+    .topbar-btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ─── SECTIONS ────────────────────────────────── */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ─── WELCOME SECTION ─────────────────────────── */
+    .welcome-hero {
+      position: relative;
+      height: 320px;
+      overflow: hidden;
+    }
+    .welcome-hero img { width: 100%; height: 100%; object-fit: cover; }
+    .welcome-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(26,20,16,0.2) 0%, rgba(26,20,16,0.85) 100%); }
+    .welcome-hero-content { position: absolute; bottom: 28px; left: 32px; right: 32px; }
+    .welcome-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+    .welcome-title { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--cream); margin-bottom: 6px; }
+    .welcome-sub { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-style: italic; color: rgba(245,239,230,0.75); }
+
+    .section-body { padding: 28px 32px 48px; }
+
+    /* VIDEO MESSAGE */
+    .video-card {
+      background: var(--warm-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      margin-bottom: 24px;
+    }
+    .video-thumb {
+      width: 220px;
+      min-height: 160px;
+      background: linear-gradient(135deg, #2A221B, #1A1410);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .video-thumb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url('assets/lisbon.jpg') center / cover;
+      opacity: 0.15;
+    }
+    .video-play { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #B8905A); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 24px rgba(201,169,110,0.4); transition: transform 0.2s ease; position: relative; z-index: 1; }
+    .video-play:hover { transform: scale(1.08); }
+    .video-body { padding: 22px 24px; flex: 1; }
+    .video-from { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+    .video-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--cream); margin-bottom: 8px; }
+    .video-text { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-style: italic; color: var(--muted); line-height: 1.7; }
+    .video-sig { font-size: 12px; color: var(--gold); margin-top: 12px; }
+
+    /* PHOTO MOSAIC */
+    .photo-mosaic { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 160px 160px; gap: 8px; border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+    .mosaic-photo { background-size: cover; background-position: center; }
+    .mosaic-photo:first-child { grid-row: 1 / 3; }
+
+    /* SPOTIFY CARD */
+    .spotify-card {
+      background: var(--warm-card);
+      border: 1px solid var(--border-s);
+      border-radius: 16px;
+      padding: 20px 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+    .spotify-icon { width: 52px; height: 52px; border-radius: 12px; background: #1DB954; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .spotify-info { flex: 1; }
+    .spotify-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+    .spotify-title { font-size: 14px; font-weight: 600; color: var(--cream); margin-bottom: 3px; }
+    .spotify-sub { font-size: 12px; color: var(--muted); }
+    .spotify-btn { padding: 9px 20px; background: #1DB954; border-radius: 99px; font-size: 12px; font-weight: 700; color: #000; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; }
+    .spotify-btn:hover { background: #1ed760; }
+
+    /* ─── CARDS ───────────────────────────────────── */
+    .card { background: var(--warm-card); border: 1px solid var(--border-s); border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
+    .card-header { padding: 14px 18px; border-bottom: 1px solid var(--border-s); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+    .card-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+    .card-body { padding: 16px 18px; }
+
+    /* ─── DAY CARDS ───────────────────────────────── */
+    .day-card { background: var(--warm-card); border: 1px solid var(--border-s); border-radius: 16px; overflow: hidden; margin-bottom: 12px; }
+    .day-header { display: flex; align-items: center; gap: 14px; padding: 16px 20px; cursor: pointer; transition: background 0.2s ease; }
+    .day-header:hover { background: rgba(255,255,255,0.02); }
+    .day-num { width: 42px; height: 42px; border-radius: 11px; background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(212,132,138,0.1)); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+    .day-num-lbl { font-size: 8px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .day-num-val { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--gold); line-height: 1.1; }
+    .day-info { flex: 1; }
+    .day-date { font-size: 13px; font-weight: 600; color: var(--cream); }
+    .day-vibe { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-style: italic; color: var(--gold); margin-top: 2px; }
+    .day-weather-pill { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); padding: 4px 10px; background: rgba(201,169,110,0.08); border-radius: 99px; }
+    .day-chevron { color: var(--muted); transition: transform 0.25s ease; }
+    .day-card.open .day-chevron { transform: rotate(180deg); }
+    .day-body { display: none; padding: 0 20px 16px; }
+    .day-card.open .day-body { display: block; }
+
+    /* STOP CARDS */
+    .stop-list { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; }
+    .stop-card { background: var(--warm-card2); border: 1px solid var(--border-s); border-radius: 12px; overflow: hidden; display: flex; }
+    .stop-photo { width: 80px; min-height: 80px; background-size: cover; background-position: center; flex-shrink: 0; }
+    .stop-content { flex: 1; padding: 11px 13px; }
+    .stop-type { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 3px; }
+    .t-activity { color: var(--gold); } .t-restaurant { color: var(--rose); } .t-hotel { color: var(--sage); } .t-flight { color: var(--lavender); }
+    .stop-name { font-size: 13px; font-weight: 600; color: var(--cream); margin-bottom: 3px; }
+    .stop-loc { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+    .stop-meta { display: flex; gap: 8px; flex-wrap: wrap; font-size: 11px; color: var(--muted); margin-bottom: 7px; }
+    .stop-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .s-btn { padding: 5px 12px; border-radius: 99px; font-size: 10.5px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; border: 1px solid; }
+    .s-btn-book { background: linear-gradient(135deg, var(--gold), #B8905A); color: #1A1410; border-color: transparent; }
+    .s-btn-book:hover { box-shadow: 0 4px 14px rgba(201,169,110,0.35); }
+    .s-btn-ghost { background: transparent; color: var(--muted); border-color: var(--border-s); }
+    .s-btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+    .stop-price { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--gold); padding: 11px 13px; flex-shrink: 0; }
+
+    /* TRAVEL TIME */
+    .travel-conn { display: flex; align-items: center; gap: 8px; padding: 5px 0; }
+    .travel-line { flex: 1; height: 1px; background: var(--border-s); }
+    .travel-pills { display: flex; gap: 5px; }
+    .travel-pill { display: flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 99px; font-size: 10px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-s); color: var(--muted); transition: all 0.15s ease; }
+    .travel-pill.active { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.1); }
+
+    /* ─── INFO GRID ───────────────────────────────── */
+    .info-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .info-card { background: var(--warm-card); border: 1px solid var(--border-s); border-radius: 14px; overflow: hidden; }
+    .info-card-photo { height: 100px; background-size: cover; background-position: center; position: relative; }
+    .info-card-photo-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent, rgba(34,28,23,0.9)); }
+    .info-card-body { padding: 14px 16px; }
+    .info-card-title { font-size: 13.5px; font-weight: 600; color: var(--cream); margin-bottom: 5px; }
+    .info-card-text { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .info-card-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; font-size: 12px; font-weight: 600; color: var(--gold); cursor: pointer; }
+
+    /* ─── TIPS ────────────────────────────────────── */
+    .tip-item { display: flex; gap: 12px; padding: 14px 16px; background: var(--warm-card); border: 1px solid var(--border-s); border-radius: 12px; margin-bottom: 10px; }
+    .tip-num { width: 26px; height: 26px; border-radius: 8px; background: rgba(201,169,110,0.12); border: 1px solid rgba(201,169,110,0.2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
+    .tip-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .tip-text strong { color: var(--cream); }
+
+    /* ─── PACKING ─────────────────────────────────── */
+    .packing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+    .packing-cat { background: var(--warm-card); border: 1px solid var(--border-s); border-radius: 12px; padding: 14px; }
+    .packing-cat-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+    .packing-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--border-s); font-size: 12.5px; color: var(--muted); cursor: pointer; }
+    .packing-item:last-child { border-bottom: none; }
+    .packing-check { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--border-s); flex-shrink: 0; transition: all 0.15s ease; }
+    .packing-item.checked .packing-check { background: var(--sage); border-color: var(--sage); }
+    .packing-item.checked span { text-decoration: line-through; color: var(--muted); opacity: 0.5; }
+
+    /* VIDEO EMBED */
+    .video-embed { background: var(--warm-card); border: 1px solid var(--border-s); border-radius: 14px; overflow: hidden; margin-bottom: 16px; }
+    .video-embed-thumb { position: relative; height: 200px; background-size: cover; background-position: center; cursor: pointer; }
+    .video-embed-overlay { position: absolute; inset: 0; background: rgba(26,20,16,0.5); display: flex; align-items: center; justify-content: center; }
+    .video-embed-play { width: 56px; height: 56px; border-radius: 50%; background: rgba(201,169,110,0.9); display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease; }
+    .video-embed-play:hover { transform: scale(1.08); }
+    .video-embed-info { padding: 14px 16px; }
+    .video-embed-title { font-size: 13.5px; font-weight: 600; color: var(--cream); margin-bottom: 3px; }
+    .video-embed-sub { font-size: 12px; color: var(--muted); }
+
+    /* ─── POINTS GUIDE ────────────────────────────── */
+    .points-step { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border-s); }
+    .points-step:last-child { border-bottom: none; }
+    .points-step-num { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #B8905A); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #1A1410; flex-shrink: 0; }
+    .points-step-title { font-size: 13px; font-weight: 600; color: var(--cream); margin-bottom: 3px; }
+    .points-step-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* ─── INSURANCE ───────────────────────────────── */
+    .insurance-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .insurance-card { background: var(--warm-card); border: 1px solid var(--border-s); border-radius: 13px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+    .insurance-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+    .insurance-name { font-size: 13px; font-weight: 600; color: var(--cream); margin-bottom: 4px; }
+    .insurance-desc { font-size: 11px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+    .insurance-link { font-size: 11px; color: var(--gold); font-weight: 600; }
+
+    /* ─── RESERVATIONS ────────────────────────────── */
+    .res-upload { border: 2px dashed rgba(201,169,110,0.22); border-radius: 13px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s ease; margin-bottom: 14px; }
+    .res-upload:hover { border-color: var(--gold); background: rgba(201,169,110,0.03); }
+    .res-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--warm-card); border: 1px solid var(--border-s); border-radius: 11px; margin-bottom: 8px; }
+    .res-icon { width: 34px; height: 34px; border-radius: 9px; background: rgba(141,175,155,0.12); border: 1px solid rgba(141,175,155,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .res-name { font-size: 13px; font-weight: 600; color: var(--cream); }
+    .res-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .res-actions { margin-left: auto; display: flex; gap: 7px; }
+    .res-btn { font-size: 11px; font-weight: 500; padding: 5px 12px; border-radius: 99px; cursor: pointer; border: 1px solid var(--border-s); color: var(--muted); background: transparent; transition: all 0.2s ease; }
+    .res-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ─── MINI FEEDBACK ───────────────────────────── */
+    .mini-feedback {
+      background: linear-gradient(135deg, rgba(201,169,110,0.07), rgba(212,132,138,0.04));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-top: 28px;
+    }
+    .mini-feedback-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--cream); margin-bottom: 4px; }
+    .mini-feedback-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+    .mini-stars { display: flex; gap: 6px; margin-bottom: 14px; }
+    .mini-star { font-size: 22px; cursor: pointer; color: rgba(255,255,255,0.15); transition: color 0.15s ease; }
+    .mini-star.active { color: var(--gold); }
+    .mini-q { font-size: 12.5px; font-weight: 600; color: var(--cream); margin-bottom: 6px; }
+    .mini-textarea { width: 100%; background: var(--warm-card2); border: 1px solid var(--border-s); border-radius: 9px; padding: 10px 13px; font-size: 12.5px; color: var(--cream); font-family: 'DM Sans', sans-serif; outline: none; resize: none; height: 70px; line-height: 1.6; transition: border-color 0.2s ease; margin-bottom: 12px; }
+    .mini-textarea:focus { border-color: var(--gold); }
+    .mini-textarea::placeholder { color: var(--muted); }
+    .mini-submit { padding: 10px 24px; background: linear-gradient(135deg, var(--gold), #B8905A); border-radius: 9px; font-size: 12.5px; font-weight: 600; color: #1A1410; cursor: pointer; border: none; transition: all 0.2s ease; }
+    .mini-submit:hover { box-shadow: 0 4px 14px rgba(201,169,110,0.35); }
+
+    /* ─── REVIEW CTA ──────────────────────────────── */
+    .review-cta { background: var(--warm-card); border: 1px solid var(--border-s); border-radius: 18px; padding: 28px; text-align: center; margin-bottom: 20px; }
+    .review-cta-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--cream); margin-bottom: 8px; }
+    .review-cta-sub { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 18px; max-width: 440px; margin-left: auto; margin-right: auto; }
+    .review-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 26px; background: linear-gradient(135deg, var(--gold), #B8905A); border-radius: 10px; font-size: 13px; font-weight: 600; color: #1A1410; cursor: pointer; text-decoration: none; transition: all 0.2s ease; }
+    .review-btn:hover { box-shadow: 0 6px 20px rgba(201,169,110,0.35); }
+    .social-handles { display: flex; gap: 14px; justify-content: center; margin-top: 12px; }
+    .social-handle { font-size: 12px; color: var(--gold); cursor: pointer; }
+
+    /* ─── GUIDE ATTACH ────────────────────────────── */
+    .guide-card { background: var(--warm-card); border: 1px solid var(--border-s); border-radius: 14px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+    .guide-icon { width: 44px; height: 44px; border-radius: 11px; background: rgba(201,169,110,0.12); border: 1px solid rgba(201,169,110,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .guide-name { font-size: 14px; font-weight: 600; color: var(--cream); margin-bottom: 3px; }
+    .guide-meta { font-size: 11.5px; color: var(--muted); }
+    .guide-dl-btn { margin-left: auto; padding: 8px 18px; background: linear-gradient(135deg, var(--gold), #B8905A); border-radius: 99px; font-size: 12px; font-weight: 600; color: #1A1410; cursor: pointer; white-space: nowrap; }
+
+    /* ─── PHOTO STRIP ─────────────────────────────── */
+    .photo-strip { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; }
+    .photo-strip-item { min-width: 160px; height: 110px; border-radius: 11px; background-size: cover; background-position: center; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══════════════════════════════════ -->
+    <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <div class="brand-icon"><img src="assets/globe-mascot.png" alt="" style="width:36px;height:36px;border-radius:10px;object-fit:contain;" /></div>
+        <div class="brand-name">
+          <div class="brand-title">Trip Studio</div>
+          <div class="brand-sub">BY MAME DEE</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">MAIN</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item  active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Client Trips
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Trip
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Vault
+      </a>
+      <div class="nav-section-label">SETTINGS</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item" style="color:var(--text-muted);font-size:12.5px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Exit to WordPress
+      </a>
+      <div class="user-card" style="margin-top:8px;">
+        <img src="assets/agent-dee.png" alt="Agent Dee" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,169,110,0.3);" />
+        <div>
+          <div class="user-name">Agent Dee</div>
+          <div class="user-role" style="color:var(--accent-gold);">AI Assistant</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar" id="topbar">
+      <div>
+        <div class="topbar-title" id="topbarTitle">Welcome to Your Trip</div>
+        <div class="topbar-sub">Sarah &amp; Michael &nbsp;&middot;&nbsp; Lisbon, Portugal &nbsp;&middot;&nbsp; Oct 5–14, 2026</div>
+      </div>
+      <div class="topbar-actions">
+        <div class="topbar-btn topbar-btn-ghost" onclick="alert('Downloading trip as PDF...')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Download PDF
+        </div>
+        <div class="topbar-btn topbar-btn-gold" onclick="shareTrip()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share Trip
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ WELCOME SECTION ════════════════════════ -->
+    <div class="section active" id="sec-welcome">
+      <div class="welcome-hero">
+        <img src="assets/lisbon.jpg" alt="Lisbon" />
+        <div class="welcome-hero-overlay"></div>
+        <div class="welcome-hero-content">
+          <div class="welcome-eyebrow">Your Trip is Fully Unlocked</div>
+          <div class="welcome-title">Welcome, Sarah &amp; Michael</div>
+          <div class="welcome-sub">Everything you need for an unforgettable Lisbon anniversary.</div>
+        </div>
+      </div>
+
+      <div class="section-body">
+
+        <!-- VIDEO MESSAGE -->
+        <div class="video-card">
+          <div class="video-thumb">
+            <div class="video-play" onclick="alert('Playing video message from Deja...')">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#1A1410" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+          </div>
+          <div class="video-body">
+            <div class="video-from">A Message from Deja &nbsp;&middot;&nbsp; Mame Dee Travel World</div>
+            <div class="video-title">Sarah &amp; Michael, I am so excited for you!</div>
+            <div class="video-text">"You two are about to experience something truly special. Lisbon has a magic that is hard to describe until you are standing in the middle of it. I built every detail of this trip with your anniversary in mind."</div>
+            <div class="video-sig">Deja &nbsp;&middot;&nbsp; Travel Concierge</div>
+          </div>
+        </div>
+
+        <!-- PHOTO MOSAIC -->
+        <div class="photo-mosaic">
+          <div class="mosaic-photo" style="background-image:url('assets/lisbon.jpg')"></div>
+          <div class="mosaic-photo" style="background-image:url('assets/paris.jpg')"></div>
+          <div class="mosaic-photo" style="background-image:url('assets/amalfi.jpg')"></div>
+          <div class="mosaic-photo" style="background-image:url('assets/hero1.jpg')"></div>
+          <div class="mosaic-photo" style="background-image:url('assets/hero2.jpg')"></div>
+        </div>
+
+        <!-- SPOTIFY -->
+        <div class="spotify-card">
+          <div class="spotify-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          </div>
+          <div class="spotify-info">
+            <div class="spotify-label">Destination Playlist</div>
+            <div class="spotify-title">Lisbon Vibes &nbsp;&middot;&nbsp; Fado, Bossa Nova &amp; Portuguese Soul</div>
+            <div class="spotify-sub">Curated to get you in the mood for your trip</div>
+          </div>
+          <div class="spotify-btn" onclick="alert('Opening Spotify playlist for Lisbon...')">Listen Now</div>
+        </div>
+
+        <!-- GUIDE ATTACHMENT -->
+        <div class="guide-card">
+          <div class="guide-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div>
+            <div class="guide-name">Lisbon, Portugal &nbsp;&middot;&nbsp; Mame Dee Guide</div>
+            <div class="guide-meta">Your personal destination guide &nbsp;&middot;&nbsp; 12 pages &nbsp;&middot;&nbsp; PDF</div>
+          </div>
+          <div class="guide-dl-btn" onclick="alert('Downloading Lisbon Guide PDF...')">Download Guide</div>
+        </div>
+
+        <div id="miniFeedback-welcome"></div>
+      </div>
+    </div>
+
+    <!-- ═══ ITINERARY SECTION ══════════════════════ -->
+    <div class="section" id="sec-itinerary">
+      <div class="section-body" style="padding-top:24px;">
+
+        <div style="margin-bottom:20px;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Your Full Itinerary</div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--cream);margin-bottom:4px;">Day by Day</h2>
+          <p style="font-size:13px;color:var(--muted);">Every day is unlocked. All booking links are live. Click any day to expand.</p>
+        </div>
+
+        <!-- DAY 1 -->
+        <div class="day-card open" id="dc1">
+          <div class="day-header" onclick="toggleDay('dc1')">
+            <div class="day-num"><div class="day-num-lbl">Day</div><div class="day-num-val">1</div></div>
+            <div class="day-info">
+              <div class="day-date">Monday, October 5</div>
+              <div class="day-vibe">Arrival Day   Welcome to Lisbon</div>
+            </div>
+            <div class="day-weather-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+              22&deg;C &nbsp;&middot;&nbsp; Sunny
+            </div>
+            <svg class="day-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-body">
+            <div class="stop-list">
+              <div class="stop-card">
+                <div class="stop-photo" style="background-image:url('assets/hero4.jpg')"></div>
+                <div class="stop-content">
+                  <div class="stop-type t-flight">Flight</div>
+                  <div class="stop-name">TAP Air Portugal &nbsp;&middot;&nbsp; TP 201</div>
+                  <div class="stop-loc">JFK &rarr; LIS &nbsp;&middot;&nbsp; Departs 7:45 PM &nbsp;&middot;&nbsp; 7h 35m</div>
+                  <div class="stop-btns">
+                    <div class="s-btn s-btn-book">View Booking</div>
+                    <div class="s-btn s-btn-ghost">Check-in Online</div>
+                  </div>
+                </div>
+                <div class="stop-price">$1,840</div>
+              </div>
+              <div class="travel-conn">
+                <div class="travel-line"></div>
+                <div class="travel-pills">
+                  <div class="travel-pill active">Car 25 min</div>
+                  <div class="travel-pill">Metro 35 min</div>
+                </div>
+                <div class="travel-line"></div>
+              </div>
+              <div class="stop-card">
+                <div class="stop-photo" style="background-image:url('assets/lisbon.jpg')"></div>
+                <div class="stop-content">
+                  <div class="stop-type t-hotel">Hotel Check-in</div>
+                  <div class="stop-name">Bairro Alto Hotel</div>
+                  <div class="stop-loc">Chiado, Lisbon &nbsp;&middot;&nbsp; Check-in from 3:00 PM</div>
+                  <div class="stop-meta"><span>Deluxe King</span><span>Breakfast incl.</span><span>Rooftop pool</span></div>
+                  <div class="stop-btns">
+                    <div class="s-btn s-btn-book">View Confirmation</div>
+                    <div class="s-btn s-btn-ghost">Open in Maps</div>
+                    <div class="s-btn s-btn-ghost">Offline Map</div>
+                  </div>
+                </div>
+                <div class="stop-price">$420<span style="font-size:10px;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400;">/night</span></div>
+              </div>
+              <div class="travel-conn">
+                <div class="travel-line"></div>
+                <div class="travel-pills"><div class="travel-pill active">8 min</div><div class="travel-pill">12 min walk</div></div>
+                <div class="travel-line"></div>
+              </div>
+              <div class="stop-card">
+                <div class="stop-photo" style="background-image:url('assets/amalfi.jpg')"></div>
+                <div class="stop-content">
+                  <div class="stop-type t-restaurant">Dinner</div>
+                  <div class="stop-name">Tasca do Chico</div>
+                  <div class="stop-loc">Chiado &nbsp;&middot;&nbsp; Fado &amp; Portuguese cuisine</div>
+                  <div class="stop-meta"><span style="color:var(--gold);">&#9733;&#9733;&#9733;&#9733; 4.4</span><span>Opens 7:00 PM</span></div>
+                  <div class="stop-btns">
+                    <div class="s-btn s-btn-book">View Reservation</div>
+                    <div class="s-btn s-btn-ghost">View Menu</div>
+                    <div class="s-btn s-btn-ghost">Open in Maps</div>
+                  </div>
+                </div>
+                <div class="stop-price">~$80</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 2 -->
+        <div class="day-card" id="dc2">
+          <div class="day-header" onclick="toggleDay('dc2')">
+            <div class="day-num"><div class="day-num-lbl">Day</div><div class="day-num-val">2</div></div>
+            <div class="day-info">
+              <div class="day-date">Tuesday, October 6</div>
+              <div class="day-vibe">Belem and Pasteis Morning</div>
+            </div>
+            <div class="day-weather-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
+              20&deg;C &nbsp;&middot;&nbsp; Partly cloudy
+            </div>
+            <svg class="day-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="day-body">
+            <div style="padding:12px 0;text-align:center;color:var(--muted);font-size:13px;">Belem Tower, Jeronimos Monastery, Pasteis de Belem, Sunset at Miradouro</div>
+          </div>
+        </div>
+
+        <!-- DAYS 3-9 -->
+        <div style="background:var(--warm-card);border:1px solid var(--border-s);border-radius:13px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px;" onclick="alert('Expanding all remaining days...')">
+          <div style="font-size:13px;font-weight:500;color:var(--muted);">Days 3 through 9 &nbsp;&middot;&nbsp; Sintra, Alfama, wine tasting, and more</div>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+
+        <div id="miniFeedback-itinerary"></div>
+      </div>
+    </div>
+
+    <!-- ═══ ESSENTIALS SECTION ═════════════════════ -->
+    <div class="section" id="sec-essentials">
+      <div class="section-body" style="padding-top:24px;">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">All the Details</div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--cream);margin-bottom:4px;">Essential Information</h2>
+        </div>
+
+        <div class="photo-strip">
+          <div class="photo-strip-item" style="background-image:url('assets/lisbon.jpg')"></div>
+          <div class="photo-strip-item" style="background-image:url('assets/hero1.jpg')"></div>
+          <div class="photo-strip-item" style="background-image:url('assets/amalfi.jpg')"></div>
+          <div class="photo-strip-item" style="background-image:url('assets/paris.jpg')"></div>
+          <div class="photo-strip-item" style="background-image:url('assets/hero2.jpg')"></div>
+        </div>
+
+        <div class="info-grid-2">
+          <div class="info-card">
+            <div class="info-card-photo" style="background-image:url('assets/lisbon.jpg')"><div class="info-card-photo-overlay"></div></div>
+            <div class="info-card-body">
+              <div class="info-card-title">Nearest Hospital</div>
+              <div class="info-card-text">Hospital de Santa Maria &nbsp;&middot;&nbsp; 2.4 km from hotel &nbsp;&middot;&nbsp; Emergency: 112</div>
+              <div class="info-card-link">Get Directions</div>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-photo" style="background-image:url('assets/hero1.jpg')"><div class="info-card-photo-overlay"></div></div>
+            <div class="info-card-body">
+              <div class="info-card-title">US Embassy Lisbon</div>
+              <div class="info-card-text">Av. das Forcas Armadas &nbsp;&middot;&nbsp; +351 217 273 300 &nbsp;&middot;&nbsp; Mon-Fri 8am-5pm</div>
+              <div class="info-card-link">View Embassy Website</div>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-photo" style="background-image:url('assets/amalfi.jpg')"><div class="info-card-photo-overlay"></div></div>
+            <div class="info-card-body">
+              <div class="info-card-title">Entry Requirements</div>
+              <div class="info-card-text">US Citizens: Visa-free up to 90 days. Valid passport required (3+ months validity).</div>
+              <div class="info-card-link">Full Requirements</div>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-photo" style="background-image:url('assets/hero2.jpg')"><div class="info-card-photo-overlay"></div></div>
+            <div class="info-card-body">
+              <div class="info-card-title">Offline Maps</div>
+              <div class="info-card-text">Download Google Maps for Lisbon before you fly. Works without internet.</div>
+              <div class="info-card-link">Download Offline Map</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="miniFeedback-essentials"></div>
+      </div>
+    </div>
+
+    <!-- ═══ TIPS SECTION ═══════════════════════════ -->
+    <div class="section" id="sec-tips">
+      <div class="section-body" style="padding-top:24px;">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">From Deja, With Love</div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--cream);margin-bottom:4px;">Insider Tips</h2>
+          <p style="font-size:13px;color:var(--muted);">Things I wish someone had told me before my first trip to Lisbon.</p>
+        </div>
+
+        <div class="tip-item"><div class="tip-num">1</div><div class="tip-text"><strong>Use a credit union ATM, not a currency exchange.</strong> You will get a much better rate. Withdraw euros from a Multibanco ATM in the city center.</div></div>
+        <div class="tip-item"><div class="tip-num">2</div><div class="tip-text"><strong>Capital One Venture X gives you free international data.</strong> Activate the travel feature before you fly. No SIM card needed.</div></div>
+        <div class="tip-item"><div class="tip-num">3</div><div class="tip-text"><strong>Take Tram 28 before 9am.</strong> It runs through Alfama and Chiado. Scenic and free with your transit card. Crowded after 10am.</div></div>
+        <div class="tip-item"><div class="tip-num">4</div><div class="tip-text"><strong>Bolt is cheaper than Uber in Lisbon.</strong> Both apps work well. Book a private transfer for airport runs to get a fixed price.</div></div>
+        <div class="tip-item"><div class="tip-num">5</div><div class="tip-text"><strong>Marriott Bonvoy members get early check-in when available.</strong> Call ahead the day before to request it.</div></div>
+        <div class="tip-item"><div class="tip-num">6</div><div class="tip-text"><strong>Pasteis de Belem is worth the line.</strong> Go early morning. Order a dozen to go. They taste different warm, straight from the oven.</div></div>
+
+        <!-- PACKING VIDEO -->
+        <div style="margin-top:24px;margin-bottom:8px;font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);">Recommended Watch</div>
+        <div class="video-embed">
+          <div class="video-embed-thumb" style="background-image:url('assets/lisbon.jpg');" onclick="alert('Opening YouTube: How to Pack for Lisbon in 2026...')">
+            <div class="video-embed-overlay">
+              <div class="video-embed-play">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#1A1410" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="video-embed-info">
+            <div class="video-embed-title">How to Pack for Lisbon, Portugal &nbsp;&middot;&nbsp; 2026 Guide</div>
+            <div class="video-embed-sub">YouTube &nbsp;&middot;&nbsp; 8 minutes &nbsp;&middot;&nbsp; Curated by Deja</div>
+          </div>
+        </div>
+
+        <div id="miniFeedback-tips"></div>
+      </div>
+    </div>
+
+    <!-- ═══ PACKING SECTION ════════════════════════ -->
+    <div class="section" id="sec-packing">
+      <div class="section-body" style="padding-top:24px;">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Be Prepared</div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--cream);margin-bottom:4px;">Packing List for Lisbon</h2>
+          <p style="font-size:13px;color:var(--muted);">Check off items as you pack. Curated for October weather and your travel style.</p>
+        </div>
+
+        <div class="packing-grid">
+          <div class="packing-cat">
+            <div class="packing-cat-title">Clothing</div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>Light layers (Oct is mild)</span></div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>Comfortable walking shoes</span></div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>One nice dinner outfit</span></div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>Light jacket or cardigan</span></div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>Scarf (evenings get cool)</span></div>
+          </div>
+          <div class="packing-cat">
+            <div class="packing-cat-title">Documents</div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>Passport (3+ months valid)</span></div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>Travel insurance card</span></div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>Hotel confirmation printout</span></div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>Flight booking reference</span></div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>Emergency contact list</span></div>
+          </div>
+          <div class="packing-cat">
+            <div class="packing-cat-title">Tech &amp; Essentials</div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>EU plug adapter (Type F)</span></div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>Portable charger</span></div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>Offline maps downloaded</span></div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>Bolt &amp; Uber apps installed</span></div>
+            <div class="packing-item" onclick="togglePack(this)"><div class="packing-check"></div><span>Viva Viagem card (at airport)</span></div>
+          </div>
+        </div>
+
+        <div id="miniFeedback-packing"></div>
+      </div>
+    </div>
+
+    <!-- ═══ POINTS SECTION ════════════════════════ -->
+    <div class="section" id="sec-points">
+      <div class="section-body" style="padding-top:24px;">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Points &amp; Miles</div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--cream);margin-bottom:4px;">How to Book Your Flight with Points</h2>
+          <p style="font-size:13px;color:var(--muted);">Step-by-step: Amex Membership Rewards &rarr; Air Canada Aeroplan &rarr; TAP Air Portugal.</p>
+        </div>
+        <div style="background:var(--warm-card);border:1px solid var(--border-s);border-radius:16px;padding:20px;">
+          <div class="points-step"><div class="points-step-num">1</div><div><div class="points-step-title">Log into your Amex account</div><div class="points-step-desc">Go to americanexpress.com, navigate to Membership Rewards, and click Transfer Points.</div></div></div>
+          <div class="points-step"><div class="points-step-num">2</div><div><div class="points-step-title">Select Air Canada Aeroplan</div><div class="points-step-desc">Transfer ratio is 1:1. Transfer 70,000 Amex points to get 70,000 Aeroplan miles. Transfers are instant.</div></div></div>
+          <div class="points-step"><div class="points-step-num">3</div><div><div class="points-step-title">Search TAP Air Portugal on Aeroplan</div><div class="points-step-desc">Go to aeroplan.com, search JFK to LIS. Business class costs 70,000 miles + $280 in taxes.</div></div></div>
+          <div class="points-step"><div class="points-step-num">4</div><div><div class="points-step-title">Complete the booking</div><div class="points-step-desc">Select your flight, enter passenger details, and pay the taxes with your card. Your miles cover the fare.</div></div></div>
+        </div>
+        <!-- REFERRAL LINKS -->
+        <div style="margin-top:28px;margin-bottom:8px;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;">Deja's Referral Links</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:24px;">
+            <div style="background:var(--warm-card);border:1px solid var(--border-s);border-radius:13px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border-s)'" onclick="alert('Opening Rakuten referral link...')">
+              <div style="width:36px;height:36px;border-radius:9px;background:rgba(201,169,110,0.12);border:1px solid rgba(201,169,110,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;">R</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--cream);">Rakuten</div>
+                <div style="font-size:11px;color:var(--muted);">Earn cashback on hotels and flights</div>
+              </div>
+              <div style="margin-left:auto;font-size:11px;font-weight:600;color:var(--gold);">Join &rarr;</div>
+            </div>
+            <div style="background:var(--warm-card);border:1px solid var(--border-s);border-radius:13px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border-s)'" onclick="alert('Opening Rove referral link...')">
+              <div style="width:36px;height:36px;border-radius:9px;background:rgba(141,175,155,0.12);border:1px solid rgba(141,175,155,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;">R</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--cream);">Rove</div>
+                <div style="font-size:11px;color:var(--muted);">Travel rewards and hotel booking</div>
+              </div>
+              <div style="margin-left:auto;font-size:11px;font-weight:600;color:var(--sage);">Join &rarr;</div>
+            </div>
+            <div style="background:var(--warm-card);border:1px solid var(--border-s);border-radius:13px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border-s)'" onclick="alert('Opening Amex referral link...')">
+              <div style="width:36px;height:36px;border-radius:9px;background:rgba(184,169,201,0.12);border:1px solid rgba(184,169,201,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;">A</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--cream);">American Express</div>
+                <div style="font-size:11px;color:var(--muted);">Membership Rewards cards</div>
+              </div>
+              <div style="margin-left:auto;font-size:11px;font-weight:600;color:var(--lavender);">Apply &rarr;</div>
+            </div>
+            <div style="background:var(--warm-card);border:1px solid var(--border-s);border-radius:13px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border-s)'" onclick="alert('Opening Capital One referral link...')">
+              <div style="width:36px;height:36px;border-radius:9px;background:rgba(212,132,138,0.12);border:1px solid rgba(212,132,138,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;">C</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--cream);">Capital One</div>
+                <div style="font-size:11px;color:var(--muted);">Miles cards with transfer partners</div>
+              </div>
+              <div style="margin-left:auto;font-size:11px;font-weight:600;color:var(--rose);">Apply &rarr;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CREDIT CARD BREAKDOWN -->
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;">Cards Worth Considering</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px;">Not sure which card to get? Here is a quick breakdown by tier. All of these earn points you can transfer to airlines to book flights like this one.</p>
+
+        <!-- NO ANNUAL FEE -->
+        <div style="margin-bottom:8px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--sage);">No Annual Fee</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+          <div style="background:var(--warm-card);border:1px solid var(--border-s);border-radius:13px;padding:16px 18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="font-size:14px;font-weight:600;color:var(--cream);">Chase Freedom Unlimited</div>
+              <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(141,175,155,0.15);color:var(--sage);">No Annual Fee</div>
+            </div>
+            <div style="font-size:12.5px;color:var(--muted);line-height:1.7;">Earns 1.5x Chase Ultimate Rewards points on everything. The best starter card if you want to build up points without paying a fee. Pair it with a premium Chase card later and your points become transferable to airlines like United and British Airways.</div>
+          </div>
+          <div style="background:var(--warm-card);border:1px solid var(--border-s);border-radius:13px;padding:16px 18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="font-size:14px;font-weight:600;color:var(--cream);">Capital One VentureOne</div>
+              <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(141,175,155,0.15);color:var(--sage);">No Annual Fee</div>
+            </div>
+            <div style="font-size:12.5px;color:var(--muted);line-height:1.7;">Earns 1.25x miles on every purchase. Miles transfer to 15 airline partners including Air Canada, Turkish Airlines, and Avianca. A solid no-cost entry into the Capital One ecosystem before upgrading to the Venture X.</div>
+          </div>
+        </div>
+
+        <!-- MID-TIER -->
+        <div style="margin-bottom:8px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">Mid-Tier (around $95 per year)</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+          <div style="background:var(--warm-card);border:1px solid var(--border-s);border-radius:13px;padding:16px 18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="font-size:14px;font-weight:600;color:var(--cream);">Chase Sapphire Preferred</div>
+              <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(201,169,110,0.15);color:var(--gold);">$95 per year</div>
+            </div>
+            <div style="font-size:12.5px;color:var(--muted);line-height:1.7;">One of the best starter travel cards out there. Earns 3x on dining and 2x on travel. Points transfer 1:1 to United, British Airways, Air France, Singapore Airlines, and more. The annual fee pays for itself easily with the travel credit and sign-up bonus.</div>
+          </div>
+          <div style="background:var(--warm-card);border:1px solid var(--border-s);border-radius:13px;padding:16px 18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="font-size:14px;font-weight:600;color:var(--cream);">Amex Gold Card</div>
+              <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(201,169,110,0.15);color:var(--gold);">$250 per year</div>
+            </div>
+            <div style="font-size:12.5px;color:var(--muted);line-height:1.7;">Earns 4x at restaurants and 4x at US supermarkets. Comes with $120 in dining credits and $120 in Uber Cash per year, which effectively lowers the real cost. Membership Rewards points transfer to Delta, Air Canada, British Airways, and many more.</div>
+          </div>
+        </div>
+
+        <!-- PREMIUM -->
+        <div style="margin-bottom:8px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--rose);">Premium (Worth Every Penny)</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+          <div style="background:var(--warm-card);border:1px solid var(--border-s);border-radius:13px;padding:16px 18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="font-size:14px;font-weight:600;color:var(--cream);">Capital One Venture X</div>
+              <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(212,132,138,0.15);color:var(--rose);">$395 per year</div>
+            </div>
+            <div style="font-size:12.5px;color:var(--muted);line-height:1.7;">Honestly one of the best value premium cards right now. Comes with a $300 annual travel credit, 10,000 bonus miles every year on your anniversary, unlimited Priority Pass lounge access, and free data internationally. The $395 fee is almost entirely offset by the credits. Miles transfer to 15 airline partners.</div>
+          </div>
+          <div style="background:var(--warm-card);border:1px solid var(--border-s);border-radius:13px;padding:16px 18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="font-size:14px;font-weight:600;color:var(--cream);">Amex Platinum</div>
+              <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(212,132,138,0.15);color:var(--rose);">$695 per year</div>
+            </div>
+            <div style="font-size:12.5px;color:var(--muted);line-height:1.7;">The gold standard for frequent travelers. Includes up to $200 in airline fee credits, $200 in hotel credits, $189 Clear Plus credit, $100 Global Entry credit, access to Centurion Lounges, and built-in travel insurance. Membership Rewards points transfer to more airline partners than any other card. If you travel more than twice a year, this card pays for itself.</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(201,169,110,0.07);border:1px solid rgba(201,169,110,0.18);border-radius:12px;padding:14px 16px;font-size:12.5px;color:var(--muted);line-height:1.7;">
+          <strong style="color:var(--cream);">A note from Deja:</strong> I am not a financial advisor and this is not financial advice. These are just the cards I personally know and recommend based on experience. Always read the terms before applying. If you use my referral links above, I may earn a small commission at no extra cost to you. I only share things I genuinely believe in.
+        </div>
+
+        <div id="miniFeedback-points"></div>
+      </div>
+    </div>
+
+    <!-- ═══ INSURANCE SECTION ══════════════════════ -->
+    <div class="section" id="sec-insurance">
+      <div class="section-body" style="padding-top:24px;">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Protect Your Trip</div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--cream);margin-bottom:4px;">Travel Insurance</h2>
+          <p style="font-size:13px;color:var(--muted);">Always read the fine print on medical evacuation coverage before you fly.</p>
+        </div>
+        <div class="insurance-grid">
+          <div class="insurance-card"><div class="insurance-name">Allianz Travel</div><div class="insurance-desc">Comprehensive coverage including trip cancellation, medical, and evacuation.</div><div class="insurance-link">Get a Quote &rarr;</div></div>
+          <div class="insurance-card"><div class="insurance-name">SafetyWing (Nomad)</div><div class="insurance-desc">Flexible monthly plans. Great for longer trips and digital nomads.</div><div class="insurance-link">Get a Quote &rarr;</div></div>
+          <div class="insurance-card"><div class="insurance-name">Amex Platinum</div><div class="insurance-desc">If you hold the Amex Platinum, you may already have built-in coverage.</div><div class="insurance-link">Check Your Benefits &rarr;</div></div>
+        </div>
+        <div id="miniFeedback-insurance"></div>
+      </div>
+    </div>
+
+    <!-- ═══ RESERVATIONS SECTION ═══════════════════ -->
+    <div class="section" id="sec-reservations">
+      <div class="section-body" style="padding-top:24px;">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">All in One Place</div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--cream);margin-bottom:4px;">My Reservations</h2>
+        </div>
+        <div class="res-upload" onclick="alert('Opening file upload...')">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 8px;display:block;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div style="font-size:13px;font-weight:600;color:var(--cream);margin-bottom:3px;">Upload Booking Confirmation</div>
+          <div style="font-size:12px;color:var(--muted);">PDF, screenshot, or booking link</div>
+        </div>
+        <div class="res-item">
+          <div class="res-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sage)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V8l9-6 9 6v14"/><path d="M9 22V12h6v10"/></svg></div>
+          <div><div class="res-name">Bairro Alto Hotel</div><div class="res-meta">Oct 5 – 14, 2026 &nbsp;&middot;&nbsp; Conf. #BAH-29847</div></div>
+          <div class="res-actions"><div class="res-btn">Add to Calendar</div><div class="res-btn">View</div></div>
+        </div>
+        <div class="res-item">
+          <div class="res-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--lavender)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 19-7z"/></svg></div>
+          <div><div class="res-name">TAP Air Portugal &nbsp;&middot;&nbsp; TP 201</div><div class="res-meta">Oct 5, 2026 &nbsp;&middot;&nbsp; Ref: TAPX8K2</div></div>
+          <div class="res-actions"><div class="res-btn">Add to Calendar</div><div class="res-btn">View</div></div>
+        </div>
+        <div id="miniFeedback-reservations"></div>
+      </div>
+    </div>
+
+    <!-- ═══ REVIEW SECTION ════════════════════════ -->
+    <div class="section" id="sec-review">
+      <div class="section-body" style="padding-top:24px;">
+        <!-- BOOK ANOTHER TRIP -->
+        <div style="background:linear-gradient(135deg,rgba(201,169,110,0.1),rgba(212,132,138,0.06));border:1px solid var(--border);border-radius:18px;padding:28px;text-align:center;margin-bottom:20px;">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--cream);margin-bottom:8px;">Ready for your next adventure?</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:18px;max-width:420px;margin-left:auto;margin-right:auto;">You deserve to travel well, and often. When you are ready to start planning your next trip, I am here for it.</div>
+          <a style="display:inline-flex;align-items:center;gap:8px;padding:12px 26px;background:linear-gradient(135deg,var(--gold),#B8905A);border-radius:10px;font-size:13px;font-weight:600;color:#1A1410;cursor:pointer;text-decoration:none;transition:all 0.2s ease;" href="https://custom-itinerary-travel-questionair.vercel.app/" target="_blank">Start Planning My Next Trip</a>
+        </div>
+
+        <div class="review-cta">
+          <div class="review-cta-title">Loving your trip plan?</div>
+          <div class="review-cta-sub">Your review helps other travelers find Mame Dee Travel World. It takes 2 minutes and means the world to us.</div>
+          <a class="review-btn" href="#" onclick="alert('Opening Google Reviews...')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Leave a Google Review
+          </a>
+          <div class="social-handles">
+            <span class="social-handle">@mamedeeworld</span>
+            <span class="social-handle">&middot;</span>
+            <span class="social-handle">#MameDeeTravel</span>
+            <span class="social-handle">&middot;</span>
+            <span class="social-handle">#DreamToDestination</span>
+          </div>
+        </div>
+        <div id="miniFeedback-review"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // ─── COUNTDOWN ─────────────────────────────────────
+  const tripDate = new Date('2026-10-05T00:00:00');
+  function updateCountdown() {
+    const diff = tripDate - new Date();
+    if (diff <= 0) return;
+    document.getElementById('cdD').textContent = Math.floor(diff / (1000*60*60*24));
+    document.getElementById('cdH').textContent = String(Math.floor((diff % (1000*60*60*24)) / (1000*60*60))).padStart(2,'0');
+    document.getElementById('cdM').textContent = String(Math.floor((diff % (1000*60*60)) / (1000*60))).padStart(2,'0');
+  }
+  setInterval(updateCountdown, 30000);
+  updateCountdown();
+
+  // ─── SECTION NAVIGATION ────────────────────────────
+  const sectionTitles = {
+    welcome: 'Welcome to Your Trip',
+    itinerary: 'Day-by-Day Itinerary',
+    essentials: 'Essential Information',
+    tips: 'Insider Tips',
+    packing: 'Packing List',
+    points: 'Points & Miles Guide',
+    insurance: 'Travel Insurance',
+    reservations: 'My Reservations',
+    review: 'Leave a Review'
+  };
+
+  function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('sec-' + name).classList.add('active');
+    document.getElementById('topbarTitle').textContent = sectionTitles[name];
+    event.currentTarget.classList.add('active');
+    // Inject mini feedback if not already there
+    const fbId = 'miniFeedback-' + name;
+    const fbEl = document.getElementById(fbId);
+    if (fbEl && fbEl.innerHTML === '') fbEl.innerHTML = buildMiniFeedback(name);
+    document.querySelector('.main').scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function buildMiniFeedback(section) {
+    return `
+      <div class="mini-feedback">
+        <div class="mini-feedback-title">How was your experience?</div>
+        <div class="mini-feedback-sub">Quick 3-question check-in. Takes 30 seconds.</div>
+        <div class="mini-stars">
+          <span class="mini-star active" onclick="setMiniStars(this,1)">&#9733;</span>
+          <span class="mini-star active" onclick="setMiniStars(this,2)">&#9733;</span>
+          <span class="mini-star active" onclick="setMiniStars(this,3)">&#9733;</span>
+          <span class="mini-star active" onclick="setMiniStars(this,4)">&#9733;</span>
+          <span class="mini-star active" onclick="setMiniStars(this,5)">&#9733;</span>
+        </div>
+        <div class="mini-q">What did you love most about the planning process?</div>
+        <textarea class="mini-textarea" placeholder="Tell us what stood out..."></textarea>
+        <div class="mini-q">Is there anything we could have done better?</div>
+        <textarea class="mini-textarea" placeholder="Any suggestions are welcome..."></textarea>
+        <button class="mini-submit" onclick="submitMiniFeedback(this)">Submit Feedback</button>
+      </div>`;
+  }
+
+  // Inject feedback into welcome section on load
+  document.getElementById('miniFeedback-welcome').innerHTML = buildMiniFeedback('welcome');
+
+  function setMiniStars(el, n) {
+    const stars = el.closest('.mini-stars').querySelectorAll('.mini-star');
+    stars.forEach((s, i) => s.classList.toggle('active', i < n));
+  }
+
+  function submitMiniFeedback(btn) {
+    btn.textContent = 'Thank you!';
+    btn.style.background = 'var(--sage)';
+    btn.disabled = true;
+  }
+
+  // ─── DAY TOGGLE ────────────────────────────────────
+  function toggleDay(id) {
+    document.getElementById(id).classList.toggle('open');
+  }
+
+  // ─── PACKING TOGGLE ────────────────────────────────
+  function togglePack(el) {
+    el.classList.toggle('checked');
+  }
+
+  function shareTrip() {
+    alert('Sharing trip link: mamedeeworld.com/trip/sarah-michael-lisbon-2026');
+  }
+</script>
+</body>
+</html>

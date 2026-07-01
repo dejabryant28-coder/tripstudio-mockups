@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trip Studio   Itinerary Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deep: #0D0B0F; --bg-card: #16121A; --bg-card2: #1C1722;
+      --accent-gold: #C9A96E; --accent-gold2: #E8C98A;
+      --accent-rose: #D4848A; --accent-blush: #F2C4C4;
+      --accent-sage: #8DAF9B; --accent-lavender: #B8A9C9;
+      --text-primary: #F5EFE6; --text-muted: #9A8F8A; --text-label: #C9A96E;
+      --border: rgba(201,169,110,0.18); --border-subtle: rgba(255,255,255,0.06);
+      --sidebar-w: 248px;
+    }
+    html, body { height: 100%; background: var(--bg-deep); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 99px; }
+    .layout { display: flex; height: 100vh; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: linear-gradient(180deg, #110E15 0%, #0D0B0F 100%); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: relative; z-index: 10; flex-shrink: 0; }
+    .sidebar::before { content: ''; position: absolute; top: 0; right: 0; width: 1px; height: 100%; background: linear-gradient(180deg, transparent, var(--accent-gold), transparent); opacity: 0.3; }
+    .sidebar-brand { padding: 28px 24px 20px; border-bottom: 1px solid var(--border-subtle); }
+    .brand-logo { display: flex; align-items: center; gap: 10px; }
+    .brand-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .brand-sub { font-size: 10px; font-weight: 500; color: var(--text-label); letter-spacing: 0.14em; text-transform: uppercase; }
+    .sidebar-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
+    .nav-section-label { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); padding: 0 12px; margin: 20px 0 8px; }
+    .nav-section-label:first-child { margin-top: 0; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; color: var(--text-muted); font-size: 13.5px; text-decoration: none; position: relative; margin-bottom: 2px; }
+    .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+    .nav-item.active { background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(212,132,138,0.08)); color: var(--accent-gold2); font-weight: 500; border: 1px solid rgba(201,169,110,0.2); }
+    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 60%; background: linear-gradient(180deg, var(--accent-gold), var(--accent-rose)); border-radius: 0 3px 3px 0; }
+    .nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+    .nav-badge { margin-left: auto; background: var(--accent-rose); color: white; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+    .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--border-subtle); }
+    .user-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gold), var(--accent-rose)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; font-family: 'Playfair Display', serif; border: 2px solid rgba(201,169,110,0.3); letter-spacing: 0.02em; }
+
+    /* MAIN */
+    .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; background: rgba(13,11,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 5; }
+    .page-breadcrumb { font-size: 12px; color: var(--text-muted); }
+    .page-breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .page-breadcrumb a:hover { color: var(--accent-gold); }
+    .page-breadcrumb span { color: var(--accent-gold); }
+    .topbar-right { display: flex; align-items: center; gap: 14px; }
+    .topbar-search { position: relative; }
+    .topbar-search input { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 8px 14px 8px 36px; font-size: 12.5px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; outline: none; width: 220px; transition: border-color 0.2s ease; }
+    .topbar-search input:focus { border-color: var(--accent-gold); }
+    .topbar-search input::placeholder { color: var(--text-muted); }
+    .topbar-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+    .topbar-notif { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+    .notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: var(--accent-rose); border-radius: 50%; border: 1.5px solid var(--bg-deep); }
+
+    /* WORKFLOW BAR */
+    .workflow-bar { background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); padding: 16px 32px; }
+    .workflow-steps { display: flex; align-items: center; max-width: 900px; }
+    .workflow-step { display: flex; align-items: center; gap: 10px; flex: 1; position: relative; }
+    .workflow-step:not(:last-child)::after { content: ''; position: absolute; left: 32px; right: -10px; top: 15px; height: 2px; background: var(--border-subtle); z-index: 0; }
+    .workflow-step.done:not(:last-child)::after { background: var(--accent-gold); opacity: 0.5; }
+    .step-circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; position: relative; z-index: 1; }
+    .step-circle.done { background: linear-gradient(135deg, var(--accent-gold), #B8905A); color: #0D0B0F; }
+    .step-circle.active { background: linear-gradient(135deg, var(--accent-rose), #C06870); color: white; box-shadow: 0 0 0 4px rgba(212,132,138,0.2); }
+    .step-circle.pending { background: var(--bg-card2); border: 2px solid var(--border-subtle); color: var(--text-muted); }
+    .step-label { font-size: 11px; font-weight: 500; white-space: nowrap; }
+    .step-label.done { color: var(--accent-gold); }
+    .step-label.active { color: var(--text-primary); }
+    .step-label.pending { color: var(--text-muted); }
+
+    /* CONTENT */
+    .content { padding: 28px 32px 60px; max-width: 960px; }
+
+    /* PAGE HEADER */
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+    .page-header-left { }
+    .page-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-label); margin-bottom: 6px; }
+    .page-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .page-desc { font-size: 13px; color: var(--text-muted); }
+    .btn-primary { padding: 12px 24px; background: linear-gradient(135deg, var(--accent-gold), #B8905A); border-radius: 10px; font-size: 13px; font-weight: 600; color: #0D0B0F; cursor: pointer; transition: all 0.2s ease; border: none; white-space: nowrap; }
+    .btn-primary:hover { box-shadow: 0 6px 20px rgba(201,169,110,0.35); transform: translateY(-1px); }
+    .btn-ghost { padding: 12px 20px; background: transparent; border: 1px solid var(--border-subtle); border-radius: 10px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
+    .btn-ghost:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+    /* TRIP SUMMARY STRIP */
+    .trip-strip { display: flex; align-items: center; gap: 20px; padding: 14px 20px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .trip-strip-item { display: flex; flex-direction: column; gap: 2px; }
+    .trip-strip-label { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+    .trip-strip-value { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .trip-strip-divider { width: 1px; height: 32px; background: var(--border-subtle); }
+
+    /* DAY CARDS */
+    .days-list { display: flex; flex-direction: column; gap: 14px; }
+
+    .day-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 18px; overflow: hidden; transition: all 0.25s ease; }
+    .day-card.collapsed .day-body { display: none; }
+    .day-card.saved { border-color: rgba(141,175,155,0.25); }
+
+    .day-header { display: flex; align-items: center; gap: 16px; padding: 18px 22px; cursor: pointer; transition: background 0.2s ease; }
+    .day-header:hover { background: rgba(255,255,255,0.02); }
+
+    .day-number { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(212,132,138,0.1)); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+    .day-num-label { font-size: 8px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); line-height: 1; }
+    .day-num-value { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--accent-gold); line-height: 1.1; }
+
+    .day-header-info { flex: 1; }
+    .day-date-row { display: flex; align-items: center; gap: 10px; margin-bottom: 3px; }
+    .day-date { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .day-date-edit { font-size: 11px; color: var(--text-muted); cursor: pointer; transition: color 0.2s ease; }
+    .day-date-edit:hover { color: var(--accent-gold); }
+    .day-vibe { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-style: italic; color: var(--accent-gold); }
+
+    .day-header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .day-stop-count { font-size: 11px; color: var(--text-muted); }
+    .day-status-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 99px; }
+    .badge-saved { background: rgba(141,175,155,0.15); color: var(--accent-sage); }
+    .badge-draft { background: rgba(201,169,110,0.12); color: var(--accent-gold); }
+    .day-chevron { color: var(--text-muted); transition: transform 0.25s ease; }
+    .day-card:not(.collapsed) .day-chevron { transform: rotate(180deg); }
+
+    /* DAY BODY */
+    .day-body { padding: 0 22px 20px; }
+
+    /* TIMELINE */
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 1px; background: linear-gradient(180deg, var(--accent-gold), rgba(201,169,110,0.1)); }
+
+    /* STOP ITEM */
+    .stop-item { position: relative; margin-bottom: 6px; }
+    .stop-dot { position: absolute; left: -23px; top: 18px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--bg-card); z-index: 1; }
+    .stop-dot-flight { background: var(--accent-lavender); }
+    .stop-dot-activity { background: var(--accent-gold); }
+    .stop-dot-restaurant { background: var(--accent-rose); }
+    .stop-dot-hotel { background: var(--accent-sage); }
+
+    .stop-card { background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 13px; overflow: hidden; transition: all 0.2s ease; }
+    .stop-card:hover { border-color: var(--border); }
+
+    .stop-card-inner { display: flex; gap: 0; }
+
+    .stop-thumb { width: 90px; min-height: 90px; background-size: cover; background-position: center; flex-shrink: 0; position: relative; }
+    .stop-thumb-placeholder { width: 90px; min-height: 90px; background: var(--bg-card); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    .stop-content { flex: 1; padding: 12px 14px; }
+    .stop-type-label { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 4px; }
+    .stop-type-flight { color: var(--accent-lavender); }
+    .stop-type-activity { color: var(--accent-gold); }
+    .stop-type-restaurant { color: var(--accent-rose); }
+    .stop-type-hotel { color: var(--accent-sage); }
+
+    .stop-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+    .stop-location { font-size: 11.5px; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+    .stop-location-link { color: var(--accent-gold); cursor: pointer; font-size: 11px; }
+    .stop-location-link:hover { text-decoration: underline; }
+
+    .stop-meta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+    .stop-meta-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-muted); }
+
+    .stop-stars { display: flex; align-items: center; gap: 3px; }
+    .star-filled { color: var(--accent-gold); font-size: 11px; }
+    .star-empty { color: var(--border-subtle); font-size: 11px; }
+
+    .stop-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .stop-action-btn { font-size: 10.5px; font-weight: 500; padding: 5px 12px; border-radius: 99px; cursor: pointer; transition: all 0.2s ease; border: 1px solid var(--border-subtle); color: var(--text-muted); background: transparent; }
+    .stop-action-btn:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+    .stop-action-btn.primary { background: rgba(201,169,110,0.12); border-color: rgba(201,169,110,0.25); color: var(--accent-gold); }
+    .stop-action-btn.danger { border-color: rgba(212,132,138,0.25); color: var(--accent-rose); }
+    .stop-action-btn.danger:hover { background: rgba(212,132,138,0.1); }
+
+    .stop-card-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; padding: 12px 14px; flex-shrink: 0; min-width: 120px; }
+    .stop-price { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--accent-gold); }
+    .stop-price-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; text-align: right; }
+    .stop-more-btn { color: var(--text-muted); cursor: pointer; font-size: 16px; }
+
+    /* TRAVEL TIME CONNECTOR */
+    .travel-time-connector { display: flex; align-items: center; gap: 10px; padding: 8px 0 8px 0; margin-left: 0; }
+    .travel-time-line { flex: 1; height: 1px; background: var(--border-subtle); }
+    .travel-time-pills { display: flex; gap: 6px; }
+    .travel-pill { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px; font-size: 10.5px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: 1px solid var(--border-subtle); color: var(--text-muted); background: var(--bg-card2); }
+    .travel-pill:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+    .travel-pill.active { border-color: var(--accent-gold); color: var(--accent-gold); background: rgba(201,169,110,0.1); }
+
+    /* ADD STOP ROW */
+    .add-stop-row { margin-top: 10px; }
+    .add-stop-search { position: relative; }
+    .add-stop-search input { width: 100%; background: var(--bg-card); border: 1px dashed rgba(201,169,110,0.25); border-radius: 11px; padding: 12px 16px 12px 42px; font-size: 13px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; outline: none; transition: all 0.2s ease; }
+    .add-stop-search input:focus { border-color: var(--accent-gold); border-style: solid; background: rgba(201,169,110,0.03); }
+    .add-stop-search input::placeholder { color: var(--text-muted); }
+    .add-stop-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+    .add-stop-type-row { display: flex; gap: 8px; margin-top: 8px; }
+    .add-stop-type-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 99px; font-size: 11.5px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: 1px solid var(--border-subtle); color: var(--text-muted); background: transparent; }
+    .add-stop-type-btn:hover { border-color: var(--accent-gold); color: var(--text-primary); }
+    .add-stop-type-btn.active { border-color: var(--accent-gold); color: var(--accent-gold); background: rgba(201,169,110,0.1); }
+
+    /* AUTOCOMPLETE */
+    .stop-autocomplete { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 13px; z-index: 50; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.5); display: none; }
+    .stop-autocomplete.open { display: block; }
+    .stop-auto-item { display: flex; align-items: center; gap: 12px; padding: 11px 15px; cursor: pointer; border-bottom: 1px solid var(--border-subtle); transition: background 0.15s ease; }
+    .stop-auto-item:last-child { border-bottom: none; }
+    .stop-auto-item:hover { background: rgba(201,169,110,0.06); }
+    .stop-auto-thumb { width: 38px; height: 38px; border-radius: 8px; background-size: cover; background-position: center; flex-shrink: 0; background-color: var(--bg-card2); }
+    .stop-auto-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .stop-auto-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .stop-auto-type { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; margin-left: auto; flex-shrink: 0; }
+    .auto-type-activity { background: rgba(201,169,110,0.12); color: var(--accent-gold); }
+    .auto-type-restaurant { background: rgba(212,132,138,0.12); color: var(--accent-rose); }
+
+    /* DAY FOOTER */
+    .day-footer { display: flex; align-items: center; gap: 10px; padding-top: 14px; border-top: 1px solid var(--border-subtle); margin-top: 14px; }
+    .day-vibe-input { flex: 1; background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 9px; padding: 9px 13px; font-size: 13px; color: var(--text-primary); font-family: 'Cormorant Garamond', serif; font-style: italic; outline: none; transition: border-color 0.2s ease; }
+    .day-vibe-input:focus { border-color: var(--accent-gold); }
+    .day-vibe-input::placeholder { color: var(--text-muted); }
+    .day-vibe-gen-btn { padding: 9px 16px; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.2); border-radius: 9px; font-size: 11.5px; font-weight: 600; color: var(--accent-gold); cursor: pointer; white-space: nowrap; transition: all 0.2s ease; }
+    .day-vibe-gen-btn:hover { background: rgba(201,169,110,0.2); }
+    .day-save-btn { padding: 9px 20px; background: linear-gradient(135deg, var(--accent-gold), #B8905A); border-radius: 9px; font-size: 12.5px; font-weight: 600; color: #0D0B0F; cursor: pointer; transition: all 0.2s ease; border: none; }
+    .day-save-btn:hover { box-shadow: 0 4px 14px rgba(201,169,110,0.3); }
+
+    /* ADD DAY BUTTON */
+    .add-day-btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border: 2px dashed rgba(201,169,110,0.2); border-radius: 16px; cursor: pointer; transition: all 0.25s ease; color: var(--text-muted); font-size: 13.5px; font-weight: 500; }
+    .add-day-btn:hover { border-color: var(--accent-gold); color: var(--accent-gold); background: rgba(201,169,110,0.03); }
+
+    /* BOOKING LINK MODAL */
+    .booking-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+    .booking-modal.open { opacity: 1; pointer-events: all; }
+    .booking-modal-inner { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 26px; max-width: 420px; width: 90%; transform: scale(0.95); transition: transform 0.2s ease; }
+    .booking-modal.open .booking-modal-inner { transform: scale(1); }
+    .booking-modal-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+    .booking-modal-sub { font-size: 12.5px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.6; }
+    .booking-url-input { width: 100%; background: var(--bg-card2); border: 1px solid var(--border-subtle); border-radius: 9px; padding: 11px 14px; font-size: 13px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; outline: none; margin-bottom: 14px; transition: border-color 0.2s ease; }
+    .booking-url-input:focus { border-color: var(--accent-gold); }
+    .booking-url-input::placeholder { color: var(--text-muted); }
+    .booking-modal-actions { display: flex; gap: 10px; }
+    .booking-save-btn { flex: 1; padding: 11px; background: linear-gradient(135deg, var(--accent-gold), #B8905A); border-radius: 9px; font-size: 13px; font-weight: 600; color: #0D0B0F; cursor: pointer; text-align: center; }
+    .booking-cancel-btn { padding: 11px 20px; background: transparent; border: 1px solid var(--border-subtle); border-radius: 9px; font-size: 13px; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; }
+    .booking-cancel-btn:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+    <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <div class="brand-icon"><img src="assets/globe-mascot.png" alt="" style="width:36px;height:36px;border-radius:10px;object-fit:contain;" /></div>
+        <div class="brand-name">
+          <div class="brand-title">Trip Studio</div>
+          <div class="brand-sub">BY MAME DEE</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">MAIN</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item  active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Client Trips
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Trip
+      </a>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Vault
+      </a>
+      <div class="nav-section-label">SETTINGS</div>
+      <a href="#" class="nav-item ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item" style="color:var(--text-muted);font-size:12.5px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Exit to WordPress
+      </a>
+      <div class="user-card" style="margin-top:8px;">
+        <img src="assets/agent-dee.png" alt="Agent Dee" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,169,110,0.3);" />
+        <div>
+          <div class="user-name">Agent Dee</div>
+          <div class="user-role" style="color:var(--accent-gold);">AI Assistant</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="page-breadcrumb">
+        <a href="client-trips.html">Client Trips</a> &nbsp;/&nbsp;
+        <a href="new-client.html">Sarah &amp; Michael</a> &nbsp;/&nbsp;
+        <span>Itinerary</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <span class="topbar-search-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          <input type="text" placeholder="Search trips, clients, destinations..." />
+        </div>
+        <div class="topbar-notif"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="notif-dot"></span></div>
+        <span style="font-size:13px;color:var(--text-primary);font-weight:500;">Good morning, <span style="color:var(--accent-gold);font-family:'Playfair Display',serif;font-style:italic;">Deja</span></span>
+      </div>
+    </div>
+
+    <!-- WORKFLOW BAR -->
+    <div class="workflow-bar">
+      <div class="workflow-steps">
+        <div class="workflow-step done"><div class="step-circle done">&#10003;</div><span class="step-label done">Profile</span></div>
+        <div class="workflow-step done"><div class="step-circle done">&#10003;</div><span class="step-label done">Flights</span></div>
+        <div class="workflow-step done"><div class="step-circle done">&#10003;</div><span class="step-label done">Accommodation</span></div>
+        <div class="workflow-step done"><div class="step-circle done">&#10003;</div><span class="step-label done">Transportation</span></div>
+        <div class="workflow-step active"><div class="step-circle active">5</div><span class="step-label active">Itinerary</span></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="page-eyebrow">Day-by-Day Itinerary</div>
+          <h1 class="page-title">Sarah &amp; Michael   Lisbon</h1>
+          <p class="page-desc">Build each day one at a time. Save and collapse when done. Drag to reorder stops within a day.</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-ghost" onclick="window.location='trip-detail.html'">Preview Trip</button>
+          <button class="btn-primary" onclick="finishItinerary()">Finish &amp; Preview</button>
+        </div>
+      </div>
+
+      <!-- TRIP SUMMARY STRIP -->
+      <div class="trip-strip">
+        <div class="trip-strip-item">
+          <div class="trip-strip-label">Destination</div>
+          <div class="trip-strip-value">Lisbon, Portugal</div>
+        </div>
+        <div class="trip-strip-divider"></div>
+        <div class="trip-strip-item">
+          <div class="trip-strip-label">Dates</div>
+          <div class="trip-strip-value">Oct 5 – 14, 2026</div>
+        </div>
+        <div class="trip-strip-divider"></div>
+        <div class="trip-strip-item">
+          <div class="trip-strip-label">Travelers</div>
+          <div class="trip-strip-value">2 Adults</div>
+        </div>
+        <div class="trip-strip-divider"></div>
+        <div class="trip-strip-item">
+          <div class="trip-strip-label">Hotel</div>
+          <div class="trip-strip-value" style="color:var(--accent-gold);">Bairro Alto Hotel</div>
+        </div>
+        <div class="trip-strip-divider"></div>
+        <div class="trip-strip-item">
+          <div class="trip-strip-label">Days Built</div>
+          <div class="trip-strip-value" id="daysBuildCount">1 of 9</div>
+        </div>
+      </div>
+
+      <!-- DAYS LIST -->
+      <div class="days-list" id="daysList">
+
+        <!-- ═══ DAY 1 ═══════════════════════════════════ -->
+        <div class="day-card saved" id="day1">
+          <div class="day-header" onclick="toggleDay('day1')">
+            <div class="day-number">
+              <div class="day-num-label">Day</div>
+              <div class="day-num-value">1</div>
+            </div>
+            <div class="day-header-info">
+              <div class="day-date-row">
+                <span class="day-date">Monday, October 5, 2026</span>
+                <span class="day-date-edit">Edit date</span>
+              </div>
+              <div class="day-vibe">Arrival Day   Welcome to Lisbon</div>
+            </div>
+            <div class="day-header-right">
+              <span class="day-stop-count">4 stops</span>
+              <span class="day-status-badge badge-saved">Saved</span>
+              <svg class="day-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <div class="day-body">
+            <div class="timeline">
+
+              <!-- STOP: FLIGHT -->
+              <div class="stop-item">
+                <div class="stop-dot stop-dot-flight"></div>
+                <div class="stop-card">
+                  <div class="stop-card-inner">
+                    <div class="stop-thumb" style="background-image:url('assets/hero4.jpg')"></div>
+                    <div class="stop-content">
+                      <div class="stop-type-label stop-type-flight">Flight</div>
+                      <div class="stop-name">TAP Air Portugal   TP 201</div>
+                      <div class="stop-location">JFK New York &rarr; LIS Lisbon &nbsp;·&nbsp; <span class="stop-location-link">View flight details</span></div>
+                      <div class="stop-meta-row">
+                        <div class="stop-meta-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Departs 7:45 PM &nbsp;·&nbsp; Arrives Oct 6, 9:20 AM</div>
+                        <div class="stop-meta-item">7h 35m &nbsp;·&nbsp; Nonstop</div>
+                        <div class="stop-meta-item">Premium Economy</div>
+                      </div>
+                      <div class="stop-actions">
+                        <div class="stop-action-btn primary" onclick="openBookingModal('Flight booking link')">Add Booking Link</div>
+                        <div class="stop-action-btn">Move</div>
+                        <div class="stop-action-btn danger">Remove</div>
+                      </div>
+                    </div>
+                    <div class="stop-card-right">
+                      <div>
+                        <div class="stop-price">$1,840</div>
+                        <div class="stop-price-label">2 travelers</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TRAVEL TIME -->
+              <div class="travel-time-connector">
+                <div class="travel-time-line"></div>
+                <div class="travel-time-pills">
+                  <div class="travel-pill active" title="By car">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    25 min
+                  </div>
+                  <div class="travel-pill" title="By metro">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg>
+                    35 min
+                  </div>
+                  <div class="travel-pill" title="Walking">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><path d="M9 20l3-7 3 7M6 11l6-2 6 2"/></svg>
+                    2h 10m
+                  </div>
+                </div>
+                <div class="travel-time-line"></div>
+              </div>
+
+              <!-- STOP: CHECK-IN -->
+              <div class="stop-item">
+                <div class="stop-dot stop-dot-hotel"></div>
+                <div class="stop-card">
+                  <div class="stop-card-inner">
+                    <div class="stop-thumb" style="background-image:url('assets/lisbon.jpg')"></div>
+                    <div class="stop-content">
+                      <div class="stop-type-label stop-type-hotel">Hotel Check-in</div>
+                      <div class="stop-name">Bairro Alto Hotel</div>
+                      <div class="stop-location">Chiado, Lisbon &nbsp;·&nbsp; <span class="stop-location-link">Open in Maps</span></div>
+                      <div class="stop-meta-row">
+                        <div class="stop-meta-item">Check-in from 3:00 PM</div>
+                        <div class="stop-meta-item">Deluxe King Room</div>
+                      </div>
+                      <div class="stop-actions">
+                        <div class="stop-action-btn primary" onclick="openBookingModal('Hotel booking link')">Add Booking Link</div>
+                        <div class="stop-action-btn">Edit</div>
+                      </div>
+                    </div>
+                    <div class="stop-card-right">
+                      <div>
+                        <div class="stop-price">$420</div>
+                        <div class="stop-price-label">per night</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TRAVEL TIME -->
+              <div class="travel-time-connector">
+                <div class="travel-time-line"></div>
+                <div class="travel-time-pills">
+                  <div class="travel-pill active"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>8 min</div>
+                  <div class="travel-pill"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><path d="M9 20l3-7 3 7M6 11l6-2 6 2"/></svg>12 min</div>
+                </div>
+                <div class="travel-time-line"></div>
+              </div>
+
+              <!-- STOP: RESTAURANT -->
+              <div class="stop-item">
+                <div class="stop-dot stop-dot-restaurant"></div>
+                <div class="stop-card">
+                  <div class="stop-card-inner">
+                    <div class="stop-thumb" style="background-image:url('assets/amalfi.jpg')"></div>
+                    <div class="stop-content">
+                      <div class="stop-type-label stop-type-restaurant">Dinner</div>
+                      <div class="stop-name">Tasca do Chico</div>
+                      <div class="stop-location">Rua do Diario de Noticias, Chiado &nbsp;·&nbsp; <span class="stop-location-link">Open in Maps</span></div>
+                      <div class="stop-meta-row">
+                        <div class="stop-meta-item">
+                          <div class="stop-stars">
+                            <span class="star-filled">&#9733;</span><span class="star-filled">&#9733;</span><span class="star-filled">&#9733;</span><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;</span>
+                          </div>
+                          4.4 (1,200+ reviews)
+                        </div>
+                        <div class="stop-meta-item">Opens 7:00 PM &nbsp;·&nbsp; Closes 11:30 PM</div>
+                        <div class="stop-meta-item">Traditional Fado &amp; Portuguese cuisine</div>
+                      </div>
+                      <div class="stop-actions">
+                        <div class="stop-action-btn primary" onclick="openBookingModal('Restaurant reservation link')">Add Booking Link</div>
+                        <div class="stop-action-btn">View Menu</div>
+                        <div class="stop-action-btn">Move</div>
+                        <div class="stop-action-btn danger">Remove</div>
+                      </div>
+                    </div>
+                    <div class="stop-card-right">
+                      <div>
+                        <div class="stop-price">~$80</div>
+                        <div class="stop-price-label">est. for 2</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- /timeline -->
+
+            <!-- DAY FOOTER -->
+            <div class="day-footer">
+              <input class="day-vibe-input" type="text" value="Arrival Day   Welcome to Lisbon" placeholder="Describe this day in 4-5 words..." />
+              <div class="day-vibe-gen-btn" onclick="genVibe(this)">Generate Vibe</div>
+              <button class="day-save-btn" onclick="saveDay('day1', this)">Save Day</button>
+            </div>
+
+          </div><!-- /day-body -->
+        </div><!-- /day1 -->
+
+        <!-- ═══ DAY 2 ═══════════════════════════════════ -->
+        <div class="day-card" id="day2">
+          <div class="day-header" onclick="toggleDay('day2')">
+            <div class="day-number">
+              <div class="day-num-label">Day</div>
+              <div class="day-num-value">2</div>
+            </div>
+            <div class="day-header-info">
+              <div class="day-date-row">
+                <span class="day-date">Tuesday, October 6, 2026</span>
+                <span class="day-date-edit">Edit date</span>
+              </div>
+              <div class="day-vibe" style="color:var(--text-muted);font-style:italic;font-size:13px;">No vibe set yet   add stops to generate</div>
+            </div>
+            <div class="day-header-right">
+              <span class="day-stop-count">0 stops</span>
+              <span class="day-status-badge badge-draft">Draft</span>
+              <svg class="day-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <div class="day-body">
+            <div class="timeline">
+
+              <!-- HOTEL MORNING (auto-populated) -->
+              <div class="stop-item">
+                <div class="stop-dot stop-dot-hotel"></div>
+                <div class="stop-card" style="border-color:rgba(141,175,155,0.2);background:rgba(141,175,155,0.04);">
+                  <div class="stop-card-inner">
+                    <div class="stop-thumb-placeholder">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V8l9-6 9 6v14"/><path d="M9 22V12h6v10"/></svg>
+                    </div>
+                    <div class="stop-content">
+                      <div class="stop-type-label stop-type-hotel">Morning Start</div>
+                      <div class="stop-name" style="color:var(--accent-sage);">Bairro Alto Hotel</div>
+                      <div class="stop-location" style="color:var(--text-muted);">Auto-added from your recommended hotel</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TRAVEL TIME -->
+              <div class="travel-time-connector">
+                <div class="travel-time-line"></div>
+                <div class="travel-time-pills" style="opacity:0.4;">
+                  <div class="travel-pill">? min</div>
+                </div>
+                <div class="travel-time-line"></div>
+              </div>
+
+              <!-- ADD STOP SEARCH -->
+              <div class="stop-item" style="margin-bottom:0;">
+                <div class="stop-dot" style="background:var(--border-subtle);border-color:var(--bg-card);top:14px;"></div>
+                <div class="add-stop-row">
+                  <div class="add-stop-search" style="position:relative;">
+                    <span class="add-stop-icon">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </span>
+                    <input type="text" placeholder="Search for an activity, restaurant, or attraction..." id="stopSearch2" oninput="showStopAuto('stopAuto2', this.value)" />
+                    <div class="stop-autocomplete" id="stopAuto2">
+                      <div class="stop-auto-item" onclick="addStop('day2', 'activity', 'Belem Tower', 'Belem, Lisbon', 'assets/lisbon.jpg', '$12', '4.7', 'UNESCO World Heritage Site · Open 10am-6pm')">
+                        <div class="stop-auto-thumb" style="background-image:url('assets/lisbon.jpg')"></div>
+                        <div>
+                          <div class="stop-auto-name">Belem Tower</div>
+                          <div class="stop-auto-meta">Belem, Lisbon &nbsp;·&nbsp; UNESCO Heritage &nbsp;·&nbsp; $12/person</div>
+                        </div>
+                        <span class="stop-auto-type auto-type-activity">Activity</span>
+                      </div>
+                      <div class="stop-auto-item" onclick="addStop('day2', 'activity', 'Jeronimos Monastery', 'Belem, Lisbon', 'assets/amalfi.jpg', '$10', '4.8', 'UNESCO Heritage · Open 10am-5:30pm')">
+                        <div class="stop-auto-thumb" style="background-image:url('assets/amalfi.jpg')"></div>
+                        <div>
+                          <div class="stop-auto-name">Jeronimos Monastery</div>
+                          <div class="stop-auto-meta">Belem, Lisbon &nbsp;·&nbsp; UNESCO Heritage &nbsp;·&nbsp; $10/person</div>
+                        </div>
+                        <span class="stop-auto-type auto-type-activity">Activity</span>
+                      </div>
+                      <div class="stop-auto-item" onclick="addStop('day2', 'restaurant', 'Pasteis de Belem', 'Belem, Lisbon', 'assets/paris.jpg', '~$15', '4.6', 'Famous pasteis de nata since 1837 · Open 8am-11pm')">
+                        <div class="stop-auto-thumb" style="background-image:url('assets/paris.jpg')"></div>
+                        <div>
+                          <div class="stop-auto-name">Pasteis de Belem</div>
+                          <div class="stop-auto-meta">Belem, Lisbon &nbsp;·&nbsp; Cafe &amp; Pastry &nbsp;·&nbsp; ~$15 for 2</div>
+                        </div>
+                        <span class="stop-auto-type auto-type-restaurant">Restaurant</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="add-stop-type-row">
+                    <div class="add-stop-type-btn active" onclick="setStopType(this)">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                      All
+                    </div>
+                    <div class="add-stop-type-btn" onclick="setStopType(this)">Activity</div>
+                    <div class="add-stop-type-btn" onclick="setStopType(this)">Restaurant</div>
+                    <div class="add-stop-type-btn" onclick="setStopType(this)">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      Upload
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- /timeline -->
+
+            <!-- DAY FOOTER -->
+            <div class="day-footer">
+              <input class="day-vibe-input" type="text" placeholder="Describe this day in 4-5 words..." id="vibe2" />
+              <div class="day-vibe-gen-btn" onclick="genVibe(this)">Generate Vibe</div>
+              <button class="day-save-btn" onclick="saveDay('day2', this)">Save Day</button>
+            </div>
+
+          </div><!-- /day-body -->
+        </div><!-- /day2 -->
+
+        <!-- ═══ DAY 3 (collapsed) ═══════════════════════ -->
+        <div class="day-card collapsed" id="day3">
+          <div class="day-header" onclick="toggleDay('day3')">
+            <div class="day-number">
+              <div class="day-num-label">Day</div>
+              <div class="day-num-value">3</div>
+            </div>
+            <div class="day-header-info">
+              <div class="day-date-row">
+                <span class="day-date">Wednesday, October 7, 2026</span>
+                <span class="day-date-edit">Edit date</span>
+              </div>
+              <div class="day-vibe" style="color:var(--text-muted);font-style:italic;font-size:13px;">Day not started yet</div>
+            </div>
+            <div class="day-header-right">
+              <span class="day-stop-count">0 stops</span>
+              <span class="day-status-badge badge-draft">Draft</span>
+              <svg class="day-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+          <div class="day-body">
+            <div style="padding:20px 0;text-align:center;color:var(--text-muted);font-size:13px;">Click to expand and start building Day 3.</div>
+          </div>
+        </div>
+
+      </div><!-- /days-list -->
+
+      <!-- ADD DAY BUTTON -->
+      <div class="add-day-btn" style="margin-top:14px;" onclick="addDay()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Day 4
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- BOOKING LINK MODAL -->
+<div class="booking-modal" id="bookingModal">
+  <div class="booking-modal-inner">
+    <div class="booking-modal-title" id="bookingModalTitle">Add Booking Link</div>
+    <div class="booking-modal-sub">Paste the direct booking or reservation link. This will appear as a button on the client's preview page.</div>
+    <input class="booking-url-input" type="url" placeholder="https://..." id="bookingUrlInput" />
+    <div class="booking-modal-actions">
+      <div class="booking-save-btn" onclick="saveBookingLink()">Save Link</div>
+      <div class="booking-cancel-btn" onclick="closeBookingModal()">Cancel</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let dayCount = 3;
+
+  function toggleDay(id) {
+    document.getElementById(id).classList.toggle('collapsed');
+  }
+
+  function saveDay(id, btn) {
+    const card = document.getElementById(id);
+    card.classList.add('saved');
+    card.classList.add('collapsed');
+    const badge = card.querySelector('.day-status-badge');
+    badge.className = 'day-status-badge badge-saved';
+    badge.textContent = 'Saved';
+    // Update count
+    const saved = document.querySelectorAll('.day-card.saved').length;
+    document.getElementById('daysBuildCount').textContent = saved + ' of 9';
+  }
+
+  function genVibe(btn) {
+    const vibes = [
+      'Arrival Day   Welcome to Lisbon',
+      'Belem & Pasteis Morning',
+      'Alfama Fado &amp; Sunset Views',
+      'Sintra Day Trip   Fairy Tale Palaces',
+      'Chiado Strolls &amp; Wine',
+      'Lazy Morning, Lively Evenings',
+      'Hidden Gems &amp; Local Flavors',
+      'Last Day   Savor Every Moment',
+      'Homeward Bound'
+    ];
+    const input = btn.previousElementSibling;
+    const random = vibes[Math.floor(Math.random() * vibes.length)];
+    input.value = random;
+    // Update header vibe
+    const card = btn.closest('.day-card');
+    const vibeEl = card.querySelector('.day-vibe');
+    vibeEl.textContent = random;
+    vibeEl.style.color = 'var(--accent-gold)';
+  }
+
+  function addStop(dayId, type, name, location, img, price, rating, meta) {
+    const card = document.getElementById(dayId);
+    const timeline = card.querySelector('.timeline');
+    const addRow = timeline.querySelector('.add-stop-row').closest('.stop-item');
+
+    // Build travel time connector
+    const travelHtml = `
+      <div class="travel-time-connector">
+        <div class="travel-time-line"></div>
+        <div class="travel-time-pills">
+          <div class="travel-pill active">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            10 min
+          </div>
+          <div class="travel-pill">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><path d="M9 20l3-7 3 7M6 11l6-2 6 2"/></svg>
+            18 min
+          </div>
+        </div>
+        <div class="travel-time-line"></div>
+      </div>`;
+
+    const dotClass = type === 'activity' ? 'stop-dot-activity' : 'stop-dot-restaurant';
+    const typeLabel = type === 'activity' ? 'Activity' : 'Dining';
+    const typeLabelClass = type === 'activity' ? 'stop-type-activity' : 'stop-type-restaurant';
+    const stars = parseFloat(rating);
+    let starsHtml = '';
+    for (let i = 1; i <= 5; i++) {
+      starsHtml += i <= Math.round(stars) ? '<span class="star-filled">&#9733;</span>' : '<span class="star-empty">&#9733;</span>';
+    }
+
+    const stopHtml = `
+      <div class="stop-item">
+        <div class="stop-dot ${dotClass}"></div>
+        <div class="stop-card">
+          <div class="stop-card-inner">
+            <div class="stop-thumb" style="background-image:url('${img}')"></div>
+            <div class="stop-content">
+              <div class="stop-type-label ${typeLabelClass}">${typeLabel}</div>
+              <div class="stop-name">${name}</div>
+              <div class="stop-location">${location} &nbsp;·&nbsp; <span class="stop-location-link">Open in Maps</span></div>
+              <div class="stop-meta-row">
+                <div class="stop-meta-item"><div class="stop-stars">${starsHtml}</div> ${rating}</div>
+                <div class="stop-meta-item">${meta}</div>
+              </div>
+              <div class="stop-actions">
+                <div class="stop-action-btn primary" onclick="openBookingModal('Booking link for ${name}')">Add Booking Link</div>
+                <div class="stop-action-btn">Move</div>
+                <div class="stop-action-btn danger" onclick="this.closest('.stop-item').remove()">Remove</div>
+              </div>
+            </div>
+            <div class="stop-card-right">
+              <div>
+                <div class="stop-price">${price}</div>
+                <div class="stop-price-label">for 2</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    // Insert before the add row
+    addRow.insertAdjacentHTML('beforebegin', travelHtml + stopHtml);
+
+    // Update stop count
+    const stops = card.querySelectorAll('.stop-item').length - 1; // exclude add row
+    card.querySelector('.day-stop-count').textContent = stops + ' stop' + (stops !== 1 ? 's' : '');
+
+    // Clear search
+    const searchInput = card.querySelector('[id^="stopSearch"]');
+    if (searchInput) searchInput.value = '';
+    const dropdown = card.querySelector('.stop-autocomplete');
+    if (dropdown) dropdown.classList.remove('open');
+  }
+
+  function showStopAuto(id, val) {
+    const el = document.getElementById(id);
+    el.classList.toggle('open', val.length > 1);
+  }
+
+  function setStopType(btn) {
+    btn.closest('.add-stop-type-row').querySelectorAll('.add-stop-type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function addDay() {
+    dayCount++;
+    const dates = ['October 8', 'October 9', 'October 10', 'October 11', 'October 12', 'October 13', 'October 14'];
+    const dateStr = dates[dayCount - 4] || 'October ' + (4 + dayCount);
+    const html = `
+      <div class="day-card collapsed" id="day${dayCount}">
+        <div class="day-header" onclick="toggleDay('day${dayCount}')">
+          <div class="day-number">
+            <div class="day-num-label">Day</div>
+            <div class="day-num-value">${dayCount}</div>
+          </div>
+          <div class="day-header-info">
+            <div class="day-date-row">
+              <span class="day-date">${dateStr}, 2026</span>
+              <span class="day-date-edit">Edit date</span>
+            </div>
+            <div class="day-vibe" style="color:var(--text-muted);font-style:italic;font-size:13px;">Day not started yet</div>
+          </div>
+          <div class="day-header-right">
+            <span class="day-stop-count">0 stops</span>
+            <span class="day-status-badge badge-draft">Draft</span>
+            <svg class="day-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="day-body">
+          <div style="padding:20px 0;text-align:center;color:var(--text-muted);font-size:13px;">Click to expand and start building Day ${dayCount}.</div>
+        </div>
+      </div>`;
+    document.getElementById('daysList').insertAdjacentHTML('beforeend', html);
+    const addBtn = document.querySelector('.add-day-btn');
+    addBtn.querySelector('span, text, div') ;
+    addBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Day ${dayCount + 1}`;
+  }
+
+  function openBookingModal(label) {
+    document.getElementById('bookingModalTitle').textContent = 'Add ' + label;
+    document.getElementById('bookingUrlInput').value = '';
+    document.getElementById('bookingModal').classList.add('open');
+  }
+
+  function closeBookingModal() {
+    document.getElementById('bookingModal').classList.remove('open');
+  }
+
+  function saveBookingLink() {
+    closeBookingModal();
+  }
+
+  function finishItinerary() {
+    alert('Itinerary complete! Opening the client preview page for Sarah & Michael...');
+    window.location = 'trip-detail.html';
+  }
+
+  // Close autocomplete on outside click
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.add-stop-search')) {
+      document.querySelectorAll('.stop-autocomplete').forEach(d => d.classList.remove('open'));
+    }
+  });
+</script>
+
+</body>
+</html>
