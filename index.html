@@ -3,185 +3,686 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trip Studio Mockups - Manus 1.6</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <title>Trip Studio — Manus 1.6 Mockup Gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg-deep: #0D0B0F; --bg-card: #16121A; --bg-card2: #1C1722;
-      --accent-gold: #C9A96E; --accent-gold2: #E8C98A;
-      --accent-rose: #D4848A; --accent-sage: #8DAF9B;
-      --text-primary: #F5EFE6; --text-muted: #9A8F8A; --text-label: #C9A96E;
-      --border: rgba(201,169,110,0.18); --border-subtle: rgba(255,255,255,0.06);
+      --bg:        #FAF8F5;
+      --bg2:       #F3EFE9;
+      --bg3:       #EDE8E0;
+      --card:      #FFFFFF;
+      --gold:      #B8935A;
+      --gold2:     #D4AA72;
+      --gold-pale: #F5ECD8;
+      --rose:      #C97880;
+      --rose-pale: #F9ECED;
+      --sage:      #6E9B85;
+      --sage-pale: #E8F2EC;
+      --ink:       #2C2420;
+      --ink2:      #5C4F48;
+      --muted:     #9A8F8A;
+      --border:    rgba(184,147,90,0.18);
+      --border-s:  rgba(44,36,32,0.08);
+      --shadow:    0 2px 16px rgba(44,36,32,0.07);
+      --shadow-lg: 0 8px 40px rgba(44,36,32,0.12);
     }
-    body { background: var(--bg-deep); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; min-height: 100vh; padding: 48px 32px; }
-    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 99px; }
-    .header { text-align: center; margin-bottom: 48px; }
-    .header h1 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
-    .header p { font-size: 14px; color: var(--text-muted); }
-    .header .badge { display: inline-block; margin-top: 10px; background: rgba(201,169,110,0.15); border: 1px solid rgba(201,169,110,0.3); color: var(--accent-gold); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 14px; border-radius: 99px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
-    .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 24px; transition: all 0.2s ease; text-decoration: none; color: inherit; display: block; }
-    .card:hover { border-color: var(--border); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
-    .card-step { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
-    .card-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
-    .card-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
-    .card-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
-    .tag-exists { background: rgba(141,175,155,0.15); color: var(--accent-sage); border: 1px solid rgba(141,175,155,0.25); }
-    .tag-build { background: rgba(212,132,138,0.12); color: var(--accent-rose); border: 1px solid rgba(212,132,138,0.25); }
-    .tag-fix { background: rgba(201,169,110,0.12); color: var(--accent-gold); border: 1px solid rgba(201,169,110,0.25); }
-    .card-link { display: flex; align-items: center; gap: 6px; margin-top: 14px; font-size: 12px; font-weight: 600; color: var(--accent-gold); }
-    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); max-width: 1100px; margin: 32px auto 12px; }
-    .section-label:first-of-type { margin-top: 0; }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--gold2); border-radius: 99px; }
+
+    /* ─── HERO ─────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #2C2420 0%, #3D2E27 50%, #2C2420 100%);
+      padding: 72px 48px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 20% 50%, rgba(184,147,90,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 70% at 80% 40%, rgba(201,120,128,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold2);
+      background: rgba(184,147,90,0.15);
+      border: 1px solid rgba(184,147,90,0.3);
+      padding: 6px 16px;
+      border-radius: 99px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold2);
+      display: inline-block;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 700;
+      color: #F5EFE6;
+      line-height: 1.15;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--gold2);
+    }
+    .hero-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-style: italic;
+      color: rgba(245,239,230,0.6);
+      margin-bottom: 36px;
+      position: relative;
+    }
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      position: relative;
+    }
+    .hero-stat {
+      text-align: center;
+    }
+    .hero-stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--gold2);
+      line-height: 1;
+    }
+    .hero-stat-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(245,239,230,0.4);
+      margin-top: 4px;
+    }
+    .hero-divider {
+      width: 1px;
+      height: 36px;
+      background: rgba(245,239,230,0.12);
+    }
+
+    /* ─── BODY ─────────────────────────────────── */
+    .body-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 56px 32px 80px;
+    }
+
+    /* ─── SECTION HEADER ───────────────────────── */
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-s);
+    }
+    .section-head-left {}
+    .section-eyebrow {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .section-count {
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--bg2);
+      border: 1px solid var(--border-s);
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-weight: 500;
+    }
+
+    /* ─── GRID ─────────────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 18px;
+      margin-bottom: 56px;
+    }
+
+    /* ─── CARD ─────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border-s);
+      border-radius: 20px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--border);
+    }
+
+    /* Card top color band */
+    .card-band {
+      height: 4px;
+      width: 100%;
+    }
+    .band-fix  { background: linear-gradient(90deg, var(--gold), var(--gold2)); }
+    .band-build { background: linear-gradient(90deg, var(--rose), #D4A0A5); }
+    .band-ref  { background: linear-gradient(90deg, var(--sage), #8DBFAA); }
+
+    .card-body {
+      padding: 22px 22px 18px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-step-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .card-step {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .card-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+    .tag-fix   { background: var(--gold-pale); color: var(--gold); border: 1px solid rgba(184,147,90,0.25); }
+    .tag-build { background: var(--rose-pale); color: var(--rose); border: 1px solid rgba(201,120,128,0.25); }
+    .tag-ref   { background: var(--sage-pale); color: var(--sage); border: 1px solid rgba(110,155,133,0.25); }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 7px;
+      line-height: 1.3;
+    }
+    .card-desc {
+      font-size: 12.5px;
+      color: var(--ink2);
+      line-height: 1.65;
+      flex: 1;
+      margin-bottom: 18px;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 22px 16px;
+      border-top: 1px solid var(--border-s);
+    }
+    .card-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gold);
+      transition: gap 0.2s ease;
+    }
+    .card:hover .card-link { gap: 10px; }
+    .card-link svg { transition: transform 0.2s ease; }
+    .card:hover .card-link svg { transform: translateX(3px); }
+
+    .card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .icon-fix   { background: var(--gold-pale); color: var(--gold); }
+    .icon-build { background: var(--rose-pale); color: var(--rose); }
+    .icon-ref   { background: var(--sage-pale); color: var(--sage); }
+
+    /* ─── LEGEND ───────────────────────────────── */
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 16px 24px;
+      background: var(--card);
+      border: 1px solid var(--border-s);
+      border-radius: 14px;
+      margin-bottom: 48px;
+      box-shadow: var(--shadow);
+      flex-wrap: wrap;
+    }
+    .legend-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-right: 4px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--ink2);
+    }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 3px;
+    }
+    .dot-fix   { background: var(--gold); }
+    .dot-build { background: var(--rose); }
+    .dot-ref   { background: var(--sage); }
+
+    /* ─── FOOTER ───────────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: 32px 32px 48px;
+      border-top: 1px solid var(--border-s);
+    }
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .footer-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <h1>Trip Studio Mockups</h1>
-    <p>Manus 1.6 HTML Reference Files for Claude Coding</p>
-    <span class="badge">All pages are exact visual targets</span>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Manus 1.6 Reference Files</div>
+    <h1>Trip Studio<br/><em>Mockup Gallery</em></h1>
+    <p class="hero-sub">Every screen. Every state. Exact visual targets for Claude Coding.</p>
+    <div class="hero-meta">
+      <div class="hero-stat">
+        <div class="hero-stat-num">15</div>
+        <div class="hero-stat-lbl">Screens</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">7</div>
+        <div class="hero-stat-lbl">Need Fixes</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">8</div>
+        <div class="hero-stat-lbl">Build from Scratch</div>
+      </div>
+    </div>
   </div>
 
-  <div class="section-label">Existing Pages — Needs Fixes</div>
-  <div class="grid">
+  <!-- BODY -->
+  <div class="body-wrap">
 
-    <a class="card" href="Step02-ClientTrips.html" target="_blank">
-      <div class="card-step">Step 02</div>
-      <div class="card-title">Client Trips</div>
-      <div class="card-desc">All trips listed with cards, filters, search, sort dropdown, grid/list toggle, and empty state card.</div>
-      <span class="card-tag tag-fix">Needs Fixes</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
+    <!-- LEGEND -->
+    <div class="legend">
+      <span class="legend-title">Legend</span>
+      <div class="legend-item"><div class="legend-dot dot-fix"></div> Exists on live site — needs fixes</div>
+      <div class="legend-item"><div class="legend-dot dot-build"></div> Does not exist yet — build from scratch</div>
+      <div class="legend-item"><div class="legend-dot dot-ref"></div> Reference document</div>
+    </div>
 
-    <a class="card" href="Step04-NewClient-UploadQuestionnaire.html" target="_blank">
-      <div class="card-step">Step 04</div>
-      <div class="card-title">New Client — Upload Questionnaire</div>
-      <div class="card-desc">Step 1 of wizard: drag-and-drop questionnaire upload with processing animation and 5-step progress bar.</div>
-      <span class="card-tag tag-fix">Needs Fixes</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
+    <!-- SECTION 1: NEEDS FIXES -->
+    <div class="section-head">
+      <div class="section-head-left">
+        <div class="section-eyebrow">Phase 1</div>
+        <div class="section-title">Existing Pages — Needs Fixes</div>
+      </div>
+      <span class="section-count">7 pages</span>
+    </div>
 
-    <a class="card" href="Step05-NewClient-UploadConsultation.html" target="_blank">
-      <div class="card-step">Step 05</div>
-      <div class="card-title">New Client — Upload Consultation</div>
-      <div class="card-desc">Step 2 of wizard: consultation notes upload, shows questionnaire already processed status.</div>
-      <span class="card-tag tag-fix">Needs Fixes</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
+    <div class="grid">
 
-    <a class="card" href="Step06-NewClient-GeneratedClientProfile.html" target="_blank">
-      <div class="card-step">Step 06</div>
-      <div class="card-title">New Client — Generated Client Profile</div>
-      <div class="card-desc">Step 3: AI-populated profile with hero image builder (Regenerate, Upload Image, Paste URL + AI badge).</div>
-      <span class="card-tag tag-fix">Needs Fixes</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
+      <a class="card" href="Step02-ClientTrips.html" target="_blank">
+        <div class="card-band band-fix"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 02</span>
+            <span class="card-tag tag-fix">Needs Fixes</span>
+          </div>
+          <div class="card-title">Client Trips</div>
+          <div class="card-desc">All trips listed with cards, status filters, search bar, sort dropdown, grid/list view toggle, and empty state card.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-fix"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        </div>
+      </a>
 
-    <a class="card" href="Step07-SectionSelectorPopup.html" target="_blank">
-      <div class="card-step">Step 07</div>
-      <div class="card-title">Section Selector Popup</div>
-      <div class="card-desc">Modal popup asking which section to build next: Flights, Accommodation, or Transportation.</div>
-      <span class="card-tag tag-fix">Needs Fixes</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
+      <a class="card" href="Step04-NewClient-UploadQuestionnaire.html" target="_blank">
+        <div class="card-band band-fix"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 04</span>
+            <span class="card-tag tag-fix">Needs Fixes</span>
+          </div>
+          <div class="card-title">New Client — Upload Questionnaire</div>
+          <div class="card-desc">Step 1 of 5 wizard: drag-and-drop questionnaire upload with processing animation and 5-step progress bar.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-fix"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        </div>
+      </a>
 
-    <a class="card" href="Step07b-FlightBuilderCashTab.html" target="_blank">
-      <div class="card-step">Step 07b</div>
-      <div class="card-title">Flight Builder — Cash Tab</div>
-      <div class="card-desc">Flight form with Cash payment selected. Upload PDF/URL, auto-extracted badge, all form fields, flight counter.</div>
-      <span class="card-tag tag-fix">Needs Fixes</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
+      <a class="card" href="Step05-NewClient-UploadConsultation.html" target="_blank">
+        <div class="card-band band-fix"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 05</span>
+            <span class="card-tag tag-fix">Needs Fixes</span>
+          </div>
+          <div class="card-title">New Client — Upload Consultation</div>
+          <div class="card-desc">Step 2 of 5: consultation notes upload, shows questionnaire already processed status above the drop zone.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-fix"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        </div>
+      </a>
 
-    <a class="card" href="Step07c-FlightBuilderPointsandMilesTab.html" target="_blank">
-      <div class="card-step">Step 07c</div>
-      <div class="card-title">Flight Builder — Points &amp; Miles Tab</div>
-      <div class="card-desc">Flight form with Points/Miles: selectable bank cards (Chase, Amex, Capital One, Citi, Bilt), transfer partners.</div>
-      <span class="card-tag tag-fix">Needs Fixes</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
+      <a class="card" href="Step06-NewClient-GeneratedClientProfile.html" target="_blank">
+        <div class="card-band band-fix"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 06</span>
+            <span class="card-tag tag-fix">Needs Fixes</span>
+          </div>
+          <div class="card-title">Generated Client Profile</div>
+          <div class="card-desc">Step 3: AI-populated profile with hero image builder — Regenerate, Upload Image, Paste URL buttons and AI badge.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-fix"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 10-16 0"/></svg></div>
+        </div>
+      </a>
+
+      <a class="card" href="Step07-SectionSelectorPopup.html" target="_blank">
+        <div class="card-band band-fix"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 07</span>
+            <span class="card-tag tag-fix">Needs Fixes</span>
+          </div>
+          <div class="card-title">Section Selector Popup</div>
+          <div class="card-desc">Modal popup asking which section to build next: Flights, Accommodation, or Transportation. Appears after profile is saved.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-fix"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg></div>
+        </div>
+      </a>
+
+      <a class="card" href="Step07b-FlightBuilderCashTab.html" target="_blank">
+        <div class="card-band band-fix"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 07b</span>
+            <span class="card-tag tag-fix">Needs Fixes</span>
+          </div>
+          <div class="card-title">Flight Builder — Cash Tab</div>
+          <div class="card-desc">Flight form with Cash payment selected. Upload PDF or URL, auto-extracted badge, all form fields, and flight counter.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-fix"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91"/></svg></div>
+        </div>
+      </a>
+
+      <a class="card" href="Step07c-FlightBuilderPointsandMilesTab.html" target="_blank">
+        <div class="card-band band-fix"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 07c</span>
+            <span class="card-tag tag-fix">Needs Fixes</span>
+          </div>
+          <div class="card-title">Flight Builder — Points &amp; Miles</div>
+          <div class="card-desc">Selectable bank cards (Chase, Amex, Capital One, Citi, Bilt), auto-fill program, transfer partner dropdown.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-fix"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- SECTION 2: BUILD FROM SCRATCH -->
+    <div class="section-head">
+      <div class="section-head-left">
+        <div class="section-eyebrow">Phase 2</div>
+        <div class="section-title">Pages to Build from Scratch</div>
+      </div>
+      <span class="section-count">8 pages</span>
+    </div>
+
+    <div class="grid">
+
+      <a class="card" href="Step08-AccommodationBuilder.html" target="_blank">
+        <div class="card-band band-build"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 08</span>
+            <span class="card-tag tag-build">Build from Scratch</span>
+          </div>
+          <div class="card-title">Accommodation Builder</div>
+          <div class="card-desc">3 hotel options side-by-side with photos and rates. Auto-saves selected option to the Vault on confirm.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-build"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>
+        </div>
+      </a>
+
+      <a class="card" href="Step09-TransportationBuilder.html" target="_blank">
+        <div class="card-band band-build"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 09</span>
+            <span class="card-tag tag-build">Build from Scratch</span>
+          </div>
+          <div class="card-title">Transportation Builder</div>
+          <div class="card-desc">Rideshare apps by destination, transit cards, private transfers. Organized by transport type and destination city.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-build"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+        </div>
+      </a>
+
+      <a class="card" href="Step10-ItineraryBuilder.html" target="_blank">
+        <div class="card-band band-build"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 10</span>
+            <span class="card-tag tag-build">Build from Scratch</span>
+          </div>
+          <div class="card-title">Itinerary Builder</div>
+          <div class="card-desc">Day-by-day drag-and-drop with morning, afternoon, and evening slots. AI day vibes and Vault autocomplete.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-build"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        </div>
+      </a>
+
+      <a class="card" href="Step11-BudgetCalculator.html" target="_blank">
+        <div class="card-band band-build"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 11</span>
+            <span class="card-tag tag-build">Build from Scratch</span>
+          </div>
+          <div class="card-title">Budget Calculator</div>
+          <div class="card-desc">Live-updating cost breakdown with per-person and total toggle, category toggles, and pipeline value tracking.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-build"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+        </div>
+      </a>
+
+      <a class="card" href="Step12-TripDetailOverview.html" target="_blank">
+        <div class="card-band band-build"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 12</span>
+            <span class="card-tag tag-build">Build from Scratch</span>
+          </div>
+          <div class="card-title">Trip Detail Overview</div>
+          <div class="card-desc">Full trip summary with completion checklist, quick actions, and all builder sections collapsible.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-build"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+        </div>
+      </a>
+
+      <a class="card" href="Step13-CommandCenter.html" target="_blank">
+        <div class="card-band band-build"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 13</span>
+            <span class="card-tag tag-build">Build from Scratch</span>
+          </div>
+          <div class="card-title">Command Center</div>
+          <div class="card-desc">Email tracking, follow-up automation, and the Mark Paid and Unlock button that flips the client page to full access.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-build"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        </div>
+      </a>
+
+      <a class="card" href="Step14-DreamPreviewAdmin.html" target="_blank">
+        <div class="card-band band-build"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 14</span>
+            <span class="card-tag tag-build">Build from Scratch</span>
+          </div>
+          <div class="card-title">Dream Preview Admin</div>
+          <div class="card-desc">Day lock controls, email and SMS preview panel, and send button. Admin view before the client sees the preview.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-build"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        </div>
+      </a>
+
+      <a class="card" href="Step15-TripUnlockedClientPage.html" target="_blank">
+        <div class="card-band band-build"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Step 15</span>
+            <span class="card-tag tag-build">Build from Scratch</span>
+          </div>
+          <div class="card-title">Trip Unlocked — Client Page</div>
+          <div class="card-desc">What the client sees after payment. Separate client portal with its own sidebar: itinerary, reservations, packing, tips, and more.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Mockup <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-build"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- SECTION 3: REFERENCE -->
+    <div class="section-head">
+      <div class="section-head-left">
+        <div class="section-eyebrow">Reference</div>
+        <div class="section-title">Documents</div>
+      </div>
+      <span class="section-count">1 document</span>
+    </div>
+
+    <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));">
+      <a class="card" href="TRANSITION-GUIDE-AND-PROMPT.md" target="_blank">
+        <div class="card-band band-ref"></div>
+        <div class="card-body">
+          <div class="card-step-row">
+            <span class="card-step">Reference</span>
+            <span class="card-tag tag-ref">Master Doc</span>
+          </div>
+          <div class="card-title">Transition Guide &amp; Claude Prompt</div>
+          <div class="card-desc">Complete diff of what exists vs. what needs fixing, what needs building, design system variables, and the full copy-paste Claude prompt.</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-link">Open Document <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          <div class="card-icon icon-ref"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        </div>
+      </a>
+    </div>
 
   </div>
 
-  <div class="section-label">Pages to Build from Scratch</div>
-  <div class="grid">
-
-    <a class="card" href="Step08-AccommodationBuilder.html" target="_blank">
-      <div class="card-step">Step 08</div>
-      <div class="card-title">Accommodation Builder</div>
-      <div class="card-desc">3 hotel options side-by-side with photos and rates. Auto-saves to Vault on confirm.</div>
-      <span class="card-tag tag-build">Build from Scratch</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
-
-    <a class="card" href="Step09-TransportationBuilder.html" target="_blank">
-      <div class="card-step">Step 09</div>
-      <div class="card-title">Transportation Builder</div>
-      <div class="card-desc">Rideshare apps by destination, transit cards, private transfers.</div>
-      <span class="card-tag tag-build">Build from Scratch</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
-
-    <a class="card" href="Step10-ItineraryBuilder.html" target="_blank">
-      <div class="card-step">Step 10</div>
-      <div class="card-title">Itinerary Builder</div>
-      <div class="card-desc">Day-by-day drag-and-drop with morning/afternoon/evening slots, AI day vibes, Vault autocomplete.</div>
-      <span class="card-tag tag-build">Build from Scratch</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
-
-    <a class="card" href="Step11-BudgetCalculator.html" target="_blank">
-      <div class="card-step">Step 11</div>
-      <div class="card-title">Budget Calculator</div>
-      <div class="card-desc">Live-updating cost breakdown with per-person/total toggle and category toggles.</div>
-      <span class="card-tag tag-build">Build from Scratch</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
-
-    <a class="card" href="Step12-TripDetailOverview.html" target="_blank">
-      <div class="card-step">Step 12</div>
-      <div class="card-title">Trip Detail Overview</div>
-      <div class="card-desc">Full trip summary with checklist, quick actions, and all builder sections collapsed/expanded.</div>
-      <span class="card-tag tag-build">Build from Scratch</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
-
-    <a class="card" href="Step13-CommandCenter.html" target="_blank">
-      <div class="card-step">Step 13</div>
-      <div class="card-title">Command Center</div>
-      <div class="card-desc">Email tracking, follow-up automation, Mark Paid and Unlock button.</div>
-      <span class="card-tag tag-build">Build from Scratch</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
-
-    <a class="card" href="Step14-DreamPreviewAdmin.html" target="_blank">
-      <div class="card-step">Step 14</div>
-      <div class="card-title">Dream Preview Admin</div>
-      <div class="card-desc">Day lock controls, email/SMS preview and send panel.</div>
-      <span class="card-tag tag-build">Build from Scratch</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
-
-    <a class="card" href="Step15-TripUnlockedClientPage.html" target="_blank">
-      <div class="card-step">Step 15</div>
-      <div class="card-title">Trip Unlocked — Client Page</div>
-      <div class="card-desc">What the client sees after payment: full trip with all booking links, confirmations, and itinerary.</div>
-      <span class="card-tag tag-build">Build from Scratch</span>
-      <div class="card-link">Open Mockup →</div>
-    </a>
-
-  </div>
-
-  <div class="section-label">Reference Documents</div>
-  <div class="grid">
-    <a class="card" href="TRANSITION-GUIDE-AND-PROMPT.md" target="_blank">
-      <div class="card-step">Reference</div>
-      <div class="card-title">Transition Guide &amp; Prompt</div>
-      <div class="card-desc">Master reference document: what exists, what needs fixing, what needs building, and the full Claude prompt.</div>
-      <span class="card-tag tag-exists">Reference Doc</span>
-      <div class="card-link">Open Document →</div>
-    </a>
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-brand">Mame Dee Travel World — Trip Studio</div>
+    <div class="footer-sub">Manus 1.6 HTML Mockup Gallery &nbsp;·&nbsp; All pages are exact visual targets for Claude Coding</div>
   </div>
 
 </body>
