@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Grind — Built for the Relentless</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0E0C0A;
+      --bg2:#161210;
+      --bg3:#1E1916;
+      --card:#1A1612;
+      --card2:#221E1A;
+      --gold:#C9A96E;
+      --gold2:#E8C98A;
+      --gold-pale:rgba(201,169,110,0.1);
+      --rose:#D4848A;
+      --rose-pale:rgba(212,132,138,0.1);
+      --sage:#8DAF9B;
+      --sage-pale:rgba(141,175,155,0.1);
+      --lavender:#B8A9C9;
+      --cream:#F5EFE6;
+      --muted:#7A706A;
+      --border:rgba(201,169,110,0.14);
+      --border-s:rgba(255,255,255,0.06);
+      --r:14px;
+    }
+    html,body{height:100%;background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;font-size:14px;overflow:hidden}
+    ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:99px}
+
+    /* ── LAYOUT ── */
+    .app{display:flex;height:100vh;overflow:hidden}
+
+    /* ── SIDEBAR ── */
+    .sidebar{width:220px;min-width:220px;background:linear-gradient(180deg,#110E0B 0%,#0E0C0A 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden}
+    .sidebar::after{content:'';position:absolute;top:0;right:0;width:1px;height:100%;background:linear-gradient(180deg,transparent,var(--gold),transparent);opacity:0.25}
+    .sb-brand{padding:22px 18px 16px;border-bottom:1px solid var(--border-s)}
+    .sb-logo{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--cream);letter-spacing:-0.01em}
+    .sb-logo em{color:var(--gold);font-style:italic}
+    .sb-tagline{font-size:9px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+
+    /* energy bar */
+    .energy-bar{margin:14px 18px;background:var(--card2);border:1px solid var(--border-s);border-radius:10px;padding:10px 12px}
+    .energy-label{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between}
+    .energy-label span{color:var(--gold)}
+    .energy-track{height:5px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden}
+    .energy-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--rose),var(--gold));transition:width 0.5s ease}
+
+    .sb-nav{flex:1;padding:10px 10px;overflow-y:auto}
+    .nav-lbl{font-size:8px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);padding:0 10px;margin:14px 0 5px}
+    .nav-lbl:first-child{margin-top:0}
+    .nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;transition:all 0.18s ease;color:var(--muted);font-size:12.5px;margin-bottom:1px;position:relative;user-select:none}
+    .nav-item:hover{background:rgba(201,169,110,0.07);color:var(--cream)}
+    .nav-item.active{background:linear-gradient(135deg,rgba(201,169,110,0.14),rgba(212,132,138,0.07));color:var(--gold2);font-weight:500;border:1px solid rgba(201,169,110,0.18)}
+    .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:55%;background:linear-gradient(180deg,var(--gold),var(--rose));border-radius:0 3px 3px 0}
+    .nav-badge{margin-left:auto;font-size:9px;font-weight:700;padding:2px 6px;border-radius:99px;background:rgba(212,132,138,0.2);color:var(--rose)}
+    .nav-badge.gold{background:rgba(201,169,110,0.18);color:var(--gold)}
+
+    .sb-footer{padding:12px 14px;border-top:1px solid var(--border-s)}
+    .sb-time{font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;color:var(--gold);text-align:center;letter-spacing:0.02em}
+    .sb-date{font-size:9px;color:var(--muted);text-align:center;margin-top:2px;letter-spacing:0.1em}
+    .sb-sleep{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;font-size:10px;color:var(--muted)}
+    .sb-sleep-dot{width:6px;height:6px;border-radius:50%;background:var(--rose)}
+
+    /* ── MAIN ── */
+    .main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+
+    /* ── TOPBAR ── */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:rgba(14,12,10,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-s);position:sticky;top:0;z-index:5;flex-shrink:0}
+    .topbar-greeting{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--cream)}
+    .topbar-greeting em{color:var(--gold);font-style:italic}
+    .topbar-right{display:flex;align-items:center;gap:10px}
+    .topbar-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:99px;font-size:11.5px;font-weight:600;cursor:pointer;transition:all 0.18s ease;border:none}
+    .btn-gold{background:linear-gradient(135deg,var(--gold),#B8905A);color:#0E0C0A}
+    .btn-gold:hover{box-shadow:0 4px 16px rgba(201,169,110,0.3)}
+    .btn-ghost{background:transparent;border:1px solid var(--border-s);color:var(--muted)}
+    .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+    .topbar-notif{width:32px;height:32px;border-radius:9px;background:var(--card);border:1px solid var(--border-s);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+    .notif-dot{position:absolute;top:6px;right:6px;width:6px;height:6px;background:var(--rose);border-radius:50%;border:1.5px solid var(--bg)}
+
+    /* ── SECTIONS ── */
+    .section{display:none;padding:24px 28px 48px;animation:fadeIn 0.2s ease}
+    .section.active{display:block}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ── PAGE HEADER ── */
+    .page-hd{margin-bottom:22px}
+    .page-eyebrow{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+    .page-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--cream)}
+    .page-sub{font-size:12.5px;color:var(--muted);margin-top:4px}
+
+    /* ── GRID HELPERS ── */
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+    .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+
+    /* ── CARD ── */
+    .c{background:var(--card);border:1px solid var(--border-s);border-radius:var(--r);padding:18px}
+    .c-title{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+    .c-dot{width:6px;height:6px;border-radius:50%}
+    .dot-gold{background:var(--gold)}
+    .dot-rose{background:var(--rose)}
+    .dot-sage{background:var(--sage)}
+
+    /* ── STAT CARDS ── */
+    .stat-num{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;line-height:1;margin-bottom:4px}
+    .stat-lbl{font-size:11px;color:var(--muted)}
+    .stat-sub{font-size:10px;margin-top:6px;display:flex;align-items:center;gap:5px}
+    .stat-up{color:var(--sage)}
+    .stat-down{color:var(--rose)}
+
+    /* ── PROGRESS RING ── */
+    .ring-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+
+    /* ── TASK LIST ── */
+    .task-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-s);cursor:pointer;transition:background 0.15s ease}
+    .task-item:last-child{border-bottom:none}
+    .task-item:hover{background:rgba(255,255,255,0.02);margin:0 -18px;padding:10px 18px;border-radius:8px}
+    .task-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border-s);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.15s ease}
+    .task-check.done{background:var(--sage);border-color:var(--sage)}
+    .task-text{flex:1}
+    .task-name{font-size:13px;color:var(--cream);line-height:1.4}
+    .task-name.done{text-decoration:line-through;color:var(--muted)}
+    .task-meta{font-size:10.5px;color:var(--muted);margin-top:2px;display:flex;gap:8px}
+    .task-tag{font-size:9px;font-weight:600;padding:2px 8px;border-radius:99px;letter-spacing:0.08em}
+    .tag-job1{background:rgba(201,169,110,0.15);color:var(--gold)}
+    .tag-job2{background:rgba(184,169,201,0.15);color:var(--lavender)}
+    .tag-personal{background:rgba(141,175,155,0.15);color:var(--sage)}
+    .tag-urgent{background:rgba(212,132,138,0.15);color:var(--rose)}
+
+    /* ── SCHEDULE BLOCK ── */
+    .sched-row{display:flex;gap:12px;margin-bottom:8px;align-items:flex-start}
+    .sched-time{font-size:10.5px;color:var(--muted);width:52px;flex-shrink:0;padding-top:3px;font-weight:500}
+    .sched-block{flex:1;padding:9px 13px;border-radius:9px;border-left:3px solid}
+    .sched-block.job1{background:rgba(201,169,110,0.08);border-color:var(--gold)}
+    .sched-block.job2{background:rgba(184,169,201,0.08);border-color:var(--lavender)}
+    .sched-block.sleep{background:rgba(141,175,155,0.08);border-color:var(--sage)}
+    .sched-block.personal{background:rgba(212,132,138,0.08);border-color:var(--rose)}
+    .sched-block.free{background:rgba(255,255,255,0.03);border-color:var(--border-s)}
+    .sched-name{font-size:12.5px;font-weight:500;color:var(--cream)}
+    .sched-sub{font-size:10.5px;color:var(--muted);margin-top:2px}
+
+    /* ── FOCUS TIMER ── */
+    .timer-display{text-align:center;padding:24px 0 16px}
+    .timer-num{font-family:'Playfair Display',serif;font-size:58px;font-weight:700;color:var(--cream);letter-spacing:-0.02em;line-height:1}
+    .timer-label{font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+    .timer-controls{display:flex;gap:10px;justify-content:center;margin-top:16px}
+    .timer-btn{padding:10px 24px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.18s ease;border:none}
+    .timer-modes{display:flex;gap:6px;justify-content:center;margin-bottom:18px}
+    .timer-mode{padding:6px 14px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.18s ease;border:1px solid var(--border-s);color:var(--muted);background:transparent}
+    .timer-mode.active{background:rgba(201,169,110,0.15);color:var(--gold);border-color:rgba(201,169,110,0.3)}
+
+    /* ── NOTES ── */
+    .note-area{width:100%;background:var(--card2);border:1px solid var(--border-s);border-radius:10px;padding:14px;font-size:13px;color:var(--cream);font-family:'DM Sans',sans-serif;outline:none;resize:none;line-height:1.7;min-height:120px;transition:border-color 0.18s ease}
+    .note-area:focus{border-color:var(--gold)}
+    .note-area::placeholder{color:var(--muted)}
+
+    /* ── HABIT TRACKER ── */
+    .habit-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-s)}
+    .habit-row:last-child{border-bottom:none}
+    .habit-name{flex:1;font-size:12.5px;color:var(--cream)}
+    .habit-streak{font-size:10px;color:var(--gold);font-weight:600;margin-right:8px}
+    .habit-dots{display:flex;gap:4px}
+    .habit-dot{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border-s);cursor:pointer;transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;font-size:9px}
+    .habit-dot.done{background:var(--sage);border-color:var(--sage);color:#0E0C0A}
+    .habit-dot:hover:not(.done){border-color:var(--gold)}
+
+    /* ── INCOME TRACKER ── */
+    .income-bar{height:8px;border-radius:99px;background:rgba(255,255,255,0.07);overflow:hidden;margin:8px 0 4px}
+    .income-fill{height:100%;border-radius:99px;transition:width 0.6s ease}
+    .income-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+    .income-row strong{color:var(--cream)}
+
+    /* ── AFFIRMATION ── */
+    .affirm-card{background:linear-gradient(135deg,rgba(201,169,110,0.08),rgba(212,132,138,0.05));border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;text-align:center;margin-bottom:14px}
+    .affirm-quote{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--cream);line-height:1.6;margin-bottom:8px}
+    .affirm-attr{font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold)}
+
+    /* ── SLEEP LOG ── */
+    .sleep-bar-wrap{display:flex;gap:4px;align-items:flex-end;height:60px;margin:10px 0}
+    .sleep-bar{flex:1;border-radius:4px 4px 0 0;min-height:4px;transition:height 0.4s ease;cursor:pointer;position:relative}
+    .sleep-bar:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--border-s);color:var(--cream);font-size:10px;padding:4px 8px;border-radius:6px;white-space:nowrap;pointer-events:none}
+    .sleep-day{font-size:9px;color:var(--muted);text-align:center;margin-top:4px}
+
+    /* ── INPUT ── */
+    .inp{width:100%;background:var(--card2);border:1px solid var(--border-s);border-radius:9px;padding:9px 13px;font-size:12.5px;color:var(--cream);font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.18s ease}
+    .inp:focus{border-color:var(--gold)}
+    .inp::placeholder{color:var(--muted)}
+    label.lbl{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px}
+
+    /* ── TOAST ── */
+    #toast{position:fixed;bottom:24px;right:24px;background:var(--card2);border:1px solid var(--border);border-radius:11px;padding:12px 18px;font-size:12.5px;color:var(--cream);box-shadow:0 8px 32px rgba(0,0,0,0.4);z-index:9999;transform:translateY(20px);opacity:0;transition:all 0.3s ease;pointer-events:none}
+    #toast.show{transform:translateY(0);opacity:1}
+
+    /* ── SCROLLBAR on main ── */
+    .main::-webkit-scrollbar{width:3px}
+    .main::-webkit-scrollbar-thumb{background:var(--gold);border-radius:99px}
+
+    /* ── MODAL ── */
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s ease}
+    .modal-bg.open{opacity:1;pointer-events:all}
+    .modal{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:26px;width:90%;max-width:400px;transform:scale(0.96);transition:transform 0.2s ease}
+    .modal-bg.open .modal{transform:scale(1)}
+    .modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--cream);margin-bottom:16px}
+    .modal-actions{display:flex;gap:10px;margin-top:18px}
+    .modal-btn{flex:1;padding:11px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;transition:all 0.18s ease}
+    .modal-primary{background:linear-gradient(135deg,var(--gold),#B8905A);color:#0E0C0A}
+    .modal-primary:hover{box-shadow:0 4px 16px rgba(201,169,110,0.3)}
+    .modal-cancel{background:transparent;border:1px solid var(--border-s);color:var(--muted)}
+    .modal-cancel:hover{border-color:var(--gold);color:var(--gold)}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:768px){
+      .sidebar{width:0;min-width:0;overflow:hidden}
+      .g4{grid-template-columns:1fr 1fr}
+      .g3{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══════════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">The <em>Grind</em></div>
+      <div class="sb-tagline">Built for the relentless</div>
+    </div>
+
+    <!-- Energy level -->
+    <div class="energy-bar">
+      <div class="energy-label">Energy <span id="energyPct">62%</span></div>
+      <div class="energy-track"><div class="energy-fill" id="energyFill" style="width:62%"></div></div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="nav-lbl">Dashboard</div>
+      <div class="nav-item active" onclick="showSection('dashboard',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Overview
+      </div>
+      <div class="nav-item" onclick="showSection('schedule',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Schedule
+      </div>
+      <div class="nav-item" onclick="showSection('tasks',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Tasks
+        <span class="nav-badge" id="taskBadge">5</span>
+      </div>
+      <div class="nav-item" onclick="showSection('focus',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Focus Timer
+      </div>
+
+      <div class="nav-lbl">Wellness</div>
+      <div class="nav-item" onclick="showSection('sleep',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        Sleep Log
+      </div>
+      <div class="nav-item" onclick="showSection('habits',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Habits
+        <span class="nav-badge gold" id="habitBadge">3</span>
+      </div>
+
+      <div class="nav-lbl">Money</div>
+      <div class="nav-item" onclick="showSection('income',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Income
+      </div>
+
+      <div class="nav-lbl">Mind</div>
+      <div class="nav-item" onclick="showSection('notes',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Brain Dump
+      </div>
+    </nav>
+
+    <div class="sb-footer">
+      <div class="sb-time" id="sbTime">--:--</div>
+      <div class="sb-date" id="sbDate">Loading...</div>
+      <div class="sb-sleep">
+        <div class="sb-sleep-dot"></div>
+        <span id="sbSleepLabel">4h 12m slept last night</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══════════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-greeting" id="topGreeting">Good morning, <em>keep going.</em></div>
+      <div class="topbar-right">
+        <button class="topbar-btn btn-ghost" onclick="openAddTask()">+ Task</button>
+        <button class="topbar-btn btn-gold" onclick="showSection('focus',document.querySelector('.nav-item:nth-child(4))'))">Start Focus</button>
+        <div class="topbar-notif" onclick="toast('No new notifications.')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <div class="notif-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ DASHBOARD ═══════════════════════════════════ -->
+    <div class="section active" id="sec-dashboard">
+
+      <!-- Affirmation -->
+      <div class="affirm-card" style="margin-top:4px">
+        <div class="affirm-quote" id="affirmText">"You are not tired. You are becoming."</div>
+        <div class="affirm-attr">Daily Fuel &nbsp;·&nbsp; <span style="cursor:pointer;text-decoration:underline" onclick="nextAffirm()">Next</span></div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="g4" style="margin-bottom:14px">
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-gold"></div>Tasks Done</div>
+          <div class="stat-num" style="color:var(--gold)" id="statDone">0</div>
+          <div class="stat-lbl">of <span id="statTotal">0</span> today</div>
+          <div class="stat-sub stat-up">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+            Keep the streak
+          </div>
+        </div>
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-rose"></div>Sleep Debt</div>
+          <div class="stat-num" style="color:var(--rose)" id="statDebt">18h</div>
+          <div class="stat-lbl">this week</div>
+          <div class="stat-sub stat-down">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            Log sleep to track
+          </div>
+        </div>
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-sage"></div>Focus Time</div>
+          <div class="stat-num" style="color:var(--sage)" id="statFocus">0m</div>
+          <div class="stat-lbl">today</div>
+          <div class="stat-sub" style="color:var(--muted)">Start a session</div>
+        </div>
+        <div class="c">
+          <div class="c-title"><div class="c-dot" style="background:var(--lavender)"></div>Income Today</div>
+          <div class="stat-num" style="color:var(--lavender)" id="statIncome">$0</div>
+          <div class="stat-lbl">earned</div>
+          <div class="stat-sub" style="color:var(--muted)">Log in Income tab</div>
+        </div>
+      </div>
+
+      <!-- Today's tasks + Schedule preview -->
+      <div class="g2">
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-gold"></div>Today's Priority Tasks</div>
+          <div id="dashTaskList">
+            <div style="color:var(--muted);font-size:12.5px;padding:10px 0">No tasks yet. Add one above.</div>
+          </div>
+        </div>
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-rose"></div>Next Up Today</div>
+          <div id="dashSchedule">
+            <div class="sched-row"><div class="sched-time">Now</div><div class="sched-block job1"><div class="sched-name">Job 1 — Morning Shift</div><div class="sched-sub">6:00 AM – 2:00 PM</div></div></div>
+            <div class="sched-row"><div class="sched-time">2 PM</div><div class="sched-block personal"><div class="sched-name">30 min power nap</div><div class="sched-sub">Non-negotiable rest</div></div></div>
+            <div class="sched-row"><div class="sched-time">3 PM</div><div class="sched-block job2"><div class="sched-name">Job 2 — Evening Shift</div><div class="sched-sub">3:00 PM – 11:00 PM</div></div></div>
+            <div class="sched-row"><div class="sched-time">11 PM</div><div class="sched-block sleep"><div class="sched-name">Wind down + Sleep</div><div class="sched-sub">Target: 11:30 PM</div></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ SCHEDULE ═══════════════════════════════════ -->
+    <div class="section" id="sec-schedule">
+      <div class="page-hd">
+        <div class="page-eyebrow">Your Day</div>
+        <div class="page-title">Daily Schedule</div>
+        <div class="page-sub">Two jobs. Four hours of sleep. Every minute counts.</div>
+      </div>
+      <div class="g2">
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-gold"></div>Today's Blocks</div>
+          <div class="sched-row"><div class="sched-time">5:30 AM</div><div class="sched-block personal"><div class="sched-name">Wake up + Morning routine</div><div class="sched-sub">Hydrate, stretch, 5 min journal</div></div></div>
+          <div class="sched-row"><div class="sched-time">6:00 AM</div><div class="sched-block job1"><div class="sched-name">Job 1 — Morning Shift</div><div class="sched-sub">Full focus. No distractions.</div></div></div>
+          <div class="sched-row"><div class="sched-time">2:00 PM</div><div class="sched-block personal"><div class="sched-name">Power Nap (20–30 min)</div><div class="sched-sub">Set alarm. Do not skip.</div></div></div>
+          <div class="sched-row"><div class="sched-time">2:30 PM</div><div class="sched-block free"><div class="sched-name">Eat + Decompress</div><div class="sched-sub">Real food. No scrolling.</div></div></div>
+          <div class="sched-row"><div class="sched-time">3:00 PM</div><div class="sched-block job2"><div class="sched-name">Job 2 — Evening Shift</div><div class="sched-sub">Show up strong.</div></div></div>
+          <div class="sched-row"><div class="sched-time">11:00 PM</div><div class="sched-block personal"><div class="sched-name">Wind down</div><div class="sched-sub">No screens after 11:15</div></div></div>
+          <div class="sched-row"><div class="sched-time">11:30 PM</div><div class="sched-block sleep"><div class="sched-name">Sleep</div><div class="sched-sub">Target 4–5 hrs tonight</div></div></div>
+        </div>
+        <div>
+          <div class="c" style="margin-bottom:14px">
+            <div class="c-title"><div class="c-dot dot-sage"></div>Schedule Legend</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="width:12px;height:12px;border-radius:3px;background:var(--gold)"></div><span style="font-size:12px;color:var(--cream)">Job 1</span></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="width:12px;height:12px;border-radius:3px;background:var(--lavender)"></div><span style="font-size:12px;color:var(--cream)">Job 2</span></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="width:12px;height:12px;border-radius:3px;background:var(--rose)"></div><span style="font-size:12px;color:var(--cream)">Personal / Self-care</span></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="width:12px;height:12px;border-radius:3px;background:var(--sage)"></div><span style="font-size:12px;color:var(--cream)">Sleep</span></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="width:12px;height:12px;border-radius:3px;background:rgba(255,255,255,0.1)"></div><span style="font-size:12px;color:var(--cream)">Free / Transition</span></div>
+            </div>
+          </div>
+          <div class="c">
+            <div class="c-title"><div class="c-dot dot-rose"></div>Weekly Hours</div>
+            <div style="margin-top:4px">
+              <div class="income-row" style="margin-bottom:4px"><span>Job 1</span><strong>40 hrs</strong></div>
+              <div class="income-bar"><div class="income-fill" style="width:80%;background:var(--gold)"></div></div>
+              <div class="income-row" style="margin-bottom:4px;margin-top:8px"><span>Job 2</span><strong>32 hrs</strong></div>
+              <div class="income-bar"><div class="income-fill" style="width:64%;background:var(--lavender)"></div></div>
+              <div class="income-row" style="margin-bottom:4px;margin-top:8px"><span>Sleep</span><strong>28 hrs</strong></div>
+              <div class="income-bar"><div class="income-fill" style="width:33%;background:var(--sage)"></div></div>
+              <div style="margin-top:10px;font-size:11px;color:var(--muted)">168 hrs in a week. You're using 100 of them to build.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TASKS ═══════════════════════════════════════ -->
+    <div class="section" id="sec-tasks">
+      <div class="page-hd">
+        <div class="page-eyebrow">Get it done</div>
+        <div class="page-title">Task List</div>
+        <div class="page-sub">Prioritize ruthlessly. Every task should earn its spot.</div>
+      </div>
+      <div class="g2">
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-rose"></div>To Do <span style="margin-left:auto;font-size:10px;color:var(--muted);text-transform:none;letter-spacing:0" id="todoCount">0 tasks</span></div>
+          <div id="taskListEl"></div>
+          <div style="margin-top:14px;display:flex;gap:8px">
+            <input class="inp" id="newTaskInput" placeholder="Add a task..." style="flex:1" onkeydown="if(event.key==='Enter')addTask()"/>
+            <select class="inp" id="newTaskTag" style="width:100px">
+              <option value="job1">Job 1</option>
+              <option value="job2">Job 2</option>
+              <option value="personal">Personal</option>
+              <option value="urgent">Urgent</option>
+            </select>
+            <button class="topbar-btn btn-gold" onclick="addTask()">Add</button>
+          </div>
+        </div>
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-sage"></div>Completed Today <span style="margin-left:auto;font-size:10px;color:var(--muted);text-transform:none;letter-spacing:0" id="doneCount">0 done</span></div>
+          <div id="doneListEl"><div style="color:var(--muted);font-size:12.5px;padding:10px 0">Nothing done yet. Let's change that.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FOCUS TIMER ═══════════════════════════════ -->
+    <div class="section" id="sec-focus">
+      <div class="page-hd">
+        <div class="page-eyebrow">Deep Work</div>
+        <div class="page-title">Focus Timer</div>
+        <div class="page-sub">Protect your focus like it's your most valuable currency.</div>
+      </div>
+      <div style="max-width:480px;margin:0 auto">
+        <div class="c">
+          <div class="timer-modes">
+            <div class="timer-mode active" onclick="setTimerMode(25,'Pomodoro',this)">Pomodoro 25m</div>
+            <div class="timer-mode" onclick="setTimerMode(50,'Deep Work 50m',this)">Deep Work 50m</div>
+            <div class="timer-mode" onclick="setTimerMode(5,'Short Break',this)">Break 5m</div>
+            <div class="timer-mode" onclick="setTimerMode(15,'Long Break',this)">Break 15m</div>
+          </div>
+          <div class="timer-display">
+            <div class="timer-num" id="timerDisplay">25:00</div>
+            <div class="timer-label" id="timerLabel">POMODORO — READY</div>
+          </div>
+          <div class="timer-controls">
+            <button class="timer-btn btn-ghost" onclick="resetTimer()">Reset</button>
+            <button class="timer-btn btn-gold" id="timerStartBtn" onclick="toggleTimer()">Start</button>
+          </div>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border-s)">
+            <label class="lbl">What are you focusing on?</label>
+            <input class="inp" id="focusTask" placeholder="e.g. Finish Job 2 report, study for certification..."/>
+          </div>
+          <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:11px;color:var(--muted)">Sessions today: <strong style="color:var(--gold)" id="sessionCount">0</strong></div>
+            <div style="font-size:11px;color:var(--muted)">Total focus: <strong style="color:var(--sage)" id="totalFocusTime">0m</strong></div>
+          </div>
+        </div>
+        <div class="c" style="margin-top:14px">
+          <div class="c-title"><div class="c-dot dot-gold"></div>Focus Tips for the Sleep-Deprived</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+            <div style="font-size:12.5px;color:var(--muted);padding:8px 0;border-bottom:1px solid var(--border-s)"><strong style="color:var(--cream)">Cold water first.</strong> Splash your face before every session.</div>
+            <div style="font-size:12.5px;color:var(--muted);padding:8px 0;border-bottom:1px solid var(--border-s)"><strong style="color:var(--cream)">One task only.</strong> Multitasking on 4 hrs sleep is a myth.</div>
+            <div style="font-size:12.5px;color:var(--muted);padding:8px 0;border-bottom:1px solid var(--border-s)"><strong style="color:var(--cream)">Stand up every 25 min.</strong> Movement fights the fog.</div>
+            <div style="font-size:12.5px;color:var(--muted);padding:8px 0"><strong style="color:var(--cream)">Protect the first hour.</strong> Do your hardest task before 8 AM.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLEEP LOG ═══════════════════════════════════ -->
+    <div class="section" id="sec-sleep">
+      <div class="page-hd">
+        <div class="page-eyebrow">Recovery</div>
+        <div class="page-title">Sleep Log</div>
+        <div class="page-sub">4 hours is the floor. Track it, protect it, optimize it.</div>
+      </div>
+      <div class="g2">
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-sage"></div>This Week</div>
+          <div class="sleep-bar-wrap" id="sleepBars"></div>
+          <div style="display:flex;gap:4px" id="sleepDays"></div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-s)">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:11px;color:var(--muted)">Weekly avg</span>
+              <strong style="font-size:11px;color:var(--cream)" id="sleepAvg">-- hrs</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span style="font-size:11px;color:var(--muted)">Sleep debt</span>
+              <strong style="font-size:11px;color:var(--rose)" id="sleepDebt">-- hrs</strong>
+            </div>
+          </div>
+        </div>
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-rose"></div>Log Last Night</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
+            <div>
+              <label class="lbl">Hours slept</label>
+              <input class="inp" type="number" id="sleepHours" min="0" max="12" step="0.5" placeholder="e.g. 4.5"/>
+            </div>
+            <div>
+              <label class="lbl">Bedtime</label>
+              <input class="inp" type="time" id="sleepBed" value="23:30"/>
+            </div>
+            <div>
+              <label class="lbl">Wake time</label>
+              <input class="inp" type="time" id="sleepWake" value="03:30"/>
+            </div>
+            <div>
+              <label class="lbl">Quality (1–5)</label>
+              <div style="display:flex;gap:8px;margin-top:4px" id="sleepQuality">
+                <div class="habit-dot" onclick="setSleepQ(1,this)">1</div>
+                <div class="habit-dot" onclick="setSleepQ(2,this)">2</div>
+                <div class="habit-dot" onclick="setSleepQ(3,this)">3</div>
+                <div class="habit-dot done" onclick="setSleepQ(4,this)">4</div>
+                <div class="habit-dot" onclick="setSleepQ(5,this)">5</div>
+              </div>
+            </div>
+            <button class="topbar-btn btn-gold" style="width:100%;justify-content:center;padding:11px" onclick="logSleep()">Log Sleep</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ HABITS ═══════════════════════════════════════ -->
+    <div class="section" id="sec-habits">
+      <div class="page-hd">
+        <div class="page-eyebrow">Consistency</div>
+        <div class="page-title">Habit Tracker</div>
+        <div class="page-sub">Small wins compound. Check in daily.</div>
+      </div>
+      <div class="g2">
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-gold"></div>Daily Habits — This Week</div>
+          <div id="habitList"></div>
+        </div>
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-sage"></div>Add a Habit</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+            <div>
+              <label class="lbl">Habit name</label>
+              <input class="inp" id="newHabitInput" placeholder="e.g. Drink water, 10 min walk..."/>
+            </div>
+            <button class="topbar-btn btn-gold" style="width:100%;justify-content:center;padding:11px" onclick="addHabit()">Add Habit</button>
+          </div>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border-s)">
+            <div class="c-title" style="margin-bottom:10px"><div class="c-dot dot-rose"></div>Survival Habits for 2-Job Life</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.8">
+              <div>Drink 64oz water daily</div>
+              <div>20 min walk on lunch</div>
+              <div>No phone 30 min before bed</div>
+              <div>Eat a real meal (not vending machine)</div>
+              <div>5 min gratitude journal</div>
+              <div>Stretch after each shift</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ INCOME ═══════════════════════════════════════ -->
+    <div class="section" id="sec-income">
+      <div class="page-hd">
+        <div class="page-eyebrow">The Bag</div>
+        <div class="page-title">Income Tracker</div>
+        <div class="page-sub">Two jobs. Every dollar logged. Watch it add up.</div>
+      </div>
+      <div class="g2">
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-gold"></div>This Month</div>
+          <div style="margin-bottom:16px">
+            <div class="income-row"><span>Job 1</span><strong id="job1Total">$0.00</strong></div>
+            <div class="income-bar"><div class="income-fill" id="job1Bar" style="width:0%;background:var(--gold)"></div></div>
+            <div class="income-row" style="margin-top:10px"><span>Job 2</span><strong id="job2Total">$0.00</strong></div>
+            <div class="income-bar"><div class="income-fill" id="job2Bar" style="width:0%;background:var(--lavender)"></div></div>
+            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border-s);display:flex;justify-content:space-between">
+              <span style="font-size:13px;color:var(--muted)">Total earned</span>
+              <span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--gold)" id="totalEarned">$0.00</span>
+            </div>
+            <div style="margin-top:6px;display:flex;justify-content:space-between">
+              <span style="font-size:11px;color:var(--muted)">Goal</span>
+              <span style="font-size:11px;color:var(--cream)" id="incomeGoalDisplay">$5,000.00</span>
+            </div>
+            <div class="income-bar" style="margin-top:4px"><div class="income-fill" id="goalBar" style="width:0%;background:linear-gradient(90deg,var(--gold),var(--rose))"></div></div>
+          </div>
+          <div id="incomeLog" style="max-height:200px;overflow-y:auto">
+            <div style="color:var(--muted);font-size:12.5px;padding:8px 0">No entries yet.</div>
+          </div>
+        </div>
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-lavender"></div>Log Income</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+            <div>
+              <label class="lbl">Source</label>
+              <select class="inp" id="incomeSource">
+                <option value="job1">Job 1</option>
+                <option value="job2">Job 2</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl">Amount ($)</label>
+              <input class="inp" type="number" id="incomeAmount" placeholder="e.g. 120.00" step="0.01"/>
+            </div>
+            <div>
+              <label class="lbl">Note (optional)</label>
+              <input class="inp" id="incomeNote" placeholder="e.g. Overtime, tip, bonus..."/>
+            </div>
+            <button class="topbar-btn btn-gold" style="width:100%;justify-content:center;padding:11px" onclick="logIncome()">Log Income</button>
+            <div style="padding-top:12px;border-top:1px solid var(--border-s)">
+              <label class="lbl">Monthly Goal ($)</label>
+              <input class="inp" type="number" id="incomeGoalInput" placeholder="e.g. 5000" value="5000" oninput="updateGoal()"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ NOTES ═══════════════════════════════════════ -->
+    <div class="section" id="sec-notes">
+      <div class="page-hd">
+        <div class="page-eyebrow">Mental Clarity</div>
+        <div class="page-title">Brain Dump</div>
+        <div class="page-sub">Get it out of your head. Your brain is not a storage device.</div>
+      </div>
+      <div class="g2">
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-gold"></div>Today's Thoughts</div>
+          <textarea class="note-area" id="noteToday" placeholder="What's on your mind? Worries, ideas, to-dos, wins, anything...&#10;&#10;Get it out. Clear the mental RAM." rows="10"></textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+            <span style="font-size:10px;color:var(--muted)" id="noteWordCount">0 words</span>
+            <button class="topbar-btn btn-gold" onclick="saveNote()">Save Note</button>
+          </div>
+        </div>
+        <div class="c">
+          <div class="c-title"><div class="c-dot dot-sage"></div>Saved Notes</div>
+          <div id="savedNotesList" style="max-height:340px;overflow-y:auto">
+            <div style="color:var(--muted);font-size:12.5px;padding:10px 0">No saved notes yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ADD TASK MODAL -->
+<div class="modal-bg" id="addTaskModal">
+  <div class="modal">
+    <div class="modal-title">Add a Task</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div>
+        <label class="lbl">Task name</label>
+        <input class="inp" id="modalTaskInput" placeholder="What needs to get done?"/>
+      </div>
+      <div>
+        <label class="lbl">Category</label>
+        <select class="inp" id="modalTaskTag">
+          <option value="job1">Job 1</option>
+          <option value="job2">Job 2</option>
+          <option value="personal">Personal</option>
+          <option value="urgent">Urgent</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn modal-primary" onclick="addTaskFromModal()">Add Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────
+let tasks = JSON.parse(localStorage.getItem('grind_tasks')||'[]');
+let habits = JSON.parse(localStorage.getItem('grind_habits')||JSON.stringify([
+  {name:'Drink 64oz water',streak:3,days:[1,1,1,0,0,0,0]},
+  {name:'20 min walk',streak:1,days:[0,0,1,0,0,0,0]},
+  {name:'No phone before bed',streak:5,days:[1,1,1,1,1,0,0]}
+]));
+let sleepLog = JSON.parse(localStorage.getItem('grind_sleep')||JSON.stringify([4,3.5,5,4,4.5,3,0]));
+let incomeData = JSON.parse(localStorage.getItem('grind_income')||JSON.stringify({job1:0,job2:0,entries:[],goal:5000}));
+let focusSessions = parseInt(localStorage.getItem('grind_sessions')||'0');
+let totalFocusMin = parseInt(localStorage.getItem('grind_focusmin')||'0');
+let notes = JSON.parse(localStorage.getItem('grind_notes')||'[]');
+let timerInterval = null;
+let timerRunning = false;
+let timerSeconds = 25*60;
+let timerDuration = 25*60;
+let sleepQuality = 4;
+
+const affirmations = [
+  '"You are not tired. You are becoming."',
+  '"Every shift is a deposit into your future."',
+  '"Rest is not quitting. Rest is reloading."',
+  '"Two jobs is not your forever. It is your bridge."',
+  '"The version of you that makes it — she started exactly here."',
+  '"Tired is temporary. Built is permanent."',
+  '"You are doing the hard thing so you never have to again."',
+  '"Sleep-deprived and still showing up. That is rare."',
+  '"Your consistency is your superpower."',
+  '"No one sees the 4 AM. But you will see the result."'
+];
+let affirmIdx = 0;
+
+// ── CLOCK ──────────────────────────────────────────────
+function updateClock(){
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  document.getElementById('sbTime').textContent = `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('sbDate').textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+  // Greeting
+  let greet = h < 5 ? 'Still going,' : h < 12 ? 'Good morning,' : h < 17 ? 'Good afternoon,' : h < 21 ? 'Good evening,' : 'Late night grind,';
+  document.getElementById('topGreeting').innerHTML = `${greet} <em>keep going.</em>`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── NAVIGATION ─────────────────────────────────────────
+function showSection(id, el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+  renderAll();
+}
+
+// ── AFFIRMATIONS ───────────────────────────────────────
+function nextAffirm(){
+  affirmIdx = (affirmIdx+1) % affirmations.length;
+  document.getElementById('affirmText').textContent = affirmations[affirmIdx];
+}
+
+// ── TASKS ──────────────────────────────────────────────
+function save(){ localStorage.setItem('grind_tasks',JSON.stringify(tasks)); }
+
+function addTask(){
+  const inp = document.getElementById('newTaskInput');
+  const tag = document.getElementById('newTaskTag').value;
+  const name = inp.value.trim();
+  if(!name) return;
+  tasks.push({id:Date.now(),name,tag,done:false});
+  inp.value='';
+  save(); renderTasks(); updateStats();
+  toast('Task added!');
+}
+
+function addTaskFromModal(){
+  const inp = document.getElementById('modalTaskInput');
+  const tag = document.getElementById('modalTaskTag').value;
+  const name = inp.value.trim();
+  if(!name) return;
+  tasks.push({id:Date.now(),name,tag,done:false});
+  inp.value='';
+  save(); renderTasks(); updateStats(); closeModal();
+  toast('Task added!');
+}
+
+function toggleTask(id){
+  const t = tasks.find(t=>t.id===id);
+  if(t){ t.done = !t.done; save(); renderTasks(); updateStats(); }
+}
+
+function deleteTask(id){
+  tasks = tasks.filter(t=>t.id!==id);
+  save(); renderTasks(); updateStats();
+}
+
+function renderTasks(){
+  const todo = tasks.filter(t=>!t.done);
+  const done = tasks.filter(t=>t.done);
+  document.getElementById('todoCount').textContent = `${todo.length} task${todo.length!==1?'s':''}`;
+  document.getElementById('doneCount').textContent = `${done.length} done`;
+  document.getElementById('taskBadge').textContent = todo.length;
+
+  const taskEl = document.getElementById('taskListEl');
+  if(!taskEl) return;
+  taskEl.innerHTML = todo.length ? todo.map(t=>`
+    <div class="task-item" onclick="toggleTask(${t.id})">
+      <div class="task-check ${t.done?'done':''}">
+        ${t.done?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}
+      </div>
+      <div class="task-text">
+        <div class="task-name ${t.done?'done':''}">${t.name}</div>
+        <div class="task-meta"><span class="task-tag tag-${t.tag}">${t.tag==='job1'?'Job 1':t.tag==='job2'?'Job 2':t.tag==='urgent'?'Urgent':'Personal'}</span></div>
+      </div>
+      <div onclick="event.stopPropagation();deleteTask(${t.id})" style="color:var(--muted);cursor:pointer;padding:4px;font-size:16px;line-height:1">&times;</div>
+    </div>`).join('') : '<div style="color:var(--muted);font-size:12.5px;padding:10px 0">All clear! Add a task above.</div>';
+
+  const doneEl = document.getElementById('doneListEl');
+  if(!doneEl) return;
+  doneEl.innerHTML = done.length ? done.map(t=>`
+    <div class="task-item">
+      <div class="task-check done">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="task-text">
+        <div class="task-name done">${t.name}</div>
+        <div class="task-meta"><span class="task-tag tag-${t.tag}">${t.tag==='job1'?'Job 1':t.tag==='job2'?'Job 2':t.tag==='urgent'?'Urgent':'Personal'}</span></div>
+      </div>
+      <div onclick="toggleTask(${t.id})" style="color:var(--muted);cursor:pointer;font-size:10px;padding:4px">Undo</div>
+    </div>`).join('') : '<div style="color:var(--muted);font-size:12.5px;padding:10px 0">Nothing done yet. Let\'s change that.</div>';
+
+  // Dashboard mini list
+  const dash = document.getElementById('dashTaskList');
+  if(dash){
+    const top = todo.slice(0,4);
+    dash.innerHTML = top.length ? top.map(t=>`
+      <div class="task-item" onclick="toggleTask(${t.id})">
+        <div class="task-check"></div>
+        <div class="task-text">
+          <div class="task-name">${t.name}</div>
+          <div class="task-meta"><span class="task-tag tag-${t.tag}">${t.tag==='job1'?'Job 1':t.tag==='job2'?'Job 2':t.tag==='urgent'?'Urgent':'Personal'}</span></div>
+        </div>
+      </div>`).join('') : '<div style="color:var(--muted);font-size:12.5px;padding:10px 0">No tasks yet. Add one above.</div>';
+  }
+}
+
+// ── STATS ──────────────────────────────────────────────
+function updateStats(){
+  const done = tasks.filter(t=>t.done).length;
+  const total = tasks.length;
+  document.getElementById('statDone').textContent = done;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statFocus').textContent = totalFocusMin + 'm';
+  document.getElementById('statIncome').textContent = '$' + (incomeData.job1+incomeData.job2).toFixed(0);
+  const debt = Math.max(0,(56 - sleepLog.reduce((a,b)=>a+b,0))).toFixed(1);
+  document.getElementById('statDebt').textContent = debt + 'h';
+  document.getElementById('sbSleepLabel').textContent = (sleepLog[6]||0) + 'h slept last night';
+  // energy
+  const pct = Math.min(100, Math.max(10, Math.round(((sleepLog[6]||4)/8)*100)));
+  document.getElementById('energyPct').textContent = pct + '%';
+  document.getElementById('energyFill').style.width = pct + '%';
+}
+
+// ── FOCUS TIMER ────────────────────────────────────────
+function setTimerMode(min, label, el){
+  document.querySelectorAll('.timer-mode').forEach(m=>m.classList.remove('active'));
+  el.classList.add('active');
+  timerDuration = min * 60;
+  timerSeconds = timerDuration;
+  timerRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('timerStartBtn').textContent = 'Start';
+  document.getElementById('timerDisplay').textContent = formatTime(timerSeconds);
+  document.getElementById('timerLabel').textContent = label.toUpperCase() + ' — READY';
+}
+
+function formatTime(s){ return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
+
+function toggleTimer(){
+  if(timerRunning){
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timerStartBtn').textContent = 'Resume';
+    document.getElementById('timerLabel').textContent = 'PAUSED';
+  } else {
+    timerRunning = true;
+    document.getElementById('timerStartBtn').textContent = 'Pause';
+    timerInterval = setInterval(()=>{
+      timerSeconds--;
+      document.getElementById('timerDisplay').textContent = formatTime(timerSeconds);
+      if(timerSeconds <= 0){
+        clearInterval(timerInterval);
+        timerRunning = false;
+        focusSessions++;
+        totalFocusMin += Math.round(timerDuration/60);
+        localStorage.setItem('grind_sessions', focusSessions);
+        localStorage.setItem('grind_focusmin', totalFocusMin);
+        document.getElementById('sessionCount').textContent = focusSessions;
+        document.getElementById('totalFocusTime').textContent = totalFocusMin + 'm';
+        document.getElementById('timerStartBtn').textContent = 'Start';
+        document.getElementById('timerLabel').textContent = 'SESSION COMPLETE!';
+        document.getElementById('timerDisplay').textContent = '00:00';
+        updateStats();
+        toast('Focus session complete! ' + focusSessions + ' sessions today.');
+      }
+    }, 1000);
+    const task = document.getElementById('focusTask').value;
+    document.getElementById('timerLabel').textContent = task ? 'FOCUSING ON: ' + task.toUpperCase() : 'FOCUS SESSION RUNNING';
+  }
+}
+
+function resetTimer(){
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = timerDuration;
+  document.getElementById('timerDisplay').textContent = formatTime(timerSeconds);
+  document.getElementById('timerStartBtn').textContent = 'Start';
+  document.getElementById('timerLabel').textContent = 'READY';
+}
+
+// ── SLEEP ──────────────────────────────────────────────
+function renderSleep(){
+  const days = ['M','T','W','T','F','S','S'];
+  const max = Math.max(...sleepLog, 8);
+  const barsEl = document.getElementById('sleepBars');
+  const daysEl = document.getElementById('sleepDays');
+  if(!barsEl) return;
+  barsEl.innerHTML = sleepLog.map((h,i)=>{
+    const pct = (h/max)*100;
+    const color = h >= 6 ? 'var(--sage)' : h >= 4 ? 'var(--gold)' : 'var(--rose)';
+    return `<div class="sleep-bar" style="background:${color};height:${Math.max(pct,4)}%" data-tip="${h}h sleep"></div>`;
+  }).join('');
+  daysEl.innerHTML = days.map(d=>`<div class="sleep-day" style="flex:1">${d}</div>`).join('');
+  const avg = (sleepLog.reduce((a,b)=>a+b,0)/7).toFixed(1);
+  const debt = Math.max(0,(56-sleepLog.reduce((a,b)=>a+b,0))).toFixed(1);
+  const avgEl = document.getElementById('sleepAvg');
+  const debtEl = document.getElementById('sleepDebt');
+  if(avgEl) avgEl.textContent = avg + ' hrs';
+  if(debtEl) debtEl.textContent = debt + ' hrs';
+}
+
+function setSleepQ(n, el){
+  sleepQuality = n;
+  document.querySelectorAll('#sleepQuality .habit-dot').forEach((d,i)=>{
+    d.classList.toggle('done', i < n);
+  });
+}
+
+function logSleep(){
+  const h = parseFloat(document.getElementById('sleepHours').value);
+  if(!h || h < 0 || h > 12){ toast('Enter valid hours (0–12)'); return; }
+  sleepLog[6] = h;
+  localStorage.setItem('grind_sleep', JSON.stringify(sleepLog));
+  renderSleep(); updateStats();
+  toast('Sleep logged: ' + h + ' hours');
+}
+
+// ── HABITS ─────────────────────────────────────────────
+function renderHabits(){
+  const el = document.getElementById('habitList');
+  if(!el) return;
+  el.innerHTML = habits.map((h,hi)=>`
+    <div class="habit-row">
+      <div class="habit-name">${h.name}</div>
+      <div class="habit-streak">${h.streak}d</div>
+      <div class="habit-dots">
+        ${h.days.map((d,di)=>`<div class="habit-dot ${d?'done':''}" onclick="toggleHabit(${hi},${di})">${d?'✓':''}</div>`).join('')}
+      </div>
+    </div>`).join('');
+  document.getElementById('habitBadge').textContent = habits.filter(h=>h.days[6]).length;
+}
+
+function toggleHabit(hi, di){
+  habits[hi].days[di] = habits[hi].days[di] ? 0 : 1;
+  habits[hi].streak = habits[hi].days.filter(Boolean).length;
+  localStorage.setItem('grind_habits', JSON.stringify(habits));
+  renderHabits();
+}
+
+function addHabit(){
+  const inp = document.getElementById('newHabitInput');
+  const name = inp.value.trim();
+  if(!name) return;
+  habits.push({name, streak:0, days:[0,0,0,0,0,0,0]});
+  inp.value='';
+  localStorage.setItem('grind_habits', JSON.stringify(habits));
+  renderHabits(); toast('Habit added!');
+}
+
+// ── INCOME ─────────────────────────────────────────────
+function logIncome(){
+  const src = document.getElementById('incomeSource').value;
+  const amt = parseFloat(document.getElementById('incomeAmount').value);
+  const note = document.getElementById('incomeNote').value.trim();
+  if(!amt || amt <= 0){ toast('Enter a valid amount'); return; }
+  incomeData[src] = (incomeData[src]||0) + amt;
+  incomeData.entries.push({src, amt, note, date: new Date().toLocaleDateString()});
+  document.getElementById('incomeAmount').value = '';
+  document.getElementById('incomeNote').value = '';
+  localStorage.setItem('grind_income', JSON.stringify(incomeData));
+  renderIncome(); updateStats(); toast('$' + amt.toFixed(2) + ' logged!');
+}
+
+function updateGoal(){
+  const g = parseFloat(document.getElementById('incomeGoalInput').value)||5000;
+  incomeData.goal = g;
+  localStorage.setItem('grind_income', JSON.stringify(incomeData));
+  renderIncome();
+}
+
+function renderIncome(){
+  const j1 = incomeData.job1||0, j2 = incomeData.job2||0;
+  const total = j1+j2;
+  const goal = incomeData.goal||5000;
+  document.getElementById('job1Total').textContent = '$'+j1.toFixed(2);
+  document.getElementById('job2Total').textContent = '$'+j2.toFixed(2);
+  document.getElementById('totalEarned').textContent = '$'+total.toFixed(2);
+  document.getElementById('incomeGoalDisplay').textContent = '$'+goal.toFixed(2);
+  const max = Math.max(j1,j2,1);
+  document.getElementById('job1Bar').style.width = Math.min(100,(j1/max)*100)+'%';
+  document.getElementById('job2Bar').style.width = Math.min(100,(j2/max)*100)+'%';
+  document.getElementById('goalBar').style.width = Math.min(100,(total/goal)*100)+'%';
+  const logEl = document.getElementById('incomeLog');
+  if(!logEl) return;
+  const entries = [...incomeData.entries].reverse().slice(0,10);
+  logEl.innerHTML = entries.length ? entries.map(e=>`
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border-s);font-size:12px">
+      <span style="color:var(--muted)">${e.date} &nbsp;·&nbsp; <span style="color:${e.src==='job1'?'var(--gold)':'var(--lavender)'}">${e.src==='job1'?'Job 1':'Job 2'}</span>${e.note?' &nbsp;·&nbsp; '+e.note:''}</span>
+      <strong style="color:var(--cream)">+$${e.amt.toFixed(2)}</strong>
+    </div>`).join('') : '<div style="color:var(--muted);font-size:12.5px;padding:8px 0">No entries yet.</div>';
+}
+
+// ── NOTES ──────────────────────────────────────────────
+document.getElementById('noteToday').addEventListener('input', function(){
+  const words = this.value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('noteWordCount').textContent = words + ' word' + (words!==1?'s':'');
+});
+
+function saveNote(){
+  const text = document.getElementById('noteToday').value.trim();
+  if(!text){ toast('Write something first.'); return; }
+  notes.unshift({text, date: new Date().toLocaleString()});
+  localStorage.setItem('grind_notes', JSON.stringify(notes));
+  document.getElementById('noteToday').value = '';
+  document.getElementById('noteWordCount').textContent = '0 words';
+  renderNotes(); toast('Note saved!');
+}
+
+function renderNotes(){
+  const el = document.getElementById('savedNotesList');
+  if(!el) return;
+  el.innerHTML = notes.length ? notes.slice(0,10).map(n=>`
+    <div style="padding:12px 0;border-bottom:1px solid var(--border-s)">
+      <div style="font-size:9px;color:var(--muted);margin-bottom:5px;letter-spacing:0.1em;text-transform:uppercase">${n.date}</div>
+      <div style="font-size:12.5px;color:var(--cream);line-height:1.6;white-space:pre-wrap">${n.text.slice(0,200)}${n.text.length>200?'...':''}</div>
+    </div>`).join('') : '<div style="color:var(--muted);font-size:12.5px;padding:10px 0">No saved notes yet.</div>';
+}
+
+// ── MODAL ──────────────────────────────────────────────
+function openAddTask(){ document.getElementById('addTaskModal').classList.add('open'); document.getElementById('modalTaskInput').focus(); }
+function closeModal(){ document.getElementById('addTaskModal').classList.remove('open'); }
+document.getElementById('addTaskModal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+
+// ── TOAST ──────────────────────────────────────────────
+let toastTimer;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 2800);
+}
+
+// ── RENDER ALL ─────────────────────────────────────────
+function renderAll(){
+  renderTasks();
+  renderSleep();
+  renderHabits();
+  renderIncome();
+  renderNotes();
+  updateStats();
+  document.getElementById('sessionCount').textContent = focusSessions;
+  document.getElementById('totalFocusTime').textContent = totalFocusMin + 'm';
+}
+
+// ── INIT ───────────────────────────────────────────────
+renderAll();
+</script>
+</body>
+</html>
